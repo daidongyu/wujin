@@ -51,11 +51,29 @@
             left: 50%;
             transform: translateX(-50%);
             display: flex;
-            gap: 30px;
+            gap: 25px;
             background: rgba(0, 0, 0, 0.7);
-            padding: 15px 30px;
+            padding: 12px 25px;
             border-radius: 25px;
             border: 2px solid #ffd700;
+        }
+
+        /* 口令按钮 */
+        .cheat-btn {
+            padding: 8px 16px;
+            font-size: 14px;
+            background: linear-gradient(135deg, #9933ff, #6600cc);
+            border: 2px solid #cc66ff;
+            border-radius: 20px;
+            color: #fff;
+            cursor: pointer;
+            font-weight: bold;
+            pointer-events: auto;
+            box-shadow: 0 0 10px rgba(153, 51, 255, 0.5);
+        }
+
+        .cheat-btn:active {
+            transform: scale(0.95);
         }
 
         .status-item {
@@ -213,109 +231,250 @@
             overflow-y: auto;
         }
 
+        /* 商店样式 */
         .shop-container {
             max-width: 1000px;
-            margin: 50px auto;
-            padding: 30px;
+            margin: 20px auto;
+            padding: 20px;
+            max-height: calc(100vh - 100px);
+            overflow-y: auto;
         }
 
         .shop-title {
             text-align: center;
-            font-size: 48px;
+            font-size: 36px;
             color: #ffd700;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
         }
 
         .shop-section {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
+            background: linear-gradient(135deg, rgba(50, 30, 60, 0.9), rgba(30, 20, 50, 0.9));
+            border-radius: 20px;
             padding: 20px;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
+            border: 2px solid rgba(255, 215, 0, 0.3);
         }
 
         .shop-section h3 {
-            color: #ff6600;
-            font-size: 24px;
-            margin-bottom: 20px;
-            border-bottom: 2px solid #ff6600;
+            color: #ff9900;
+            font-size: 20px;
+            margin-bottom: 15px;
+            border-bottom: 2px solid rgba(255, 153, 0, 0.5);
             padding-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .shop-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 12px;
         }
 
         .shop-item {
-            background: rgba(0, 0, 0, 0.5);
-            border-radius: 10px;
-            padding: 15px;
+            background: linear-gradient(135deg, rgba(80, 50, 100, 0.9), rgba(50, 30, 70, 0.9));
+            border-radius: 15px;
+            padding: 10px;
             text-align: center;
-            border: 2px solid #444;
+            border: 2px solid rgba(255, 255, 255, 0.2);
             transition: all 0.3s;
             cursor: pointer;
             pointer-events: auto;
+            min-height: 100px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .shop-item:active {
+            transform: scale(0.95);
         }
 
         .shop-item:hover {
             border-color: #ffd700;
-            transform: translateY(-5px);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(255, 215, 0, 0.3);
         }
 
         .shop-item.owned {
-            border-color: #00ff00;
+            border-color: rgba(0, 255, 100, 0.6);
+            background: linear-gradient(135deg, rgba(0, 100, 50, 0.8), rgba(0, 60, 30, 0.8));
         }
 
         .shop-item.equipped {
             border-color: #00ffff;
-            background: rgba(0, 255, 255, 0.2);
+            background: linear-gradient(135deg, rgba(0, 150, 150, 0.6), rgba(0, 100, 100, 0.6));
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.4);
+        }
+
+        .shop-item.disabled {
+            opacity: 0.5;
+            filter: grayscale(0.5);
+        }
+
+        .shop-item.disabled .shop-item-price {
+            color: #ff6666;
         }
 
         .shop-item-icon {
-            font-size: 48px;
-            margin-bottom: 10px;
+            font-size: 32px;
+            margin-bottom: 8px;
         }
 
         .shop-item-name {
             color: #fff;
-            font-size: 16px;
+            font-size: 13px;
+            font-weight: bold;
             margin-bottom: 5px;
+            line-height: 1.2;
         }
 
         .shop-item-price {
             color: #ffd700;
-            font-size: 14px;
+            font-size: 12px;
         }
 
         .shop-item-level {
             color: #00ff00;
-            font-size: 12px;
+            font-size: 11px;
             margin-top: 5px;
         }
 
         .close-btn {
             position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 10px 30px;
-            font-size: 18px;
-            background: #ff3300;
+            top: 15px;
+            right: 15px;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            background: linear-gradient(135deg, #ff4444, #cc0000);
             border: none;
-            border-radius: 20px;
+            border-radius: 25px;
             color: #fff;
             cursor: pointer;
             pointer-events: auto;
+            box-shadow: 0 4px 15px rgba(255, 50, 50, 0.4);
+            z-index: 100;
         }
 
-        /* 武器升级界面 */
-        #upgradeScreen {
-            position: absolute;
+        .close-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* 口令输入界面 */
+        #cheatScreen {
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.9);
+            background: rgba(0, 0, 0, 0.85);
+            display: none;
+            z-index: 95;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .cheat-container {
+            background: linear-gradient(135deg, rgba(60, 20, 80, 0.98), rgba(40, 10, 60, 0.98));
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 400px;
+            width: 90%;
+            border: 3px solid #9933ff;
+            box-shadow: 0 0 30px rgba(153, 51, 255, 0.5);
+        }
+
+        .cheat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .cheat-header h2 {
+            color: #cc66ff;
+            font-size: 24px;
+            margin: 0;
+        }
+
+        .cheat-hints {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .cheat-hints p {
+            color: #ddd;
+            font-size: 14px;
+            margin: 8px 0;
+        }
+
+        .cheat-hints strong {
+            color: #ffd700;
+        }
+
+        .cheat-input-wrapper {
+            display: flex;
+            gap: 10px;
+        }
+
+        .cheat-input {
+            flex: 1;
+            padding: 12px 15px;
+            font-size: 16px;
+            border: 2px solid #9933ff;
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.5);
+            color: #fff;
+            outline: none;
+        }
+
+        .cheat-input:focus {
+            border-color: #cc66ff;
+            box-shadow: 0 0 10px rgba(153, 51, 255, 0.5);
+        }
+
+        .cheat-input::placeholder {
+            color: #888;
+        }
+
+        .cheat-submit {
+            padding: 12px 25px;
+            font-size: 16px;
+            font-weight: bold;
+            background: linear-gradient(135deg, #9933ff, #6600cc);
+            border: none;
+            border-radius: 10px;
+            color: #fff;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(153, 51, 255, 0.5);
+        }
+
+        .cheat-submit:active {
+            transform: scale(0.95);
+        }
+
+        .cheat-message {
+            margin-top: 15px;
+            text-align: center;
+            font-size: 16px;
+            color: #ffd700;
+            min-height: 24px;
+        }
+
+        /* 商店/升级界面 */
+        #shopScreen,
+        #upgradeScreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(20, 10, 40, 0.98), rgba(10, 5, 30, 0.98));
             display: none;
             z-index: 90;
             overflow-y: auto;
@@ -476,24 +635,44 @@
 
         /* ==================== 移动端控制 ==================== */
         .mobile-btn {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: rgba(0, 0, 0, 0.7);
+            border-radius: 25px;
+            background: rgba(0, 0, 0, 0.8);
             border: 2px solid #ffd700;
             color: #fff;
-            font-size: 24px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             pointer-events: auto;
+            font-size: 14px;
+            padding: 8px 16px;
+        }
+
+        /* 飞行按钮 - 更醒目 */
+        .flying-btn {
+            position: absolute;
+            bottom: 20px;
+            left: 160px;
+            width: auto;
+            height: 50px;
+            font-size: 16px;
+            font-weight: bold;
+            background: linear-gradient(135deg, rgba(100, 100, 255, 0.8), rgba(150, 100, 255, 0.8));
+            border: 3px solid #8888ff;
+            box-shadow: 0 0 15px rgba(100, 100, 255, 0.5);
+            z-index: 55;
+        }
+
+        .flying-btn.flying {
+            background: linear-gradient(135deg, rgba(100, 255, 100, 0.8), rgba(100, 200, 100, 0.8));
+            border-color: #66ff66;
+            box-shadow: 0 0 20px rgba(100, 255, 100, 0.6);
         }
 
         /* 虚拟摇杆 */
         #joystickContainer {
             position: absolute;
-            bottom: 100px;
+            bottom: 80px;
             left: 30px;
             width: 120px;
             height: 120px;
@@ -522,40 +701,40 @@
             box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
         }
 
-        /* 攻击按钮 */
+        /* 攻击按钮 - 右下角 */
         #attackBtn {
             position: absolute;
-            bottom: 100px;
+            bottom: 30px;
             right: 30px;
-            width: 80px;
-            height: 80px;
+            width: 90px;
+            height: 90px;
             border-radius: 50%;
-            background: rgba(255, 0, 0, 0.7);
-            border: 3px solid #ff6600;
+            background: linear-gradient(135deg, rgba(255, 80, 80, 0.9), rgba(200, 50, 50, 0.9));
+            border: 4px solid #ff4444;
             color: #fff;
-            font-size: 36px;
+            font-size: 40px;
             display: none;
             align-items: center;
             justify-content: center;
             z-index: 50;
             pointer-events: auto;
-            box-shadow: 0 0 20px rgba(255, 102, 0, 0.5);
+            box-shadow: 0 0 25px rgba(255, 80, 80, 0.6);
         }
 
         #attackBtn:active {
-            background: rgba(255, 0, 0, 1);
+            background: rgba(255, 80, 80, 1);
             transform: scale(0.9);
         }
 
-        /* 闪避按钮 */
+        /* 闪避按钮 - 攻击按钮上方 */
         #dodgeBtn {
             position: absolute;
-            bottom: 200px;
+            bottom: 130px;
             right: 40px;
             width: 60px;
             height: 60px;
             border-radius: 50%;
-            background: rgba(0, 150, 255, 0.7);
+            background: linear-gradient(135deg, rgba(0, 150, 255, 0.9), rgba(0, 100, 200, 0.9));
             border: 3px solid #00aaff;
             color: #fff;
             font-size: 28px;
@@ -572,15 +751,21 @@
             transform: scale(0.9);
         }
 
-        /* 移动端菜单 */
+        /* 移动端菜单 - 右上角 */
         #mobileMenu {
             position: absolute;
-            top: 80px;
+            top: 10px;
             right: 10px;
             display: none;
-            flex-direction: column;
+            flex-direction: row;
             gap: 8px;
             z-index: 50;
+        }
+
+        #mobileMenu button {
+            width: 45px;
+            height: 45px;
+            font-size: 20px;
         }
 
         #mobileMenu.flying {
@@ -656,25 +841,31 @@
                 right: 10px;
             }
 
+            /* 技能栏 - 移动端左侧 */
             #skillBar {
-                bottom: 190px;
+                top: 50%;
+                left: 10px;
+                transform: translateY(-50%);
                 padding: 5px;
-                right: 10px;
-                left: auto;
-                transform: none;
             }
 
             #minimap {
                 width: 80px;
                 height: 80px;
-                top: 10px;
+                top: 60px;
                 left: 10px;
             }
 
             .skill-slot {
-                width: 42px;
-                height: 42px;
-                font-size: 18px;
+                width: 48px;
+                height: 48px;
+                font-size: 20px;
+            }
+
+            /* 飞行按钮位置调整 */
+            .flying-btn {
+                bottom: 30px;
+                left: 150px;
             }
 
             /* 显示移动端控件 */
@@ -701,28 +892,50 @@
             /* 商店移动端适配 */
             .shop-container {
                 padding: 15px;
-                margin-top: 80px;
+                padding-bottom: 80px;
             }
 
             .shop-title {
-                font-size: 32px;
+                font-size: 28px;
+                margin-top: 60px;
+            }
+
+            .shop-section {
+                padding: 15px;
+                border-radius: 15px;
+            }
+
+            .shop-section h3 {
+                font-size: 18px;
             }
 
             .shop-grid {
-                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+                grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
                 gap: 10px;
             }
 
             .shop-item {
                 padding: 10px;
+                min-height: 90px;
+                border-radius: 12px;
             }
 
             .shop-item-icon {
-                font-size: 32px;
+                font-size: 28px;
+            }
+
+            .shop-item-name {
+                font-size: 11px;
+            }
+
+            .shop-item-price {
+                font-size: 10px;
             }
 
             .close-btn {
-                padding: 8px 20px;
+                top: 10px;
+                right: 10px;
+                padding: 10px 20px;
                 font-size: 14px;
             }
         }
@@ -730,24 +943,38 @@
         /* 超小屏幕适配 */
         @media (max-width: 480px) {
             #statusBar {
-                gap: 8px;
-                padding: 8px 10px;
+                gap: 5px;
+                padding: 5px 8px;
             }
 
             .status-label {
-                font-size: 9px;
+                font-size: 8px;
             }
 
             .status-value {
-                font-size: 12px;
+                font-size: 11px;
             }
 
             .exp-bar {
-                width: 60px;
+                width: 50px;
             }
 
             #weaponInfo {
                 display: none;
+            }
+
+            .shop-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 8px;
+            }
+
+            .shop-item {
+                min-height: 85px;
+                padding: 8px;
+            }
+
+            .shop-item-icon {
+                font-size: 26px;
             }
 
             #joystickContainer {
@@ -863,6 +1090,9 @@
                     <div class="status-label">生命值</div>
                     <div class="status-value" id="hpDisplay" style="color: #ff0000;">100/100</div>
                 </div>
+                <div class="status-item">
+                    <button id="cheatBtn" class="cheat-btn" onclick="showCheatInput()">🎮 口令</button>
+                </div>
             </div>
 
             <!-- 武器信息 -->
@@ -931,22 +1161,24 @@
             <div id="message"></div>
         </div>
 
-        <!-- 移动端虚拟摇杆 -->
+        <!-- 移动端虚拟摇杆 - 左下角 -->
         <div id="joystickContainer">
             <div id="joystickBase">
                 <div id="joystickThumb"></div>
             </div>
         </div>
 
-        <!-- 移动端攻击按钮 -->
+        <!-- 移动端攻击按钮 - 右下角 -->
         <div id="attackBtn">⚔️</div>
 
-        <!-- 移动端闪避按钮 -->
+        <!-- 移动端闪避按钮 - 攻击按钮上方 -->
         <div id="dodgeBtn">💨</div>
 
-        <!-- 移动端菜单按钮 -->
+        <!-- 移动端飞行按钮 - 独立按钮更明显 -->
+        <button id="flyBtn" class="mobile-btn flying-btn">🪽 飞行</button>
+
+        <!-- 移动端菜单按钮 - 右上角 -->
         <div id="mobileMenu">
-            <button id="flyBtn" class="mobile-btn" style="background: rgba(100, 100, 255, 0.7); border-color: #6666ff;">🪽</button>
             <button id="shopBtn" class="mobile-btn">🛒</button>
             <button id="upgradeBtn" class="mobile-btn">⚔️</button>
         </div>
@@ -962,9 +1194,12 @@
 
         <!-- 商店界面 -->
         <div id="shopScreen">
-            <button class="close-btn" onclick="closeShop()">关闭 [E]</button>
+            <button class="close-btn" onclick="closeShop()">✕ 关闭</button>
             <div class="shop-container">
                 <h2 class="shop-title">🏪 商店</h2>
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <span style="color: #ffd700; font-size: 20px;">💰 金币: <span id="shopGold">0</span></span>
+                </div>
 
                 <div class="shop-section">
                     <h3>🪶 翅膀商店</h3>
@@ -972,7 +1207,7 @@
                 </div>
 
                 <div class="shop-section">
-                    <h3>🗡️ 武器商店</h3>
+                    <h3>⚔️ 武器商店</h3>
                     <div class="shop-grid" id="weaponShopGrid"></div>
                 </div>
             </div>
@@ -980,10 +1215,30 @@
 
         <!-- 武器升级界面 -->
         <div id="upgradeScreen">
-            <button class="close-btn" onclick="closeUpgrade()">关闭 [Q]</button>
+            <button class="close-btn" onclick="closeUpgrade()">✕ 关闭</button>
             <div class="shop-container">
                 <h2 class="shop-title">⚔️ 武器图鉴</h2>
                 <div class="shop-grid" id="weaponGrid"></div>
+            </div>
+        </div>
+
+        <!-- 口令输入界面 -->
+        <div id="cheatScreen">
+            <div class="cheat-container">
+                <div class="cheat-header">
+                    <h2>🎮 输入口令</h2>
+                    <button class="close-btn" onclick="closeCheatInput()">✕</button>
+                </div>
+                <div class="cheat-hints">
+                    <p>💡 提示：</p>
+                    <p>🔹 <strong>老七变身</strong> - 武器强化2级</p>
+                    <p>🔹 <strong>老七牛逼</strong> - 终极变身状态</p>
+                </div>
+                <div class="cheat-input-wrapper">
+                    <input type="text" id="cheatInput" class="cheat-input" placeholder="输入口令..." autocomplete="off">
+                    <button class="cheat-submit" onclick="submitCheat()">确认</button>
+                </div>
+                <div id="cheatMessage" class="cheat-message"></div>
             </div>
         </div>
     </div>
@@ -1555,19 +1810,19 @@
             return group;
         }
 
-        // 创建玩家剑 - 更大更明显的武器
+        // 创建玩家剑 - 真正的长剑，清晰可见
         function createSword(weaponIndex, level) {
             const weapon = WEAPONS[weaponIndex];
             const group = new THREE.Group();
 
-            // 剑身 - 更大
-            const bladeLength = 2 + level * 0.25;
-            const bladeWidth = 0.2 + level * 0.03;
-            const bladeGeo = new THREE.BoxGeometry(bladeWidth, bladeLength, 0.08);
+            // 剑身 - 真正的长剑
+            const bladeLength = 3 + level * 0.3;
+            const bladeWidth = 0.15 + level * 0.02;
+            const bladeGeo = new THREE.BoxGeometry(bladeWidth, bladeLength, 0.04);
             const bladeMat = new THREE.MeshStandardMaterial({
                 color: weapon.color,
                 metalness: 0.95,
-                roughness: 0.1,
+                roughness: 0.05,
                 emissive: weapon.color,
                 emissiveIntensity: 0.5 + level * 0.08
             });
@@ -1577,51 +1832,65 @@
             group.add(blade);
 
             // 添加武器点光源 - 使武器更亮更明显
-            const weaponLight = new THREE.PointLight(weapon.color, 1 + level * 0.2, 5);
+            const weaponLight = new THREE.PointLight(weapon.color, 1.5 + level * 0.3, 8);
             weaponLight.position.y = bladeLength / 2;
             group.add(weaponLight);
 
-            // 剑刃高光
-            const edgeGeo = new THREE.BoxGeometry(bladeWidth * 0.3, bladeLength * 0.95, 0.12);
-            const edgeMat = new THREE.MeshBasicMaterial({
+            // 剑脊（中间的高光）
+            const spineGeo = new THREE.BoxGeometry(bladeWidth * 0.2, bladeLength * 0.9, 0.08);
+            const spineMat = new THREE.MeshBasicMaterial({
                 color: 0xffffff,
                 transparent: true,
-                opacity: 0.3
+                opacity: 0.4
             });
-            const edge = new THREE.Mesh(edgeGeo, edgeMat);
-            edge.position.y = bladeLength / 2;
-            edge.position.z = 0.02;
-            group.add(edge);
+            const spine = new THREE.Mesh(spineGeo, spineMat);
+            spine.position.y = bladeLength / 2;
+            spine.position.z = 0.02;
+            group.add(spine);
 
-            // 剑柄 - 更粗
-            const handleGeo = new THREE.CylinderGeometry(0.08, 0.08, 0.5, 8);
+            // 剑尖 - 三角形
+            const tipGeo = new THREE.ConeGeometry(bladeWidth * 0.6, bladeLength * 0.15, 4);
+            const tipMat = new THREE.MeshStandardMaterial({
+                color: weapon.color,
+                metalness: 0.95,
+                emissive: weapon.color,
+                emissiveIntensity: 0.5
+            });
+            const tip = new THREE.Mesh(tipGeo, tipMat);
+            tip.position.y = bladeLength + bladeLength * 0.075;
+            tip.rotation.z = Math.PI;
+            group.add(tip);
+
+            // 剑柄 - 更粗更长
+            const handleGeo = new THREE.CylinderGeometry(0.06, 0.07, 0.6, 8);
             const handleMat = new THREE.MeshStandardMaterial({
-                color: 0x8b4513,
-                roughness: 0.6
+                color: 0x4a3728,
+                roughness: 0.7
             });
             const handle = new THREE.Mesh(handleGeo, handleMat);
-            handle.position.y = -0.25;
+            handle.position.y = -0.3;
             group.add(handle);
 
-            // 剑格 - 更大更华丽
-            const guardSize = 0.4 + level * 0.03;
-            const guardGeo = new THREE.BoxGeometry(guardSize, 0.08, 0.08);
+            // 剑格 - 十字护手，更大更华丽
+            const guardSize = 0.5 + level * 0.05;
+            const guardGeo = new THREE.BoxGeometry(guardSize, 0.1, 0.1);
             const guardMat = new THREE.MeshStandardMaterial({
                 color: weapon.color,
                 metalness: 0.95,
                 emissive: weapon.color,
-                emissiveIntensity: 0.3
+                emissiveIntensity: 0.4
             });
             const guard = new THREE.Mesh(guardGeo, guardMat);
             guard.position.y = 0;
             group.add(guard);
 
-            // 剑格装饰 - 左右两个
-            const guardDecoGeo = new THREE.SphereGeometry(0.06, 8, 8);
+            // 剑格装饰球
+            const guardDecoGeo = new THREE.SphereGeometry(0.08, 8, 8);
             const guardDecoMat = new THREE.MeshStandardMaterial({
                 color: weapon.color,
                 emissive: weapon.color,
-                emissiveIntensity: 0.5
+                emissiveIntensity: 0.6,
+                metalness: 0.8
             });
             const leftDeco = new THREE.Mesh(guardDecoGeo, guardDecoMat);
             leftDeco.position.set(-guardSize/2, 0, 0);
@@ -1630,135 +1899,220 @@
             rightDeco.position.set(guardSize/2, 0, 0);
             group.add(rightDeco);
 
-            // 等级装饰
+            // 等级装饰 - 宝石
             if (level >= 3) {
-                const gemGeo = new THREE.OctahedronGeometry(0.1 + level * 0.01);
+                const gemGeo = new THREE.OctahedronGeometry(0.12 + level * 0.02);
                 const gemMat = new THREE.MeshStandardMaterial({
                     color: weapon.color,
                     emissive: weapon.color,
-                    emissiveIntensity: 0.6,
-                    metalness: 0.8
+                    emissiveIntensity: 0.8,
+                    metalness: 0.9
                 });
                 const gem = new THREE.Mesh(gemGeo, gemMat);
-                gem.position.y = bladeLength * 0.6;
+                gem.position.y = bladeLength * 0.5;
                 group.add(gem);
             }
 
-            // 高级特效
+            // 高级特效 - 光环环绕
             if (level >= 5) {
-                // 剑身发光环
-                const glowGeo = new THREE.TorusGeometry(bladeWidth * 0.8, 0.03, 8, 16);
-                const glowMat = new THREE.MeshBasicMaterial({
-                    color: weapon.color,
-                    transparent: true,
-                    opacity: 0.6
-                });
-                const glow = new THREE.Mesh(glowGeo, glowMat);
-                glow.position.y = bladeLength * 0.5;
-                group.add(glow);
-            }
-
-            // 高级特效
-            if (level >= 5) {
-                const glowGeo = new THREE.RingGeometry(0.1, 0.2, 16);
-                const glowMat = new THREE.MeshBasicMaterial({
-                    color: weapon.color,
-                    transparent: true,
-                    opacity: 0.5,
-                    side: THREE.DoubleSide
-                });
-                const glow = new THREE.Mesh(glowGeo, glowMat);
-                glow.position.y = bladeLength;
-                group.add(glow);
-            }
-
-            if (level >= 8) {
-                // 添加光环
-                const haloGeo = new THREE.TorusGeometry(0.15, 0.02, 8, 16);
+                const haloGeo = new THREE.TorusGeometry(bladeWidth + 0.1, 0.03, 8, 32);
                 const haloMat = new THREE.MeshBasicMaterial({
                     color: weapon.color,
                     transparent: true,
-                    opacity: 0.6
+                    opacity: 0.7
                 });
                 const halo = new THREE.Mesh(haloGeo, haloMat);
-                halo.position.y = bladeLength * 0.5;
-                halo.rotation.x = Math.PI / 2;
+                halo.position.y = bladeLength * 0.6;
                 group.add(halo);
+            }
+
+            if (level >= 8) {
+                // 第二层光环
+                const halo2Geo = new THREE.TorusGeometry(bladeWidth + 0.2, 0.04, 8, 32);
+                const halo2Mat = new THREE.MeshBasicMaterial({
+                    color: 0xffffff,
+                    transparent: true,
+                    opacity: 0.5
+                });
+                const halo2 = new THREE.Mesh(halo2Geo, halo2Mat);
+                halo2.position.y = bladeLength * 0.7;
+                halo2.rotation.x = Math.PI / 3;
+                group.add(halo2);
             }
 
             return group;
         }
 
-        // 创建翅膀
+        // 创建翅膀 - 精美可动的翅膀
         function createWing(wingIndex) {
             const wing = WINGS[wingIndex];
             const group = new THREE.Group();
 
+            // 翅膀颜色根据等级变化
+            const wingColors = [
+                0xffffff, // 白
+                0x87ceeb, // 蓝
+                0xffd700, // 金
+                0xff69b4, // 粉
+                0x9932cc, // 紫
+                0xff4500, // 橙
+                0x00ff00, // 绿
+                0x00ffff, // 青
+                0xff0000, // 红
+                0xffffff, // 白
+                0x4a0080, // 深紫
+                0x8b008b, // 暗红紫
+                0x000080, // 藏青
+                0x228b22, // 森林绿
+                0xff6347, // 番茄红
+                0x9400d3, // 暗紫
+                0x00ced1, // 暗青
+                0xff1493, // 深粉
+                0xffd700, // 金
+                0xffffff  // 纯白
+            ];
+
+            const wingColor = wingColors[wingIndex % wingColors.length];
+            const isDark = wingIndex >= 10;
+
+            // 翅膀主材质
             const wingMat = new THREE.MeshStandardMaterial({
-                color: wingIndex >= 10 ? 0x4a0080 : 0xffffff,
+                color: wingColor,
                 transparent: true,
-                opacity: 0.8,
+                opacity: 0.85,
                 side: THREE.DoubleSide,
-                emissive: wingIndex >= 10 ? 0x2a0050 : 0x444444,
-                emissiveIntensity: 0.2
+                emissive: isDark ? 0x220044 : 0x333344,
+                emissiveIntensity: 0.3
             });
 
-            // 左翼
-            const leftWingGeo = new THREE.PlaneGeometry(2, 1.5);
-            const leftWing = new THREE.Mesh(leftWingGeo, wingMat);
-            leftWing.position.set(-1, 0, 0);
-            leftWing.rotation.y = Math.PI / 6;
-            group.add(leftWing);
+            // 翅膀大小随等级增加
+            const wingSize = 1.5 + wingIndex * 0.15;
+            const wingHeight = 1.2 + wingIndex * 0.1;
 
-            // 右翼
-            const rightWingGeo = new THREE.PlaneGeometry(2, 1.5);
-            const rightWing = new THREE.Mesh(rightWingGeo, wingMat.clone());
-            rightWing.position.set(1, 0, 0);
-            rightWing.rotation.y = -Math.PI / 6;
-            group.add(rightWing);
+            // 左翼 - 多层羽毛效果
+            for (let i = 0; i < 3; i++) {
+                const leftFeatherGeo = new THREE.PlaneGeometry(wingSize - i * 0.3, wingHeight - i * 0.2);
+                const featherMat = wingMat.clone();
+                featherMat.opacity = 0.8 - i * 0.2;
 
-            // 高级翅膀添加更多层次
-            if (wingIndex >= 5) {
-                const leftWing2Geo = new THREE.PlaneGeometry(1.5, 1);
-                const leftWing2 = new THREE.Mesh(leftWing2Geo, wingMat.clone());
-                leftWing2.position.set(-1.2, 0.3, 0.1);
-                leftWing2.rotation.y = Math.PI / 4;
-                group.add(leftWing2);
-
-                const rightWing2Geo = new THREE.PlaneGeometry(1.5, 1);
-                const rightWing2 = new THREE.Mesh(rightWing2Geo, wingMat.clone());
-                rightWing2.position.set(1.2, 0.3, 0.1);
-                rightWing2.rotation.y = -Math.PI / 4;
-                group.add(rightWing2);
+                const leftFeather = new THREE.Mesh(leftFeatherGeo, featherMat);
+                leftFeather.position.set(-0.8 - i * 0.3, i * 0.15, -i * 0.1);
+                leftFeather.rotation.y = Math.PI / 5 + i * 0.1;
+                leftFeather.rotation.z = -0.1 - i * 0.05;
+                leftFeather.userData.wingIndex = i;
+                leftFeather.userData.side = 'left';
+                group.add(leftFeather);
             }
 
-            // 最高级翅膀添加特效
-            if (wingIndex >= 15) {
+            // 右翼 - 多层羽毛效果
+            for (let i = 0; i < 3; i++) {
+                const rightFeatherGeo = new THREE.PlaneGeometry(wingSize - i * 0.3, wingHeight - i * 0.2);
+                const featherMat = wingMat.clone();
+                featherMat.opacity = 0.8 - i * 0.2;
+
+                const rightFeather = new THREE.Mesh(rightFeatherGeo, featherMat);
+                rightFeather.position.set(0.8 + i * 0.3, i * 0.15, -i * 0.1);
+                rightFeather.rotation.y = -Math.PI / 5 - i * 0.1;
+                rightFeather.rotation.z = 0.1 + i * 0.05;
+                rightFeather.userData.wingIndex = i;
+                rightFeather.userData.side = 'right';
+                group.add(rightFeather);
+            }
+
+            // 翅膀骨架
+            const boneMat = new THREE.MeshBasicMaterial({
+                color: isDark ? 0x330066 : 0xaa8866,
+                linewidth: 2
+            });
+
+            // 左骨架
+            const leftBoneGeo = new THREE.CylinderGeometry(0.02, 0.03, wingSize * 1.2, 4);
+            const leftBone = new THREE.Mesh(leftBoneGeo, boneMat);
+            leftBone.position.set(-wingSize * 0.6, wingHeight * 0.3, 0);
+            leftBone.rotation.z = Math.PI / 3;
+            group.add(leftBone);
+
+            // 右骨架
+            const rightBoneGeo = new THREE.CylinderGeometry(0.02, 0.03, wingSize * 1.2, 4);
+            const rightBone = new THREE.Mesh(rightBoneGeo, boneMat.clone());
+            rightBone.position.set(wingSize * 0.6, wingHeight * 0.3, 0);
+            rightBone.rotation.z = -Math.PI / 3;
+            group.add(rightBone);
+
+            // 翅膀光晕 - 所有翅膀都有
+            const glowGeo = new THREE.RingGeometry(0.5, wingSize * 0.8, 32);
+            const glowMat = new THREE.MeshBasicMaterial({
+                color: wingColor,
+                transparent: true,
+                opacity: 0.2,
+                side: THREE.DoubleSide
+            });
+            const glow = new THREE.Mesh(glowGeo, glowMat);
+            glow.position.y = wingHeight * 0.5;
+            glow.rotation.x = Math.PI / 2;
+            group.add(glow);
+
+            // 高级翅膀添加发光粒子
+            if (wingIndex >= 5) {
+                const particleCount = 20 + wingIndex * 3;
                 const particleGeo = new THREE.BufferGeometry();
-                const particleCount = 50;
                 const positions = new Float32Array(particleCount * 3);
 
                 for (let i = 0; i < particleCount; i++) {
-                    positions[i * 3] = (Math.random() - 0.5) * 4;
-                    positions[i * 3 + 1] = Math.random() * 2;
-                    positions[i * 3 + 2] = (Math.random() - 0.5) * 2;
+                    positions[i * 3] = (Math.random() - 0.5) * wingSize * 2;
+                    positions[i * 3 + 1] = Math.random() * wingHeight;
+                    positions[i * 3 + 2] = (Math.random() - 0.5) * 0.5;
                 }
 
                 particleGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
 
                 const particleMat = new THREE.PointsMaterial({
-                    color: 0xffd700,
-                    size: 0.1,
+                    color: wingColor,
+                    size: 0.08 + wingIndex * 0.01,
                     transparent: true,
-                    opacity: 0.8
+                    opacity: 0.9
                 });
 
                 const particles = new THREE.Points(particleGeo, particleMat);
                 group.add(particles);
             }
 
-            group.userData.baseY = 1.8;
-            group.position.y = 1.8;
+            // 最高级翅膀添加大型光翼
+            if (wingIndex >= 15) {
+                // 大型光翼背景
+                const bigWingGeo = new THREE.PlaneGeometry(wingSize * 2, wingHeight * 1.5);
+                const bigWingMat = new THREE.MeshBasicMaterial({
+                    color: wingColor,
+                    transparent: true,
+                    opacity: 0.15,
+                    side: THREE.DoubleSide
+                });
+
+                const bigLeftWing = new THREE.Mesh(bigWingGeo, bigWingMat);
+                bigLeftWing.position.set(-wingSize, wingHeight * 0.5, -0.2);
+                bigLeftWing.rotation.y = Math.PI / 6;
+                group.add(bigLeftWing);
+
+                const bigRightWing = new THREE.Mesh(bigWingGeo, bigWingMat.clone());
+                bigRightWing.position.set(wingSize, wingHeight * 0.5, -0.2);
+                bigRightWing.rotation.y = -Math.PI / 6;
+                group.add(bigRightWing);
+
+                // 添加光柱效果
+                const lightGeo = new THREE.CylinderGeometry(0.1, 0.3, wingHeight * 2, 8);
+                const lightMat = new THREE.MeshBasicMaterial({
+                    color: wingColor,
+                    transparent: true,
+                    opacity: 0.3
+                });
+                const light = new THREE.Mesh(lightGeo, lightMat);
+                light.position.y = wingHeight;
+                group.add(light);
+            }
+
+            group.userData.baseY = 2;
+            group.userData.wingIndex = wingIndex;
+            group.position.y = 2;
 
             return group;
         }
@@ -2611,10 +2965,217 @@
             setTimeout(() => msg.style.display = 'none', 2000);
         }
 
+        // ==================== 口令系统 ====================
+
+        // 显示口令输入界面
+        function showCheatInput() {
+            const cheatScreen = document.getElementById('cheatScreen');
+            cheatScreen.style.display = 'flex';
+            gameState.paused = true;
+            document.getElementById('cheatInput').value = '';
+            document.getElementById('cheatInput').focus();
+            document.getElementById('cheatMessage').textContent = '';
+        }
+
+        // 关闭口令输入界面
+        function closeCheatInput() {
+            document.getElementById('cheatScreen').style.display = 'none';
+            gameState.paused = false;
+        }
+
+        // 提交口令
+        function submitCheat() {
+            const input = document.getElementById('cheatInput').value.trim();
+            const messageEl = document.getElementById('cheatMessage');
+
+            if (!input) {
+                messageEl.textContent = '请输入口令！';
+                messageEl.style.color = '#ff6666';
+                return;
+            }
+
+            if (input === '老七变身') {
+                // 口令1：武器强化2级
+                if (gameState.player.weaponLevel >= 10) {
+                    messageEl.textContent = '武器已满级！';
+                    messageEl.style.color = '#ffd700';
+                    return;
+                }
+
+                const newLevel = Math.min(10, gameState.player.weaponLevel + 2);
+                gameState.player.weaponLevel = newLevel;
+
+                // 更新武器外观
+                if (playerSword) {
+                    player.remove(playerSword);
+                }
+                playerSword = createSword(gameState.player.weaponIndex, newLevel);
+                playerSword.position.set(0, 1.8, 1.8);
+                playerSword.rotation.set(Math.PI / 6, 0, 0);
+                player.add(playerSword);
+
+                updateHUD();
+                messageEl.textContent = `✨ 变身成功！武器升到 ${newLevel} 级！`;
+                messageEl.style.color = '#00ff00';
+
+                // 变身特效
+                createTransformEffect();
+
+            } else if (input === '老七牛逼') {
+                // 口令2：终极变身
+                // 武器满级
+                gameState.player.weaponLevel = 10;
+                gameState.player.weaponIndex = 19; // 创世神剑
+
+                // 金币充足
+                gameState.player.gold += 100000;
+
+                // 翅膀满级并装备
+                if (!gameState.ownedWings.includes(19)) {
+                    gameState.ownedWings.push(19);
+                }
+                gameState.equippedWing = 19;
+
+                // 更新武器
+                if (playerSword) {
+                    player.remove(playerSword);
+                }
+                playerSword = createSword(19, 10);
+                playerSword.position.set(0, 1.8, 1.8);
+                playerSword.rotation.set(Math.PI / 6, 0, 0);
+                player.add(playerSword);
+
+                // 更新翅膀
+                if (playerWing) {
+                    scene.remove(playerWing);
+                }
+                playerWing = createWing(19);
+                player.add(playerWing);
+
+                // 满血
+                gameState.player.maxHp = 10000;
+                gameState.player.hp = 10000;
+
+                updateHUD();
+
+                messageEl.textContent = '🦅 终极变身！武器翅膀全满级！';
+                messageEl.style.color = '#ffd700';
+
+                // 终极变身特效
+                createUltimateTransformEffect();
+
+                showMessage('🦅👑 终极状态激活！');
+
+            } else {
+                messageEl.textContent = '❌ 口令错误！';
+                messageEl.style.color = '#ff6666';
+            }
+
+            // 3秒后关闭
+            setTimeout(() => {
+                closeCheatInput();
+            }, 2000);
+        }
+
+        // 普通变身特效
+        function createTransformEffect() {
+            const weapon = WEAPONS[gameState.player.weaponIndex];
+
+            // 光芒爆发
+            for (let i = 0; i < 20; i++) {
+                const geo = new THREE.SphereGeometry(0.15);
+                const mat = new THREE.MeshBasicMaterial({
+                    color: weapon.color,
+                    transparent: true,
+                    opacity: 1
+                });
+                const particle = new THREE.Mesh(geo, mat);
+                particle.position.copy(player.position);
+                particle.position.y = 2;
+                particle.userData = {
+                    life: 1,
+                    type: 'spark',
+                    velocity: new THREE.Vector3(
+                        (Math.random() - 0.5) * 0.5,
+                        Math.random() * 0.5,
+                        (Math.random() - 0.5) * 0.5
+                    )
+                };
+                scene.add(particle);
+                particles.push(particle);
+            }
+        }
+
+        // 终极变身特效
+        function createUltimateTransformEffect() {
+            // 大量彩色粒子
+            const colors = [0xffd700, 0xff6600, 0xff0066, 0x00ffff, 0xff00ff, 0x00ff00, 0xffffff];
+
+            for (let i = 0; i < 100; i++) {
+                const geo = new THREE.SphereGeometry(0.2);
+                const mat = new THREE.MeshBasicMaterial({
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    transparent: true,
+                    opacity: 1
+                });
+                const particle = new THREE.Mesh(geo, mat);
+                particle.position.copy(player.position);
+                particle.position.y = 2;
+                particle.userData = {
+                    life: 1.5,
+                    type: 'ultimateSpark',
+                    velocity: new THREE.Vector3(
+                        (Math.random() - 0.5) * 1,
+                        Math.random() * 0.8,
+                        (Math.random() - 0.5) * 1
+                    )
+                };
+                scene.add(particle);
+                particles.push(particle);
+            }
+
+            // 冲击波
+            const waveGeo = new THREE.RingGeometry(1, 5, 32);
+            const waveMat = new THREE.MeshBasicMaterial({
+                color: 0xffd700,
+                transparent: true,
+                opacity: 0.8,
+                side: THREE.DoubleSide
+            });
+            const wave = new THREE.Mesh(waveGeo, waveMat);
+            wave.position.copy(player.position);
+            wave.position.y = 1;
+            wave.rotation.x = -Math.PI / 2;
+            wave.userData = { life: 1, type: 'wave', scale: 1 };
+            scene.add(wave);
+            particles.push(wave);
+
+            // 屏幕震动
+            createScreenShake();
+        }
+
+        // 绑定回车键
+        document.addEventListener('DOMContentLoaded', () => {
+            const cheatInput = document.getElementById('cheatInput');
+            if (cheatInput) {
+                cheatInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        submitCheat();
+                    }
+                });
+            }
+        });
+
         // ==================== 商店系统 ====================
 
         // 更新商店
         function updateShop() {
+            // 更新金币显示
+            const shopGoldEl = document.getElementById('shopGold');
+            if (shopGoldEl) {
+                shopGoldEl.textContent = gameState.player.gold;
+            }
+
             // 翅膀商店
             const wingGrid = document.getElementById('wingShopGrid');
             wingGrid.innerHTML = '';
@@ -2622,17 +3183,24 @@
             WINGS.forEach((wing, index) => {
                 const owned = gameState.ownedWings.includes(index);
                 const equipped = gameState.equippedWing === index;
+                const canAfford = gameState.player.gold >= wing.price;
 
                 const item = document.createElement('div');
-                item.className = `shop-item ${owned ? 'owned' : ''} ${equipped ? 'equipped' : ''}`;
+                item.className = `shop-item ${owned ? 'owned' : ''} ${equipped ? 'equipped' : ''} ${!owned && !canAfford ? 'disabled' : ''}`;
                 item.innerHTML = `
                     <div class="shop-item-icon">${wing.icon}</div>
                     <div class="shop-item-name">${wing.name}</div>
-                    <div class="shop-item-price">${owned ? (equipped ? '已装备' : '已拥有') : `💰 ${wing.price}`}</div>
+                    <div class="shop-item-price">${owned ? (equipped ? '✅ 已装备' : '👆 点击装备') : `💰 ${wing.price}`}</div>
                     <div class="shop-item-level">速度+${Math.round(wing.speedBonus * 100)}%</div>
                 `;
 
-                item.onclick = () => buyWing(index);
+                item.onclick = () => {
+                    if (!owned && !canAfford) {
+                        showMessage(`金币不足！需要 ${wing.price} 💰`);
+                        return;
+                    }
+                    buyWing(index);
+                };
                 wingGrid.appendChild(item);
             });
 
@@ -2645,39 +3213,51 @@
                 const current = gameState.player.weaponIndex === index;
                 const canUpgrade = current && gameState.player.weaponLevel < 10;
                 const upgradeCost = current ? gameState.player.weaponLevel * 100 : 0;
+                const unlockCost = (index + 1) * 500;
+                const canAfford = !owned && gameState.player.gold >= unlockCost;
 
                 const item = document.createElement('div');
-                item.className = `shop-item ${current ? 'equipped' : ''}`;
+                item.className = `shop-item ${current ? 'equipped' : ''} ${owned && !current ? 'owned' : ''} ${!owned && !canAfford ? 'disabled' : ''}`;
                 item.innerHTML = `
                     <div class="shop-item-icon">${weapon.icon}</div>
                     <div class="shop-item-name">${weapon.name}</div>
                     <div class="shop-item-price">
                         ${current ?
-                            (canUpgrade ? `💰 升级: ${upgradeCost}` : '已满级') :
-                            (owned ? '已解锁' : '未解锁')
+                            (canUpgrade ? `💰 升级: ${upgradeCost}` : '⭐ 已满级') :
+                            (owned ? '👆 点击装备' : `💰 解锁: ${unlockCost}`)
                         }
                     </div>
                     ${current ? `<div class="shop-item-level">等级: ${gameState.player.weaponLevel}/10</div>` : ''}
                 `;
 
-                item.onclick = () => selectWeapon(index);
+                item.onclick = () => {
+                    if (!owned && !canAfford) {
+                        showMessage(`金币不足！需要 ${unlockCost} 💰`);
+                        return;
+                    }
+                    selectWeapon(index);
+                };
                 weaponGrid.appendChild(item);
             });
         }
 
         // 购买翅膀
         function buyWing(index) {
+            if (!gameState.playing) return;
+
             const wing = WINGS[index];
 
             if (gameState.ownedWings.includes(index)) {
-                // 装备翅膀
+                // 已经拥有，装备翅膀
                 gameState.equippedWing = index;
                 if (playerWing) {
                     scene.remove(playerWing);
                 }
                 playerWing = createWing(index);
                 player.add(playerWing);
+                updateHUD();
                 updateShop();
+                showMessage(`装备 ${wing.name}!`);
                 return;
             }
 
@@ -2692,25 +3272,29 @@
                 playerWing = createWing(index);
                 player.add(playerWing);
 
-                updateShop();
                 updateHUD();
+                updateShop();
                 showMessage(`获得 ${wing.name}!`);
             } else {
-                showMessage('金币不足!');
+                showMessage(`金币不足！需要 ${wing.price} 💰`);
             }
         }
 
         // 选择武器
         function selectWeapon(index) {
+            if (!gameState.playing) return;
+
             if (gameState.unlockedWeapons.includes(index)) {
+                // 已解锁，直接装备
                 gameState.player.weaponIndex = index;
 
                 if (playerSword) {
                     player.remove(playerSword);
                 }
                 playerSword = createSword(index, gameState.player.weaponLevel);
-                playerSword.position.set(1.2, 1.5, 0.5);
-                playerSword.rotation.x = Math.PI / 4;
+                // 武器放在玩家前方，清晰可见
+                playerSword.position.set(0, 1.8, 1.8);
+                playerSword.rotation.set(Math.PI / 6, 0, 0);
                 player.add(playerSword);
 
                 updateShop();
@@ -2727,15 +3311,16 @@
                         player.remove(playerSword);
                     }
                     playerSword = createSword(index, gameState.player.weaponLevel);
-                    playerSword.position.set(0.8, 1.2, 0.3);
-                    playerSword.rotation.x = Math.PI / 6;
+                    // 武器放在玩家前方，清晰可见
+                    playerSword.position.set(0, 1.8, 1.8);
+                    playerSword.rotation.set(Math.PI / 6, 0, 0);
                     player.add(playerSword);
 
                     updateShop();
                     updateHUD();
                     showMessage(`解锁 ${WEAPONS[index].name}!`);
                 } else {
-                    showMessage('金币不足! 需要 ' + unlockCost);
+                    showMessage(`金币不足！需要 ${unlockCost} 💰`);
                 }
             }
         }
@@ -2810,19 +3395,14 @@
             gameState.player.flying = !gameState.player.flying;
 
             const flyBtn = document.getElementById('flyBtn');
-            const mobileMenu = document.getElementById('mobileMenu');
 
             if (gameState.player.flying) {
-                flyBtn.textContent = '🛬';
-                flyBtn.style.background = 'rgba(100, 255, 100, 0.7)';
-                flyBtn.style.borderColor = '#66ff66';
-                mobileMenu.classList.add('flying');
+                flyBtn.textContent = '🛬 飞行中';
+                flyBtn.classList.add('flying');
                 showMessage('🦅 起飞！怪物打不到你！');
             } else {
-                flyBtn.textContent = '🪽';
-                flyBtn.style.background = 'rgba(100, 100, 255, 0.7)';
-                flyBtn.style.borderColor = '#6666ff';
-                mobileMenu.classList.remove('flying');
+                flyBtn.textContent = '🪽 飞行';
+                flyBtn.classList.remove('flying');
                 showMessage('🪖 落地！');
             }
         }
@@ -2924,10 +3504,10 @@
             player = createPlayer();
             player.position.set(0, 0, 0);
 
-            // 创建剑
+            // 创建剑 - 放在玩家前方清晰可见
             playerSword = createSword(0, 1);
-            playerSword.position.set(0.8, 1.2, 0.3);
-            playerSword.rotation.x = Math.PI / 6;
+            playerSword.position.set(0, 1.8, 1.8);
+            playerSword.rotation.set(Math.PI / 6, 0, 0);
             player.add(playerSword);
 
             // 创建翅膀
@@ -3135,6 +3715,13 @@
                     particle.position.z = player.position.z + Math.sin(particle.userData.angle) * particle.userData.radius;
                     particle.rotation.z = particle.userData.angle;
                     particle.userData.life -= 0.05;
+                } else if (type === 'ultimateSpark') {
+                    // 终极粒子
+                    if (particle.userData.velocity) {
+                        particle.position.add(particle.userData.velocity);
+                        particle.userData.velocity.y -= 0.02;
+                    }
+                    particle.userData.life -= 0.02;
                 } else {
                     // 默认衰减
                     particle.userData.life -= 0.03;
@@ -3153,11 +3740,30 @@
                 playerSword.rotation.z = Math.sin(Date.now() * 0.003) * 0.1;
             }
 
-            // 翅膀动画
+            // 翅膀动画 - 更精美更自然的扇动效果
             if (playerWing) {
-                playerWing.children.forEach((wing, i) => {
-                    wing.rotation.y = (i === 0 ? 1 : -1) * Math.PI / 6 + Math.sin(Date.now() * 0.005 + i) * 0.2;
+                const time = Date.now() * 0.005;
+                const isFlying = gameState.player.flying;
+                const wingIndex = gameState.equippedWing;
+                const flapSpeed = isFlying ? 3 : 1.5; // 飞行时扇动更快
+                const flapIntensity = isFlying ? 0.5 : 0.3; // 飞行时幅度更大
+
+                playerWing.children.forEach((child) => {
+                    if (child.userData.wingIndex !== undefined) {
+                        // 羽毛层，每层有不同的扇动
+                        const idx = child.userData.wingIndex;
+                        const side = child.userData.side === 'left' ? 1 : -1;
+
+                        // 上下扇动
+                        child.rotation.z = side * (0.1 + idx * 0.05) + Math.sin(time * flapSpeed + idx * 0.5) * flapIntensity;
+                        // 前后摆动
+                        child.rotation.y += Math.sin(time * flapSpeed * 0.7 + idx) * 0.02;
+                    }
                 });
+
+                // 飞行时翅膀位置升高
+                const targetY = isFlying ? 4 : 2;
+                playerWing.position.y += (targetY - playerWing.position.y) * 0.1;
             }
 
             // 更新小地图
