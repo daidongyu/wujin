@@ -1253,9 +1253,17 @@
             MONSTER_SPEED: 0.06,
             ATTACK_RANGE: 8,
             ATTACK_COOLDOWN: 500,
-            SPAWN_INTERVAL: 3000,
-            MAX_MONSTERS: 15
+            SPAWN_INTERVAL: 1500,
+            MAX_MONSTERS: 30
         };
+
+        // 怪物名字前缀
+        const MONSTER_PREFIXES = [
+            '狂暴的', '凶残的', '邪恶的', '嗜血的', '疯狂的',
+            '黑暗的', '冰冷的', '灼热的', '神秘的', '古老的',
+            '无敌的', '变异的', '精英的', '霸道的', '狡猾的',
+            '愤怒的', '毁灭的', '混沌的', '神圣的', '噩梦的'
+        ];
 
         // 武器数据 - 20种武器，每种10级
         const WEAPONS = [
@@ -1810,304 +1818,205 @@
             return group;
         }
 
-        // 创建玩家剑 - 真正的长剑，清晰可见
+        // 创建玩家剑 - 简洁优雅的长剑
         function createSword(weaponIndex, level) {
             const weapon = WEAPONS[weaponIndex];
             const group = new THREE.Group();
 
-            // 剑身 - 真正的长剑
-            const bladeLength = 3 + level * 0.3;
-            const bladeWidth = 0.15 + level * 0.02;
-            const bladeGeo = new THREE.BoxGeometry(bladeWidth, bladeLength, 0.04);
+            // 剑身 - 简洁的BoxGeometry，大小固定不变
+            const bladeLength = 2.5;
+            const bladeWidth = 0.12;
+
+            // 剑身主体
+            const bladeGeo = new THREE.BoxGeometry(bladeWidth, bladeLength, 0.03);
             const bladeMat = new THREE.MeshStandardMaterial({
                 color: weapon.color,
-                metalness: 0.95,
-                roughness: 0.05,
+                metalness: 0.9,
+                roughness: 0.1,
                 emissive: weapon.color,
-                emissiveIntensity: 0.5 + level * 0.08
+                emissiveIntensity: 0.4
             });
             const blade = new THREE.Mesh(bladeGeo, bladeMat);
-            blade.position.y = bladeLength / 2;
-            blade.castShadow = true;
+            blade.position.y = bladeLength / 2 + 0.3;
             group.add(blade);
 
-            // 添加武器点光源 - 使武器更亮更明显
-            const weaponLight = new THREE.PointLight(weapon.color, 1.5 + level * 0.3, 8);
-            weaponLight.position.y = bladeLength / 2;
-            group.add(weaponLight);
-
-            // 剑脊（中间的高光）
-            const spineGeo = new THREE.BoxGeometry(bladeWidth * 0.2, bladeLength * 0.9, 0.08);
-            const spineMat = new THREE.MeshBasicMaterial({
-                color: 0xffffff,
-                transparent: true,
-                opacity: 0.4
-            });
-            const spine = new THREE.Mesh(spineGeo, spineMat);
-            spine.position.y = bladeLength / 2;
-            spine.position.z = 0.02;
-            group.add(spine);
-
-            // 剑尖 - 三角形
-            const tipGeo = new THREE.ConeGeometry(bladeWidth * 0.6, bladeLength * 0.15, 4);
+            // 剑尖（金字塔形）
+            const tipGeo = new THREE.ConeGeometry(bladeWidth * 0.6, bladeLength * 0.2, 4);
             const tipMat = new THREE.MeshStandardMaterial({
                 color: weapon.color,
-                metalness: 0.95,
+                metalness: 0.9,
                 emissive: weapon.color,
                 emissiveIntensity: 0.5
             });
             const tip = new THREE.Mesh(tipGeo, tipMat);
-            tip.position.y = bladeLength + bladeLength * 0.075;
-            tip.rotation.z = Math.PI;
+            tip.position.y = bladeLength + 0.3 + bladeLength * 0.1;
+            tip.rotation.x = Math.PI;
             group.add(tip);
 
-            // 剑柄 - 更粗更长
-            const handleGeo = new THREE.CylinderGeometry(0.06, 0.07, 0.6, 8);
-            const handleMat = new THREE.MeshStandardMaterial({
-                color: 0x4a3728,
-                roughness: 0.7
-            });
-            const handle = new THREE.Mesh(handleGeo, handleMat);
-            handle.position.y = -0.3;
-            group.add(handle);
-
-            // 剑格 - 十字护手，更大更华丽
-            const guardSize = 0.5 + level * 0.05;
-            const guardGeo = new THREE.BoxGeometry(guardSize, 0.1, 0.1);
+            // 剑格（十字护手）
+            const guardGeo = new THREE.BoxGeometry(0.4, 0.08, 0.08);
             const guardMat = new THREE.MeshStandardMaterial({
                 color: weapon.color,
                 metalness: 0.95,
                 emissive: weapon.color,
-                emissiveIntensity: 0.4
+                emissiveIntensity: 0.6
             });
             const guard = new THREE.Mesh(guardGeo, guardMat);
-            guard.position.y = 0;
+            guard.position.y = 0.3;
             group.add(guard);
 
-            // 剑格装饰球
-            const guardDecoGeo = new THREE.SphereGeometry(0.08, 8, 8);
-            const guardDecoMat = new THREE.MeshStandardMaterial({
-                color: weapon.color,
-                emissive: weapon.color,
-                emissiveIntensity: 0.6,
-                metalness: 0.8
+            // 剑柄
+            const handleGeo = new THREE.CylinderGeometry(0.05, 0.06, 0.5, 8);
+            const handleMat = new THREE.MeshStandardMaterial({
+                color: 0x5c3a21,
+                roughness: 0.8
             });
-            const leftDeco = new THREE.Mesh(guardDecoGeo, guardDecoMat);
-            leftDeco.position.set(-guardSize/2, 0, 0);
-            group.add(leftDeco);
-            const rightDeco = new THREE.Mesh(guardDecoGeo, guardDecoMat);
-            rightDeco.position.set(guardSize/2, 0, 0);
-            group.add(rightDeco);
+            const handle = new THREE.Mesh(handleGeo, handleMat);
+            handle.position.y = 0;
+            group.add(handle);
 
-            // 等级装饰 - 宝石
+            // 剑首
+            const pommelGeo = new THREE.SphereGeometry(0.08, 12, 12);
+            const pommelMat = new THREE.MeshStandardMaterial({
+                color: weapon.color,
+                metalness: 0.95,
+                emissive: weapon.color,
+                emissiveIntensity: 0.6
+            });
+            const pommel = new THREE.Mesh(pommelGeo, pommelMat);
+            pommel.position.y = -0.25;
+            group.add(pommel);
+
+            // 等级装饰（剑身上的宝石，大小固定）
             if (level >= 3) {
-                const gemGeo = new THREE.OctahedronGeometry(0.12 + level * 0.02);
+                const gemGeo = new THREE.OctahedronGeometry(0.08);
                 const gemMat = new THREE.MeshStandardMaterial({
                     color: weapon.color,
+                    metalness: 0.9,
                     emissive: weapon.color,
-                    emissiveIntensity: 0.8,
-                    metalness: 0.9
+                    emissiveIntensity: 0.8
                 });
                 const gem = new THREE.Mesh(gemGeo, gemMat);
-                gem.position.y = bladeLength * 0.5;
+                gem.position.y = bladeLength * 0.6 + 0.3;
                 group.add(gem);
             }
 
-            // 高级特效 - 光环环绕
+            // 武器发光效果（柔和的光晕，随等级增强但大小有限）
             if (level >= 5) {
-                const haloGeo = new THREE.TorusGeometry(bladeWidth + 0.1, 0.03, 8, 32);
-                const haloMat = new THREE.MeshBasicMaterial({
+                const glowGeo = new THREE.SphereGeometry(0.4, 16, 16);
+                const glowMat = new THREE.MeshBasicMaterial({
                     color: weapon.color,
                     transparent: true,
-                    opacity: 0.7
+                    opacity: 0.15 + (level - 5) * 0.02,
+                    side: THREE.BackSide
                 });
-                const halo = new THREE.Mesh(haloGeo, haloMat);
-                halo.position.y = bladeLength * 0.6;
-                group.add(halo);
-            }
-
-            if (level >= 8) {
-                // 第二层光环
-                const halo2Geo = new THREE.TorusGeometry(bladeWidth + 0.2, 0.04, 8, 32);
-                const halo2Mat = new THREE.MeshBasicMaterial({
-                    color: 0xffffff,
-                    transparent: true,
-                    opacity: 0.5
-                });
-                const halo2 = new THREE.Mesh(halo2Geo, halo2Mat);
-                halo2.position.y = bladeLength * 0.7;
-                halo2.rotation.x = Math.PI / 3;
-                group.add(halo2);
+                const glow = new THREE.Mesh(glowGeo, glowMat);
+                glow.position.y = bladeLength / 2 + 0.3;
+                group.add(glow);
             }
 
             return group;
         }
 
-        // 创建翅膀 - 精美可动的翅膀
+        // 创建翅膀 - 简洁优雅的翅膀形状，带光晕
         function createWing(wingIndex) {
-            const wing = WINGS[wingIndex];
             const group = new THREE.Group();
 
             // 翅膀颜色根据等级变化
             const wingColors = [
-                0xffffff, // 白
-                0x87ceeb, // 蓝
-                0xffd700, // 金
-                0xff69b4, // 粉
-                0x9932cc, // 紫
-                0xff4500, // 橙
-                0x00ff00, // 绿
-                0x00ffff, // 青
-                0xff0000, // 红
-                0xffffff, // 白
-                0x4a0080, // 深紫
-                0x8b008b, // 暗红紫
-                0x000080, // 藏青
-                0x228b22, // 森林绿
-                0xff6347, // 番茄红
-                0x9400d3, // 暗紫
-                0x00ced1, // 暗青
-                0xff1493, // 深粉
-                0xffd700, // 金
-                0xffffff  // 纯白
+                0xffffff, 0x87ceeb, 0xffd700, 0xff69b4, 0x9932cc,
+                0xff4500, 0x00ff00, 0x00ffff, 0xff0000, 0xffffff,
+                0x4a0080, 0x8b008b, 0x000080, 0x228b22, 0xff6347,
+                0x9400d3, 0x00ced1, 0xff1493, 0xffd700, 0xffffff
             ];
-
             const wingColor = wingColors[wingIndex % wingColors.length];
-            const isDark = wingIndex >= 10;
-
-            // 翅膀主材质
-            const wingMat = new THREE.MeshStandardMaterial({
-                color: wingColor,
-                transparent: true,
-                opacity: 0.85,
-                side: THREE.DoubleSide,
-                emissive: isDark ? 0x220044 : 0x333344,
-                emissiveIntensity: 0.3
-            });
 
             // 翅膀大小随等级增加
-            const wingSize = 1.5 + wingIndex * 0.15;
-            const wingHeight = 1.2 + wingIndex * 0.1;
+            const wingSize = 1.5 + wingIndex * 0.05;
+            const wingHeight = 1.2 + wingIndex * 0.03;
 
-            // 左翼 - 多层羽毛效果
-            for (let i = 0; i < 3; i++) {
-                const leftFeatherGeo = new THREE.PlaneGeometry(wingSize - i * 0.3, wingHeight - i * 0.2);
-                const featherMat = wingMat.clone();
-                featherMat.opacity = 0.8 - i * 0.2;
+            // 创建单个翅膀面板（羽翼形状）
+            function createWingPanel(side) {
+                const panel = new THREE.Group();
+                const dir = side === 'left' ? -1 : 1;
 
-                const leftFeather = new THREE.Mesh(leftFeatherGeo, featherMat);
-                leftFeather.position.set(-0.8 - i * 0.3, i * 0.15, -i * 0.1);
-                leftFeather.rotation.y = Math.PI / 5 + i * 0.1;
-                leftFeather.rotation.z = -0.1 - i * 0.05;
-                leftFeather.userData.wingIndex = i;
-                leftFeather.userData.side = 'left';
-                group.add(leftFeather);
-            }
+                // 翅膀主体 - 优雅的弧形羽翼
+                const shape = new THREE.Shape();
+                shape.moveTo(0, 0);
+                shape.bezierCurveTo(dir * wingSize * 0.5, wingHeight * 0.3, dir * wingSize * 0.9, wingHeight * 0.5, dir * wingSize, wingHeight * 0.2);
+                shape.bezierCurveTo(dir * wingSize * 1.1, wingHeight * 0.0, dir * wingSize * 0.8, -wingHeight * 0.2, dir * wingSize * 0.3, -wingHeight * 0.3);
+                shape.bezierCurveTo(dir * 0.1, -wingHeight * 0.15, 0, 0, 0, 0);
 
-            // 右翼 - 多层羽毛效果
-            for (let i = 0; i < 3; i++) {
-                const rightFeatherGeo = new THREE.PlaneGeometry(wingSize - i * 0.3, wingHeight - i * 0.2);
-                const featherMat = wingMat.clone();
-                featherMat.opacity = 0.8 - i * 0.2;
+                const wingGeo = new THREE.ShapeGeometry(shape);
+                const wingMat = new THREE.MeshStandardMaterial({
+                    color: wingColor,
+                    transparent: true,
+                    opacity: 0.75,
+                    side: THREE.DoubleSide,
+                    emissive: wingColor,
+                    emissiveIntensity: 0.2
+                });
+                const wingMesh = new THREE.Mesh(wingGeo, wingMat);
+                panel.add(wingMesh);
 
-                const rightFeather = new THREE.Mesh(rightFeatherGeo, featherMat);
-                rightFeather.position.set(0.8 + i * 0.3, i * 0.15, -i * 0.1);
-                rightFeather.rotation.y = -Math.PI / 5 - i * 0.1;
-                rightFeather.rotation.z = 0.1 + i * 0.05;
-                rightFeather.userData.wingIndex = i;
-                rightFeather.userData.side = 'right';
-                group.add(rightFeather);
-            }
-
-            // 翅膀骨架
-            const boneMat = new THREE.MeshBasicMaterial({
-                color: isDark ? 0x330066 : 0xaa8866,
-                linewidth: 2
-            });
-
-            // 左骨架
-            const leftBoneGeo = new THREE.CylinderGeometry(0.02, 0.03, wingSize * 1.2, 4);
-            const leftBone = new THREE.Mesh(leftBoneGeo, boneMat);
-            leftBone.position.set(-wingSize * 0.6, wingHeight * 0.3, 0);
-            leftBone.rotation.z = Math.PI / 3;
-            group.add(leftBone);
-
-            // 右骨架
-            const rightBoneGeo = new THREE.CylinderGeometry(0.02, 0.03, wingSize * 1.2, 4);
-            const rightBone = new THREE.Mesh(rightBoneGeo, boneMat.clone());
-            rightBone.position.set(wingSize * 0.6, wingHeight * 0.3, 0);
-            rightBone.rotation.z = -Math.PI / 3;
-            group.add(rightBone);
-
-            // 翅膀光晕 - 所有翅膀都有
-            const glowGeo = new THREE.RingGeometry(0.5, wingSize * 0.8, 32);
-            const glowMat = new THREE.MeshBasicMaterial({
-                color: wingColor,
-                transparent: true,
-                opacity: 0.2,
-                side: THREE.DoubleSide
-            });
-            const glow = new THREE.Mesh(glowGeo, glowMat);
-            glow.position.y = wingHeight * 0.5;
-            glow.rotation.x = Math.PI / 2;
-            group.add(glow);
-
-            // 高级翅膀添加发光粒子
-            if (wingIndex >= 5) {
-                const particleCount = 20 + wingIndex * 3;
-                const particleGeo = new THREE.BufferGeometry();
-                const positions = new Float32Array(particleCount * 3);
-
-                for (let i = 0; i < particleCount; i++) {
-                    positions[i * 3] = (Math.random() - 0.5) * wingSize * 2;
-                    positions[i * 3 + 1] = Math.random() * wingHeight;
-                    positions[i * 3 + 2] = (Math.random() - 0.5) * 0.5;
+                // 翅膀内部纹理线
+                for (let i = 1; i <= 3; i++) {
+                    const lineMat = new THREE.LineBasicMaterial({ color: wingColor, transparent: true, opacity: 0.4 });
+                    const points = [
+                        new THREE.Vector3(0, 0, 0.01),
+                        new THREE.Vector3(dir * wingSize * (0.2 + i * 0.2), wingHeight * (0.1 + i * 0.1), 0.01)
+                    ];
+                    const lineGeo = new THREE.BufferGeometry().setFromPoints(points);
+                    const line = new THREE.Line(lineGeo, lineMat);
+                    panel.add(line);
                 }
 
-                particleGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-
-                const particleMat = new THREE.PointsMaterial({
-                    color: wingColor,
-                    size: 0.08 + wingIndex * 0.01,
-                    transparent: true,
-                    opacity: 0.9
-                });
-
-                const particles = new THREE.Points(particleGeo, particleMat);
-                group.add(particles);
-            }
-
-            // 最高级翅膀添加大型光翼
-            if (wingIndex >= 15) {
-                // 大型光翼背景
-                const bigWingGeo = new THREE.PlaneGeometry(wingSize * 2, wingHeight * 1.5);
-                const bigWingMat = new THREE.MeshBasicMaterial({
+                // 翅膀光晕 - 柔和的发光效果
+                const glowGeo = new THREE.PlaneGeometry(wingSize * 1.8, wingHeight * 1.2);
+                const glowMat = new THREE.MeshBasicMaterial({
                     color: wingColor,
                     transparent: true,
                     opacity: 0.15,
                     side: THREE.DoubleSide
                 });
+                const glow = new THREE.Mesh(glowGeo, glowMat);
+                glow.position.z = -0.05;
+                panel.add(glow);
 
-                const bigLeftWing = new THREE.Mesh(bigWingGeo, bigWingMat);
-                bigLeftWing.position.set(-wingSize, wingHeight * 0.5, -0.2);
-                bigLeftWing.rotation.y = Math.PI / 6;
-                group.add(bigLeftWing);
+                return panel;
+            }
 
-                const bigRightWing = new THREE.Mesh(bigWingGeo, bigWingMat.clone());
-                bigRightWing.position.set(wingSize, wingHeight * 0.5, -0.2);
-                bigRightWing.rotation.y = -Math.PI / 6;
-                group.add(bigRightWing);
+            // 左翼
+            const leftWing = createWingPanel('left');
+            leftWing.position.set(-0.3, 0, 0);
+            leftWing.rotation.y = Math.PI / 6;
+            group.add(leftWing);
 
-                // 添加光柱效果
-                const lightGeo = new THREE.CylinderGeometry(0.1, 0.3, wingHeight * 2, 8);
-                const lightMat = new THREE.MeshBasicMaterial({
+            // 右翼
+            const rightWing = createWingPanel('right');
+            rightWing.position.set(0.3, 0, 0);
+            rightWing.rotation.y = -Math.PI / 6;
+            group.add(rightWing);
+
+            // 核心发光球体 - 表示翅膀能量中心
+            const coreGeo = new THREE.SphereGeometry(0.15 + wingIndex * 0.01, 16, 16);
+            const coreMat = new THREE.MeshBasicMaterial({ color: wingColor, transparent: true, opacity: 0.9 });
+            const core = new THREE.Mesh(coreGeo, coreMat);
+            group.add(core);
+
+            // 高级翅膀添加外圈光环
+            if (wingIndex >= 5) {
+                const haloGeo = new THREE.RingGeometry(0.3, wingSize * 0.6, 32);
+                const haloMat = new THREE.MeshBasicMaterial({
                     color: wingColor,
                     transparent: true,
-                    opacity: 0.3
+                    opacity: 0.2,
+                    side: THREE.DoubleSide
                 });
-                const light = new THREE.Mesh(lightGeo, lightMat);
-                light.position.y = wingHeight;
-                group.add(light);
+                const halo = new THREE.Mesh(haloGeo, haloMat);
+                halo.rotation.x = Math.PI / 2;
+                halo.position.y = wingHeight * 0.3;
+                group.add(halo);
             }
 
             group.userData.baseY = 2;
@@ -2124,6 +2033,11 @@
 
             const group = new THREE.Group();
 
+            // 随机生成怪物名字
+            const prefix = MONSTER_PREFIXES[Math.floor(Math.random() * MONSTER_PREFIXES.length)];
+            const typeName = type === 'boss' ? '魔王' : (type === 'daKai' ? '大开' : '野哥');
+            const monsterName = prefix + typeName;
+
             // 身体
             const bodyColor = type === 'boss' ? 0x8b0000 : (type === 'daKai' ? 0x4a0080 : 0x4a4a4a);
             const bodyGeo = new THREE.SphereGeometry(0.6 * scale, 12, 12);
@@ -2132,6 +2046,26 @@
             body.position.y = scale;
             body.castShadow = true;
             group.add(body);
+
+            // 名字标签
+            const canvas = document.createElement('canvas');
+            canvas.width = 256;
+            canvas.height = 64;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+            ctx.roundRect(0, 0, 256, 64, 8);
+            ctx.fill();
+            ctx.font = 'bold 24px Arial';
+            ctx.fillStyle = type === 'boss' ? '#ff4444' : (type === 'daKai' ? '#ff69b4' : '#ffd700');
+            ctx.textAlign = 'center';
+            ctx.fillText(monsterName, 128, 40);
+
+            const nameTexture = new THREE.CanvasTexture(canvas);
+            const nameMat = new THREE.SpriteMaterial({ map: nameTexture, transparent: true });
+            const nameSprite = new THREE.Sprite(nameMat);
+            nameSprite.scale.set(2, 0.5, 1);
+            nameSprite.position.y = scale + 1.2;
+            group.add(nameSprite);
 
             // 眼睛
             const eyeColor = type === 'boss' ? 0xff0000 : 0xffff00;
@@ -2186,6 +2120,7 @@
             group.userData = {
                 type: type,
                 level: level,
+                name: monsterName,
                 hp: monsterData.baseHP * scale,
                 maxHp: monsterData.baseHP * scale,
                 damage: monsterData.baseDamage * scale,
