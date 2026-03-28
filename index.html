@@ -334,43 +334,48 @@
             font-size: 12px;
         }
 
-        /* 消息提示 */
+        /* 消息提示 - 顶部中央，小尺寸不遮挡特效 */
         #message {
             position: absolute;
-            top: 50%;
+            top: 60px;
             left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0, 0, 0, 0.9);
-            padding: 20px 40px;
-            border-radius: 15px;
-            border: 3px solid #ffd700;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            padding: 8px 20px;
+            border-radius: 20px;
+            border: 2px solid rgba(255, 215, 0, 0.6);
             color: #fff;
-            font-size: 24px;
+            font-size: 16px;
             display: none;
-            z-index: 80;
+            z-index: 25;
             text-align: center;
+            white-space: nowrap;
+            max-width: 80%;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .level-up {
             color: #00ff00 !important;
-            animation: pulse 0.5s ease-in-out;
+            animation: pulseSmall 0.3s ease-in-out;
+            font-size: 18px;
         }
 
-        @keyframes pulse {
-            0%, 100% { transform: translate(-50%, -50%) scale(1); }
-            50% { transform: translate(-50%, -50%) scale(1.2); }
+        @keyframes pulseSmall {
+            0%, 100% { transform: translateX(-50%) scale(1); }
+            50% { transform: translateX(-50%) scale(1.1); }
         }
 
-        /* 小地图 */
+        /* 小地图 - 左上角 */
         #minimap {
             position: absolute;
-            bottom: 20px;
-            right: 20px;
-            width: 150px;
-            height: 150px;
-            background: rgba(0, 0, 0, 0.7);
+            top: 10px;
+            left: 10px;
+            width: 100px;
+            height: 100px;
+            background: rgba(0, 0, 0, 0.6);
             border-radius: 50%;
-            border: 3px solid #ffd700;
+            border: 2px solid rgba(255, 215, 0, 0.5);
             overflow: hidden;
         }
 
@@ -417,31 +422,32 @@
             100% { opacity: 0; transform: translateY(-50px); }
         }
 
-        /* 技能栏 */
+        /* 技能栏 - 左侧垂直排列 */
         #skillBar {
             position: absolute;
-            bottom: 60px;
-            left: 50%;
-            transform: translateX(-50%);
+            top: 50%;
+            left: 10px;
+            transform: translateY(-50%);
             display: flex;
-            gap: 10px;
-            background: rgba(0, 0, 0, 0.7);
-            padding: 10px 20px;
-            border-radius: 15px;
-            border: 2px solid #ffd700;
+            flex-direction: column;
+            gap: 8px;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 8px;
+            border-radius: 12px;
+            border: 2px solid rgba(255, 215, 0, 0.5);
             z-index: 30;
         }
 
         .skill-slot {
-            width: 50px;
-            height: 50px;
+            width: 45px;
+            height: 45px;
             background: rgba(50, 50, 50, 0.9);
-            border-radius: 10px;
+            border-radius: 8px;
             border: 2px solid #666;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
+            font-size: 22px;
             position: relative;
             cursor: pointer;
             pointer-events: auto;
@@ -449,7 +455,7 @@
 
         .skill-slot.ready {
             border-color: #00ff00;
-            box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+            box-shadow: 0 0 8px rgba(0, 255, 0, 0.5);
         }
 
         .skill-slot.on-cooldown {
@@ -652,16 +658,23 @@
 
             #skillBar {
                 bottom: 190px;
-                padding: 5px 10px;
+                padding: 5px;
                 right: 10px;
                 left: auto;
                 transform: none;
             }
 
+            #minimap {
+                width: 80px;
+                height: 80px;
+                top: 10px;
+                left: 10px;
+            }
+
             .skill-slot {
-                width: 45px;
-                height: 45px;
-                font-size: 20px;
+                width: 42px;
+                height: 42px;
+                font-size: 18px;
             }
 
             /* 显示移动端控件 */
@@ -884,12 +897,7 @@
                 <div>武器: Q</div>
             </div>
 
-            <!-- 小地图 -->
-            <div id="minimap">
-                <canvas id="minimapCanvas" width="150" height="150"></canvas>
-            </div>
-
-            <!-- 技能栏 -->
+            <!-- 技能栏 - 左侧垂直排列 -->
             <div id="skillBar">
                 <div class="skill-slot ready" id="skill1" title="技能1 [1]">
                     <span>💥</span>
@@ -909,12 +917,17 @@
                 </div>
             </div>
 
-            <!-- 快捷键提示 -->
-            <div class="key-hint">
-                <span>[E]</span> 商店 | <span>[Q]</span> 武器升级 | <span>[空格]</span> 攻击 | <span>[ESC]</span> 暂停
+            <!-- 小地图 - 左上角 -->
+            <div id="minimap">
+                <canvas id="minimapCanvas" width="100" height="100"></canvas>
             </div>
 
-            <!-- 消息提示 -->
+            <!-- 快捷键提示 -->
+            <div class="key-hint">
+                <span>[1-4]</span> 技能 | <span>[E]</span> 商店 | <span>[空格]</span> 攻击
+            </div>
+
+            <!-- 消息提示 - 顶部中央，不遮挡特效 -->
             <div id="message"></div>
         </div>
 
@@ -982,7 +995,7 @@
         const CONFIG = {
             WORLD_SIZE: 200,
             PLAYER_SPEED: 0.3,
-            MONSTER_SPEED: 0.08,
+            MONSTER_SPEED: 0.06,
             ATTACK_RANGE: 8,
             ATTACK_COOLDOWN: 500,
             SPAWN_INTERVAL: 3000,
@@ -991,26 +1004,26 @@
 
         // 武器数据 - 20种武器，每种10级
         const WEAPONS = [
-            { id: 1, name: '如意金箍棒', icon: '🔧', baseDamage: 10, color: 0xffd700 },
-            { id: 2, name: '倚天剑', icon: '⚔️', baseDamage: 12, color: 0x87ceeb },
-            { id: 3, name: '屠龙刀', icon: '🗡️', baseDamage: 15, color: 0x4682b4 },
-            { id: 4, name: '赤霄剑', icon: '🔴', baseDamage: 18, color: 0xff4444 },
-            { id: 5, name: '干将莫邪', icon: '🗡️', baseDamage: 22, color: 0x9932cc },
-            { id: 6, name: '湛卢剑', icon: '⚡', baseDamage: 26, color: 0x1e90ff },
-            { id: 7, name: '泰阿剑', icon: '💎', baseDamage: 30, color: 0x00ced1 },
-            { id: 8, name: '轩辕剑', icon: '🌟', baseDamage: 35, color: 0xffa500 },
-            { id: 9, name: '盘古斧', icon: '🪓', baseDamage: 40, color: 0x8b4513 },
-            { id: 10, name: '刑天剑', icon: '👑', baseDamage: 45, color: 0xdc143c },
-            { id: 11, name: '蚩尤战刃', icon: '🔥', baseDamage: 50, color: 0xff4500 },
-            { id: 12, name: '魔神之剑', icon: '👿', baseDamage: 55, color: 0x8b0000 },
-            { id: 13, name: '天使圣剑', icon: '😇', baseDamage: 60, color: 0xffffff },
-            { id: 14, name: '暗翼魔剑', icon: '🦇', baseDamage: 65, color: 0x2f2f2f },
-            { id: 15, name: '龙魂剑', icon: '🐉', baseDamage: 70, color: 0x228b22 },
-            { id: 16, name: '凤凰烈焰剑', icon: '🦅', baseDamage: 75, color: 0xff6600 },
-            { id: 17, name: '雷霆神剑', icon: '⚡', baseDamage: 80, color: 0xffff00 },
-            { id: 18, name: '星辰剑', icon: '✨', baseDamage: 85, color: 0x00ffff },
-            { id: 19, name: '混沌之剑', icon: '🌌', baseDamage: 90, color: 0x9400d3 },
-            { id: 20, name: '创世神剑', icon: '👑', baseDamage: 100, color: 0xffd700 }
+            { id: 1, name: '如意金箍棒', icon: '🔧', baseDamage: 30, color: 0xffd700 },
+            { id: 2, name: '倚天剑', icon: '⚔️', baseDamage: 35, color: 0x87ceeb },
+            { id: 3, name: '屠龙刀', icon: '🗡️', baseDamage: 40, color: 0x4682b4 },
+            { id: 4, name: '赤霄剑', icon: '🔴', baseDamage: 45, color: 0xff4444 },
+            { id: 5, name: '干将莫邪', icon: '🗡️', baseDamage: 50, color: 0x9932cc },
+            { id: 6, name: '湛卢剑', icon: '⚡', baseDamage: 55, color: 0x1e90ff },
+            { id: 7, name: '泰阿剑', icon: '💎', baseDamage: 60, color: 0x00ced1 },
+            { id: 8, name: '轩辕剑', icon: '🌟', baseDamage: 65, color: 0xffa500 },
+            { id: 9, name: '盘古斧', icon: '🪓', baseDamage: 70, color: 0x8b4513 },
+            { id: 10, name: '刑天剑', icon: '👑', baseDamage: 75, color: 0xdc143c },
+            { id: 11, name: '蚩尤战刃', icon: '🔥', baseDamage: 80, color: 0xff4500 },
+            { id: 12, name: '魔神之剑', icon: '👿', baseDamage: 85, color: 0x8b0000 },
+            { id: 13, name: '天使圣剑', icon: '😇', baseDamage: 90, color: 0xffffff },
+            { id: 14, name: '暗翼魔剑', icon: '🦇', baseDamage: 95, color: 0x2f2f2f },
+            { id: 15, name: '龙魂剑', icon: '🐉', baseDamage: 100, color: 0x228b22 },
+            { id: 16, name: '凤凰烈焰剑', icon: '🦅', baseDamage: 110, color: 0xff6600 },
+            { id: 17, name: '雷霆神剑', icon: '⚡', baseDamage: 120, color: 0xffff00 },
+            { id: 18, name: '星辰剑', icon: '✨', baseDamage: 130, color: 0x00ffff },
+            { id: 19, name: '混沌之剑', icon: '🌌', baseDamage: 140, color: 0x9400d3 },
+            { id: 20, name: '创世神剑', icon: '👑', baseDamage: 150, color: 0xffd700 }
         ];
 
         // 翅膀数据 - 20级
@@ -1039,9 +1052,9 @@
 
         // 怪物类型
         const MONSTER_TYPES = {
-            wild: { name: '野哥', emoji: '👹', baseHP: 30, baseDamage: 5, exp: 10, gold: 5 },
-            daKai: { name: '大开', emoji: '👺', baseHP: 60, baseDamage: 10, exp: 25, gold: 15 },
-            boss: { name: 'BOSS', emoji: '👿', baseHP: 300, baseDamage: 25, exp: 100, gold: 100 }
+            wild: { name: '野哥', emoji: '👹', baseHP: 50, baseDamage: 2, exp: 10, gold: 5 },
+            daKai: { name: '大开', emoji: '👺', baseHP: 100, baseDamage: 3, exp: 25, gold: 15 },
+            boss: { name: '野哥终极体', emoji: '👿', baseHP: 500, baseDamage: 5, exp: 100, gold: 100 }
         };
 
         // 技能系统 - 4个技能
@@ -1095,8 +1108,8 @@
                 level: 1,
                 exp: 0,
                 expToLevel: 100,
-                hp: 100,
-                maxHp: 100,
+                hp: 1000,
+                maxHp: 1000,
                 gold: 0,
                 weaponIndex: 0,
                 weaponLevel: 1,
@@ -1548,23 +1561,28 @@
             const group = new THREE.Group();
 
             // 剑身 - 更大
-            const bladeLength = 1.5 + level * 0.2;
-            const bladeWidth = 0.15 + level * 0.02;
-            const bladeGeo = new THREE.BoxGeometry(bladeWidth, bladeLength, 0.05);
+            const bladeLength = 2 + level * 0.25;
+            const bladeWidth = 0.2 + level * 0.03;
+            const bladeGeo = new THREE.BoxGeometry(bladeWidth, bladeLength, 0.08);
             const bladeMat = new THREE.MeshStandardMaterial({
                 color: weapon.color,
                 metalness: 0.95,
                 roughness: 0.1,
                 emissive: weapon.color,
-                emissiveIntensity: 0.4 + level * 0.05
+                emissiveIntensity: 0.5 + level * 0.08
             });
             const blade = new THREE.Mesh(bladeGeo, bladeMat);
             blade.position.y = bladeLength / 2;
             blade.castShadow = true;
             group.add(blade);
 
+            // 添加武器点光源 - 使武器更亮更明显
+            const weaponLight = new THREE.PointLight(weapon.color, 1 + level * 0.2, 5);
+            weaponLight.position.y = bladeLength / 2;
+            group.add(weaponLight);
+
             // 剑刃高光
-            const edgeGeo = new THREE.BoxGeometry(bladeWidth * 0.3, bladeLength * 0.95, 0.08);
+            const edgeGeo = new THREE.BoxGeometry(bladeWidth * 0.3, bladeLength * 0.95, 0.12);
             const edgeMat = new THREE.MeshBasicMaterial({
                 color: 0xffffff,
                 transparent: true,
@@ -1950,7 +1968,7 @@
             isAttacking = true;
 
             const weapon = WEAPONS[gameState.player.weaponIndex];
-            const damage = weapon.baseDamage + (gameState.player.weaponLevel - 1) * 5;
+            const damage = weapon.baseDamage + (gameState.player.weaponLevel - 1) * 15;
             const range = CONFIG.ATTACK_RANGE + gameState.player.weaponLevel * 0.5;
 
             // 检查击中
@@ -2461,7 +2479,7 @@
                 gameState.player.exp -= gameState.player.expToLevel;
                 gameState.player.level++;
                 gameState.player.expToLevel = Math.floor(gameState.player.expToLevel * 1.5);
-                gameState.player.maxHp += 10;
+                gameState.player.maxHp += 100;
                 gameState.player.hp = gameState.player.maxHp;
                 showLevelUp();
             }
@@ -2533,7 +2551,7 @@
             document.getElementById('weaponIcon').textContent = WEAPONS[gameState.player.weaponIndex].icon;
 
             const weapon = WEAPONS[gameState.player.weaponIndex];
-            const damage = weapon.baseDamage + (gameState.player.weaponLevel - 1) * 5;
+            const damage = weapon.baseDamage + (gameState.player.weaponLevel - 1) * 15;
             document.getElementById('weaponDamage').textContent = damage;
             document.getElementById('weaponFullName').textContent = `${weapon.name} Lv.${gameState.player.weaponLevel}`;
 
@@ -2751,14 +2769,14 @@
             }
         }
 
-        // 显示消息
+        // 显示消息 - 顶部小提示
         function showMessage(text) {
             const msg = document.getElementById('message');
             msg.textContent = text;
             msg.className = '';
             msg.style.display = 'block';
 
-            setTimeout(() => msg.style.display = 'none', 1500);
+            setTimeout(() => msg.style.display = 'none', 800);
         }
 
         // 切换商店
@@ -2799,7 +2817,7 @@
                 flyBtn.style.background = 'rgba(100, 255, 100, 0.7)';
                 flyBtn.style.borderColor = '#66ff66';
                 mobileMenu.classList.add('flying');
-                showMessage('🦅 起飞！移动速度提升！');
+                showMessage('🦅 起飞！怪物打不到你！');
             } else {
                 flyBtn.textContent = '🪽';
                 flyBtn.style.background = 'rgba(100, 100, 255, 0.7)';
@@ -2836,7 +2854,7 @@
                 const owned = gameState.unlockedWeapons.includes(index);
                 const isCurrent = gameState.player.weaponIndex === index;
                 const level = isCurrent ? gameState.player.weaponLevel : 1;
-                const damage = weapon.baseDamage + (level - 1) * 5;
+                const damage = weapon.baseDamage + (level - 1) * 15;
 
                 const item = document.createElement('div');
                 item.className = `shop-item ${isCurrent ? 'equipped' : ''}`;
@@ -2887,8 +2905,8 @@
                     level: 1,
                     exp: 0,
                     expToLevel: 100,
-                    hp: 100,
-                    maxHp: 100,
+                    hp: 1000,
+                    maxHp: 1000,
                     gold: 0,
                     weaponIndex: 0,
                     weaponLevel: 1,
@@ -2961,14 +2979,16 @@
 
             const delta = clock.getDelta();
 
-            // 玩家移动
-            const speed = CONFIG.PLAYER_SPEED * (1 + WINGS[gameState.equippedWing].speedBonus);
+            // 玩家移动 - 飞行时速度增加
+            const wingSpeedBonus = WINGS[gameState.equippedWing].speedBonus;
+            const flySpeedBonus = gameState.player.flying ? 0.5 : 0; // 飞行额外速度加成
+            const speed = CONFIG.PLAYER_SPEED * (1 + wingSpeedBonus + flySpeedBonus);
 
             // 检测是否为移动端
             const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
 
-            // 飞行高度处理
-            const flyHeight = gameState.player.flying ? 3 : 0;
+            // 飞行高度处理 - 飞高一些让怪物打不到
+            const flyHeight = gameState.player.flying ? 8 : 0;
             player.position.y += (flyHeight - player.position.y) * 0.1;
 
             if (isMobile) {
@@ -3036,14 +3056,17 @@
                 const dz = player.position.z - monster.position.z;
                 const distance = Math.sqrt(dx * dx + dz * dz);
 
+                // 飞行时怪物无法攻击（玩家飞得太高）
+                const isFlying = gameState.player.flying && player.position.y > 4;
+
                 if (distance > 2) {
                     monster.position.x += (dx / distance) * monster.userData.speed;
                     monster.position.z += (dz / distance) * monster.userData.speed;
 
                     // 面向玩家
                     monster.rotation.y = Math.atan2(dx, dz);
-                } else {
-                    // 攻击玩家
+                } else if (!isFlying) {
+                    // 攻击玩家 - 只有在地面时才能被攻击
                     const now = Date.now();
                     if (now - monster.userData.lastAttack > 1000) {
                         monster.userData.lastAttack = now;
@@ -3063,6 +3086,9 @@
 
                         updateHUD();
                     }
+                } else {
+                    // 飞行时怪物只能干瞪眼
+                    monster.rotation.y = Math.atan2(dx, dz);
                 }
             });
 
@@ -3247,7 +3273,7 @@
 【怪物】
 👹 野哥: 普通怪物
 👺 大开: 精英怪物
-👿 BOSS: 每10波出现
+👿 野哥终极体: 每10波出现
 
 祝游戏愉快!
                 `);
@@ -3278,7 +3304,7 @@
 【怪物】
 👹 野哥: 普通怪物
 👺 大开: 精英怪物
-👿 BOSS: 每10波出现
+👿 野哥终极体: 每10波出现
 
 祝游戏愉快!
                 `);
