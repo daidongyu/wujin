@@ -944,7 +944,7 @@
             WORLD_SIZE: 200,
             PLAYER_SPEED: 0.3,
             MONSTER_SPEED: 0.08,
-            ATTACK_RANGE: 3,
+            ATTACK_RANGE: 8,
             ATTACK_COOLDOWN: 500,
             SPAWN_INTERVAL: 3000,
             MAX_MONSTERS: 15
@@ -1082,6 +1082,8 @@
         let joystickTouch = null;
         let joystickStartX = 0;
         let joystickStartY = 0;
+        let joystickX = 0; // 摇杆X偏移 (-1 ~ 1)
+        let joystickY = 0; // 摇杆Y偏移 (-1 ~ 1)
         let attackTouch = null;
         let dodgeTouch = null;
 
@@ -1124,43 +1126,18 @@
 
                         joystickThumb.style.transform = `translate(calc(-50% + ${thumbX}px), calc(-50% + ${thumbY}px))`;
 
-                        // 更新移动状态
-                        const normalizedDist = distance / maxDistance;
+                        // 标准化摇杆偏移 (-1 ~ 1)
+                        joystickX = dx / maxDistance;
+                        joystickY = dy / maxDistance;
 
-                        // 判断方向
-                        const absAngle = Math.abs(angle);
-                        if (absAngle > Math.PI * 0.25 && absAngle < Math.PI * 0.75) {
-                            // 上下
-                            keys.forward = angle < 0 && normalizedDist > 0.2;
-                            keys.backward = angle > 0 && normalizedDist > 0.2;
-                        } else {
-                            keys.forward = false;
-                            keys.backward = false;
-                        }
+                        // 限制范围
+                        joystickX = Math.max(-1, Math.min(1, joystickX));
+                        joystickY = Math.max(-1, Math.min(1, joystickY));
 
-                        if (absAngle < Math.PI * 0.25 || absAngle > Math.PI * 0.75) {
-                            // 左右
-                            keys.left = (absAngle > Math.PI * 0.625 || absAngle < Math.PI * 0.125) && angle < 0 && normalizedDist > 0.2;
-                            keys.right = (absAngle < Math.PI * 0.375 && angle > 0) && normalizedDist > 0.2;
-                        } else {
-                            keys.left = false;
-                            keys.right = false;
-                        }
-
-                        // 旋转
-                        if (normalizedDist > 0.5) {
-                            if (angle > -Math.PI * 0.625 && angle < -Math.PI * 0.125) {
-                                keys.left = true;
-                                keys.right = false;
-                            } else if (angle > Math.PI * 0.125 && angle < Math.PI * 0.625) {
-                                keys.right = true;
-                                keys.left = false;
-                            }
-                        }
-
-                        // 添加玩家旋转
-                        if (normalizedDist > 0.1) {
-                            player.rotation.y = angle + Math.PI;
+                        // 如果距离太小，清除移动
+                        if (distance < maxDistance * 0.2) {
+                            joystickX = 0;
+                            joystickY = 0;
                         }
 
                         break;
@@ -1180,11 +1157,9 @@
                 if (!found) {
                     joystickActive = false;
                     joystickTouch = null;
+                    joystickX = 0;
+                    joystickY = 0;
                     joystickThumb.style.transform = 'translate(-50%, -50%)';
-                    keys.forward = false;
-                    keys.backward = false;
-                    keys.left = false;
-                    keys.right = false;
                 }
             });
 
@@ -1814,7 +1789,7 @@
 
             const weapon = WEAPONS[gameState.player.weaponIndex];
             const damage = weapon.baseDamage + (gameState.player.weaponLevel - 1) * 5;
-            const range = CONFIG.ATTACK_RANGE + gameState.player.weaponLevel * 0.2;
+            const range = CONFIG.ATTACK_RANGE + gameState.player.weaponLevel * 0.5;
 
             // 检查击中
             monsters.forEach((monster, index) => {
@@ -1831,7 +1806,7 @@
                 let angleDiff = Math.abs(angleToMonster - playerAngle);
                 if (angleDiff > Math.PI) angleDiff = Math.PI * 2 - angleDiff;
 
-                if (distance < range && angleDiff < Math.PI / 2) {
+                if (distance < range && angleDiff < Math.PI * 0.85) {
                     // 命中
                     monster.userData.hp -= damage;
                     showDamageNumber(monster.position, damage);
@@ -1874,11 +1849,12 @@
         // 创建攻击特效
         function createAttackEffect() {
             const weapon = WEAPONS[gameState.player.weaponIndex];
-            const effectGeo = new THREE.RingGeometry(0.5, 1.5, 16);
+            const effectRange = CONFIG.ATTACK_RANGE + gameState.player.weaponLevel * 0.5;
+            const effectGeo = new THREE.RingGeometry(effectRange * 0.3, effectRange, 32);
             const effectMat = new THREE.MeshBasicMaterial({
                 color: weapon.color,
                 transparent: true,
-                opacity: 0.6,
+                opacity: 0.5,
                 side: THREE.DoubleSide
             });
             const effect = new THREE.Mesh(effectGeo, effectMat);
@@ -2367,21 +2343,44 @@
             // 玩家移动
             const speed = CONFIG.PLAYER_SPEED * (1 + WINGS[gameState.equippedWing].speedBonus);
 
-            if (keys.forward) {
-                player.position.x -= Math.sin(player.rotation.y) * speed;
-                player.position.z -= Math.cos(player.rotation.y) * speed;
-            }
-            if (keys.backward) {
-                player.position.x += Math.sin(player.rotation.y) * speed;
-                player.position.z += Math.cos(player.rotation.y) * speed;
-            }
+            // 检测是否为移动端
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
 
-            // 旋转
-            if (keys.left) {
-                player.rotation.y += 0.05;
-            }
-            if (keys.right) {
-                player.rotation.y -= 0.05;
+            if (isMobile) {
+                // 移动端：使用摇杆直接控制移动方向
+                if (joystickActive && (Math.abs(joystickX) > 0.1 || Math.abs(joystickY) > 0.1)) {
+                    // joystickY < 0 表示向上推摇杆，应该向前移动（-Z方向）
+                    // joystickX > 0 表示向右推摇杆，应该向右移动（+X方向）
+                    const moveX = joystickX * speed;
+                    const moveZ = joystickY * speed; // 向上推(-Y) = 向前(+Z暂时理解，实际是-Z)
+
+                    // 转换为世界坐标（向上推=向-Z移动）
+                    player.position.x += moveX;
+                    player.position.z -= moveZ;
+
+                    // 更新角色朝向（面向摇杆方向的反方向，即摇杆推的方向）
+                    if (Math.abs(joystickX) > 0.1 || Math.abs(joystickY) > 0.1) {
+                        player.rotation.y = Math.atan2(joystickX, -joystickY);
+                    }
+                }
+            } else {
+                // PC端：使用按键控制
+                if (keys.forward) {
+                    player.position.x -= Math.sin(player.rotation.y) * speed;
+                    player.position.z -= Math.cos(player.rotation.y) * speed;
+                }
+                if (keys.backward) {
+                    player.position.x += Math.sin(player.rotation.y) * speed;
+                    player.position.z += Math.cos(player.rotation.y) * speed;
+                }
+
+                // 旋转
+                if (keys.left) {
+                    player.rotation.y += 0.05;
+                }
+                if (keys.right) {
+                    player.rotation.y -= 0.05;
+                }
             }
 
             // 边界限制
