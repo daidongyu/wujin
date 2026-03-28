@@ -1210,13 +1210,16 @@
                 // 左侧区域点击设置移动方向
                 if (x < window.innerWidth * 0.4) {
                     const centerX = window.innerWidth / 2;
-                    const centerY = window.innerHeight;
+                    const centerY = window.innerHeight * 0.7;
 
                     const dx = x - centerX;
-                    const dy = y - centerY;
-                    const angle = Math.atan2(dx, -dy);
+                    const dy = centerY - y; // 反转Y使向上点击 = 向上
 
-                    player.rotation.y = angle + Math.PI;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist > 20) {
+                        // 与摇杆保持一致的方向映射
+                        player.rotation.y = Math.atan2(-dx / dist, dy / dist);
+                    }
                 }
             });
 
@@ -2349,18 +2352,25 @@
             if (isMobile) {
                 // 移动端：使用摇杆直接控制移动方向
                 if (joystickActive && (Math.abs(joystickX) > 0.1 || Math.abs(joystickY) > 0.1)) {
-                    // joystickY < 0 表示向上推摇杆，应该向前移动（-Z方向）
-                    // joystickX > 0 表示向右推摇杆，应该向右移动（+X方向）
+                    // 相机在 (0, 15, 20) 向下看
+                    // 屏幕上方 = 世界 -Z 方向
+                    // 屏幕右方 = 世界 +X 方向
+                    // joystickX > 0 = 向右推 = 屏幕右 = 世界 +X
+                    // joystickY > 0 = 向下推 = 屏幕下 = 世界 +Z
                     const moveX = joystickX * speed;
-                    const moveZ = joystickY * speed; // 向上推(-Y) = 向前(+Z暂时理解，实际是-Z)
+                    const moveZ = joystickY * speed;
 
-                    // 转换为世界坐标（向上推=向-Z移动）
                     player.position.x += moveX;
-                    player.position.z -= moveZ;
+                    player.position.z += moveZ;
 
-                    // 更新角色朝向（面向摇杆方向的反方向，即摇杆推的方向）
+                    // 更新角色朝向
+                    // Math.atan2(-joystickX, joystickY) 确保:
+                    // 向上推 → 面向 -Z (屏幕上方)
+                    // 向下推 → 面向 +Z (屏幕下方)
+                    // 向右推 → 面向 +X (屏幕右方)
+                    // 向左推 → 面向 -X (屏幕左方)
                     if (Math.abs(joystickX) > 0.1 || Math.abs(joystickY) > 0.1) {
-                        player.rotation.y = Math.atan2(joystickX, -joystickY);
+                        player.rotation.y = Math.atan2(-joystickX, joystickY);
                     }
                 }
             } else {
