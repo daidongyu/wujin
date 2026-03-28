@@ -1818,14 +1818,14 @@
             return group;
         }
 
-        // 创建玩家剑 - 简洁优雅的长剑
+        // 创建玩家剑 - 更宽的剑身，带有光晕效果
         function createSword(weaponIndex, level) {
             const weapon = WEAPONS[weaponIndex];
             const group = new THREE.Group();
 
-            // 剑身 - 简洁的BoxGeometry，大小固定不变
+            // 剑身 - 更宽的BoxGeometry，大小固定
             const bladeLength = 2.5;
-            const bladeWidth = 0.12;
+            const bladeWidth = 0.25; // 加宽剑身
 
             // 剑身主体
             const bladeGeo = new THREE.BoxGeometry(bladeWidth, bladeLength, 0.03);
@@ -1840,8 +1840,8 @@
             blade.position.y = bladeLength / 2 + 0.3;
             group.add(blade);
 
-            // 剑尖（金字塔形）
-            const tipGeo = new THREE.ConeGeometry(bladeWidth * 0.6, bladeLength * 0.2, 4);
+            // 剑尖（金字塔形）- 加宽
+            const tipGeo = new THREE.ConeGeometry(bladeWidth * 0.8, bladeLength * 0.2, 4);
             const tipMat = new THREE.MeshStandardMaterial({
                 color: weapon.color,
                 metalness: 0.9,
@@ -1853,8 +1853,8 @@
             tip.rotation.x = Math.PI;
             group.add(tip);
 
-            // 剑格（十字护手）
-            const guardGeo = new THREE.BoxGeometry(0.4, 0.08, 0.08);
+            // 剑格（十字护手）- 加宽
+            const guardGeo = new THREE.BoxGeometry(0.6, 0.1, 0.1);
             const guardMat = new THREE.MeshStandardMaterial({
                 color: weapon.color,
                 metalness: 0.95,
@@ -1990,12 +1990,14 @@
             const leftWing = createWingPanel('left');
             leftWing.position.set(-0.3, 0, 0);
             leftWing.rotation.y = Math.PI / 6;
+            leftWing.userData.side = 'left';
             group.add(leftWing);
 
             // 右翼
             const rightWing = createWingPanel('right');
             rightWing.position.set(0.3, 0, 0);
             rightWing.rotation.y = -Math.PI / 6;
+            rightWing.userData.side = 'right';
             group.add(rightWing);
 
             // 核心发光球体 - 表示翅膀能量中心
@@ -2381,10 +2383,11 @@
         function createSlashWave(damage, skill) {
             const range = CONFIG.ATTACK_RANGE * 2.5;
 
-            // 创建多道剑气
-            for (let i = 0; i < 5; i++) {
+            // 创建多道指向性剑气 - 带光晕
+            for (let i = 0; i < 3; i++) {
                 setTimeout(() => {
-                    const slashGeo = new THREE.PlaneGeometry(range, 1.5);
+                    // 剑气主体
+                    const slashGeo = new THREE.PlaneGeometry(range * 0.8, 2);
                     const slashMat = new THREE.MeshBasicMaterial({
                         color: skill.color,
                         transparent: true,
@@ -2395,13 +2398,29 @@
                     const slash = new THREE.Mesh(slashGeo, slashMat);
                     slash.position.copy(player.position);
                     slash.position.y = 1.5;
-                    slash.position.x += Math.sin(player.rotation.y) * (i * 2);
-                    slash.position.z += Math.cos(player.rotation.y) * (i * 2);
+                    slash.position.x += Math.sin(player.rotation.y) * (i * 1.5);
+                    slash.position.z += Math.cos(player.rotation.y) * (i * 1.5);
                     slash.rotation.y = player.rotation.y;
-                    slash.rotation.x = -Math.PI / 6;
+                    slash.rotation.x = -Math.PI / 8;
                     slash.userData = { life: 1, type: 'slash', rotSpeed: 0 };
                     scene.add(slash);
                     particles.push(slash);
+
+                    // 剑气光晕
+                    const glowGeo = new THREE.PlaneGeometry(range * 0.8, 3);
+                    const glowMat = new THREE.MeshBasicMaterial({
+                        color: skill.color,
+                        transparent: true,
+                        opacity: 0.2,
+                        side: THREE.DoubleSide,
+                        depthWrite: false
+                    });
+                    const glow = new THREE.Mesh(glowGeo, glowMat);
+                    glow.position.copy(slash.position);
+                    glow.rotation.copy(slash.rotation);
+                    glow.userData = { life: 1, type: 'slash', rotSpeed: 0 };
+                    scene.add(glow);
+                    particles.push(glow);
 
                     // 检测剑气路径上的怪物
                     monsters.forEach((monster, index) => {
@@ -2439,8 +2458,8 @@
             });
 
             if (nearestMonster) {
-                // 雷电特效
-                const boltGeo = new THREE.CylinderGeometry(0.1, 0.3, nearestDist + 5, 8);
+                // 雷电光柱
+                const boltGeo = new THREE.CylinderGeometry(0.3, 0.5, nearestDist + 5, 8);
                 const boltMat = new THREE.MeshBasicMaterial({
                     color: skill.color,
                     transparent: true,
@@ -2462,33 +2481,23 @@
                 scene.add(bolt);
                 particles.push(bolt);
 
+                // 雷电光晕
+                const glowGeo = new THREE.CylinderGeometry(0.6, 1.0, nearestDist + 5, 8);
+                const glowMat = new THREE.MeshBasicMaterial({
+                    color: 0xffffff,
+                    transparent: true,
+                    opacity: 0.3
+                });
+                const glow = new THREE.Mesh(glowGeo, glowMat);
+                glow.position.copy(bolt.position);
+                glow.rotation.copy(bolt.rotation);
+                glow.userData = { life: 1, type: 'bolt' };
+                scene.add(glow);
+                particles.push(glow);
+
                 // 伤害
                 nearestMonster.userData.hp -= damage;
                 showDamageNumber(nearestMonster.position, damage);
-
-                // 爆炸效果
-                for (let i = 0; i < 20; i++) {
-                    const sparkGeo = new THREE.SphereGeometry(0.1);
-                    const sparkMat = new THREE.MeshBasicMaterial({
-                        color: skill.color,
-                        transparent: true,
-                        opacity: 1
-                    });
-                    const spark = new THREE.Mesh(sparkGeo, sparkMat);
-                    spark.position.copy(nearestMonster.position);
-                    spark.position.y += 1;
-                    spark.userData = {
-                        life: 1,
-                        type: 'spark',
-                        velocity: new THREE.Vector3(
-                            (Math.random() - 0.5) * 0.5,
-                            Math.random() * 0.5,
-                            (Math.random() - 0.5) * 0.5
-                        )
-                    };
-                    scene.add(spark);
-                    particles.push(spark);
-                }
 
                 if (nearestMonster.userData.hp <= 0) {
                     const idx = monsters.indexOf(nearestMonster);
@@ -2504,45 +2513,37 @@
         function createFlameBurst(damage, skill) {
             const range = CONFIG.ATTACK_RANGE * 1.8;
 
-            // 火焰光环
-            const flameGeo = new THREE.TorusGeometry(range, 0.5, 16, 32);
+            // 火焰光环 - 带光晕
+            const flameGeo = new THREE.TorusGeometry(range, 0.8, 16, 32);
             const flameMat = new THREE.MeshBasicMaterial({
                 color: skill.color,
                 transparent: true,
-                opacity: 0.7,
+                opacity: 0.8,
                 side: THREE.DoubleSide
             });
             const flame = new THREE.Mesh(flameGeo, flameMat);
             flame.position.copy(player.position);
             flame.position.y = 1.5;
             flame.rotation.x = Math.PI / 2;
+            flame.rotation.z = player.rotation.y;
             flame.userData = { life: 1, type: 'flame' };
             scene.add(flame);
             particles.push(flame);
 
-            // 火焰粒子
-            for (let i = 0; i < 30; i++) {
-                const sparkGeo = new THREE.SphereGeometry(0.15 + Math.random() * 0.1);
-                const sparkMat = new THREE.MeshBasicMaterial({
-                    color: Math.random() > 0.5 ? skill.color : 0xff8800,
-                    transparent: true,
-                    opacity: 1
-                });
-                const spark = new THREE.Mesh(sparkGeo, sparkMat);
-                spark.position.copy(player.position);
-                spark.position.y = 1.5;
-                spark.userData = {
-                    life: 1,
-                    type: 'spark',
-                    velocity: new THREE.Vector3(
-                        (Math.random() - 0.5) * 0.8,
-                        Math.random() * 0.5,
-                        (Math.random() - 0.5) * 0.8
-                    )
-                };
-                scene.add(spark);
-                particles.push(spark);
-            }
+            // 火焰光晕
+            const glowGeo = new THREE.TorusGeometry(range, 1.5, 16, 32);
+            const glowMat = new THREE.MeshBasicMaterial({
+                color: skill.color,
+                transparent: true,
+                opacity: 0.25,
+                side: THREE.DoubleSide
+            });
+            const glow = new THREE.Mesh(glowGeo, glowMat);
+            glow.position.copy(flame.position);
+            glow.rotation.copy(flame.rotation);
+            glow.userData = { life: 1, type: 'flame' };
+            scene.add(glow);
+            particles.push(glow);
 
             // 范围伤害
             monsters.forEach((monster, index) => {
@@ -2564,13 +2565,13 @@
         function createWhirlwind(damage, skill) {
             const range = CONFIG.ATTACK_RANGE * 2;
 
-            // 多个旋转刀刃
-            for (let i = 0; i < 8; i++) {
-                const bladeGeo = new THREE.PlaneGeometry(1.5, 0.4);
+            // 多个旋转刀刃 - 带光晕
+            for (let i = 0; i < 5; i++) {
+                const bladeGeo = new THREE.PlaneGeometry(2, 0.6);
                 const bladeMat = new THREE.MeshBasicMaterial({
                     color: skill.color,
                     transparent: true,
-                    opacity: 0.7,
+                    opacity: 0.8,
                     side: THREE.DoubleSide
                 });
                 const blade = new THREE.Mesh(bladeGeo, bladeMat);
@@ -2579,11 +2580,30 @@
                 blade.userData = {
                     life: 1,
                     type: 'whirlwind',
-                    angle: (i / 8) * Math.PI * 2,
+                    angle: (i / 5) * Math.PI * 2,
                     radius: 1
                 };
                 scene.add(blade);
                 particles.push(blade);
+
+                // 刀刃光晕
+                const glowGeo = new THREE.PlaneGeometry(3, 1);
+                const glowMat = new THREE.MeshBasicMaterial({
+                    color: skill.color,
+                    transparent: true,
+                    opacity: 0.25,
+                    side: THREE.DoubleSide
+                });
+                const glow = new THREE.Mesh(glowGeo, glowMat);
+                glow.position.copy(blade.position);
+                glow.userData = {
+                    life: 1,
+                    type: 'whirlwind',
+                    angle: (i / 5) * Math.PI * 2,
+                    radius: 1
+                };
+                scene.add(glow);
+                particles.push(glow);
             }
 
             // 范围伤害（多次判定）
@@ -2629,126 +2649,93 @@
             const level = gameState.player.weaponLevel;
             const effectRange = CONFIG.ATTACK_RANGE + level * 0.5;
 
-            // 1. 主要剑气光弧 - 扇形剑气
-            const slashCount = 3;
-            for (let i = 0; i < slashCount; i++) {
-                const angleOffset = (i - 1) * 0.3;
-                const slashGeo = new THREE.PlaneGeometry(effectRange * 0.8, 0.5);
-                const slashMat = new THREE.MeshBasicMaterial({
-                    color: weapon.color,
-                    transparent: true,
-                    opacity: 0.8 - i * 0.2,
-                    side: THREE.DoubleSide,
-                    depthWrite: false
-                });
-                const slash = new THREE.Mesh(slashGeo, slashMat);
-                slash.position.copy(player.position);
-                slash.position.y = 1.5;
-                slash.rotation.y = player.rotation.y + angleOffset;
-                slash.rotation.x = -Math.PI / 6;
-                slash.userData = {
-                    life: 1,
-                    type: 'slash',
-                    rotSpeed: 0.05 * (3 - i)
-                };
-                scene.add(slash);
-                particles.push(slash);
-            }
-
-            // 2. 剑光冲击波 - 从剑尖向外扩散
-            const waveGeo = new THREE.RingGeometry(0.3, effectRange, 32);
-            const waveMat = new THREE.MeshBasicMaterial({
+            // 1. 指向性剑气光刃 - 向前发射的光剑形状
+            const slashGeo = new THREE.PlaneGeometry(effectRange * 1.2, 1.2);
+            const slashMat = new THREE.MeshBasicMaterial({
                 color: weapon.color,
                 transparent: true,
-                opacity: 0.6,
+                opacity: 0.7,
                 side: THREE.DoubleSide,
                 depthWrite: false
             });
-            const wave = new THREE.Mesh(waveGeo, waveMat);
-            wave.position.copy(player.position);
-            wave.position.y = 1.5;
-            wave.rotation.x = -Math.PI / 2;
-            wave.rotation.z = player.rotation.y;
-            wave.userData = { life: 1, type: 'wave', scale: 1 };
-            scene.add(wave);
-            particles.push(wave);
+            const slash = new THREE.Mesh(slashGeo, slashMat);
+            slash.position.copy(player.position);
+            slash.position.y = 1.5;
+            slash.position.x += Math.sin(player.rotation.y) * effectRange * 0.5;
+            slash.position.z += Math.cos(player.rotation.y) * effectRange * 0.5;
+            slash.rotation.y = player.rotation.y;
+            slash.rotation.x = -Math.PI / 8;
+            slash.userData = { life: 1, type: 'slash', rotSpeed: 0.1 };
+            scene.add(slash);
+            particles.push(slash);
 
-            // 3. 中心光球
-            const coreGeo = new THREE.SphereGeometry(0.3 + level * 0.05, 16, 16);
+            // 2. 剑身光晕 - 跟随剑的延长线
+            const glowGeo = new THREE.PlaneGeometry(1.0, effectRange * 0.8);
+            const glowMat = new THREE.MeshBasicMaterial({
+                color: weapon.color,
+                transparent: true,
+                opacity: 0.3,
+                side: THREE.DoubleSide,
+                depthWrite: false
+            });
+            const glow = new THREE.Mesh(glowGeo, glowMat);
+            glow.position.copy(player.position);
+            glow.position.y = 1.5;
+            glow.position.x += Math.sin(player.rotation.y) * effectRange * 0.4;
+            glow.position.z += Math.cos(player.rotation.y) * effectRange * 0.4;
+            glow.rotation.y = player.rotation.y;
+            glow.userData = { life: 1, type: 'slash', rotSpeed: 0 };
+            scene.add(glow);
+            particles.push(glow);
+
+            // 3. 剑尖光球 - 向前飞行的能量球
+            const coreGeo = new THREE.SphereGeometry(0.5 + level * 0.1, 16, 16);
             const coreMat = new THREE.MeshBasicMaterial({
                 color: 0xffffff,
                 transparent: true,
-                opacity: 0.9
+                opacity: 0.95
             });
             const core = new THREE.Mesh(coreGeo, coreMat);
             core.position.copy(player.position);
             core.position.y = 1.5;
             core.position.x += Math.sin(player.rotation.y) * 1.5;
             core.position.z += Math.cos(player.rotation.y) * 1.5;
-            core.userData = { life: 1, type: 'core' };
+            core.userData = { life: 1, type: 'core', direction: player.rotation.y };
             scene.add(core);
             particles.push(core);
 
-            // 4. 火花粒子
-            for (let i = 0; i < 15 + level * 2; i++) {
-                const sparkGeo = new THREE.SphereGeometry(0.05 + Math.random() * 0.05);
-                const sparkMat = new THREE.MeshBasicMaterial({
-                    color: Math.random() > 0.5 ? weapon.color : 0xffff00,
-                    transparent: true,
-                    opacity: 1
-                });
-                const spark = new THREE.Mesh(sparkGeo, sparkMat);
-                spark.position.copy(player.position);
-                spark.position.y = 1.5;
-                spark.position.x += Math.sin(player.rotation.y) * 0.5;
-                spark.position.z += Math.cos(player.rotation.y) * 0.5;
-                spark.userData = {
-                    life: 1,
-                    type: 'spark',
-                    velocity: new THREE.Vector3(
-                        (Math.random() - 0.5) * 0.5 + Math.sin(player.rotation.y) * 0.3,
-                        Math.random() * 0.3,
-                        (Math.random() - 0.5) * 0.5 + Math.cos(player.rotation.y) * 0.3
-                    )
-                };
-                scene.add(spark);
-                particles.push(spark);
-            }
+            // 4. 光环环绕 - 攻击时的能量光环
+            const haloGeo = new THREE.TorusGeometry(1.5, 0.1, 8, 32);
+            const haloMat = new THREE.MeshBasicMaterial({
+                color: weapon.color,
+                transparent: true,
+                opacity: 0.5
+            });
+            const halo = new THREE.Mesh(haloGeo, haloMat);
+            halo.position.copy(player.position);
+            halo.position.y = 1.5;
+            halo.rotation.x = Math.PI / 2;
+            halo.rotation.z = player.rotation.y;
+            halo.userData = { life: 1, type: 'halo', rotSpeed: 0.15 };
+            scene.add(halo);
+            particles.push(halo);
 
-            // 5. 光环特效（高级武器）
-            if (level >= 5) {
-                for (let i = 0; i < 2; i++) {
-                    const haloGeo = new THREE.TorusGeometry(1 + i * 0.5, 0.05, 8, 32);
-                    const haloMat = new THREE.MeshBasicMaterial({
-                        color: weapon.color,
-                        transparent: true,
-                        opacity: 0.4 - i * 0.15
-                    });
-                    const halo = new THREE.Mesh(haloGeo, haloMat);
-                    halo.position.copy(player.position);
-                    halo.position.y = 1.5;
-                    halo.rotation.x = Math.PI / 2 + Math.PI / 6;
-                    halo.rotation.z = player.rotation.y;
-                    halo.userData = { life: 1, type: 'halo', rotSpeed: 0.1 * (i === 0 ? 1 : -1) };
-                    scene.add(halo);
-                    particles.push(halo);
-                }
-            }
-
-            // 6. 屏幕震动效果
-            if (level >= 3) {
-                const originalCamPos = camera.position.clone();
-                let shakeCount = 0;
-                const shakeInterval = setInterval(() => {
-                    camera.position.x = originalCamPos.x + (Math.random() - 0.5) * 0.3;
-                    camera.position.y = originalCamPos.y + (Math.random() - 0.5) * 0.3;
-                    shakeCount++;
-                    if (shakeCount > 5) {
-                        clearInterval(shakeInterval);
-                        camera.position.copy(originalCamPos);
-                    }
-                }, 30);
-            }
+            // 5. 边缘光晕
+            const edgeGlowGeo = new THREE.RingGeometry(1.4, 2.0, 32);
+            const edgeGlowMat = new THREE.MeshBasicMaterial({
+                color: weapon.color,
+                transparent: true,
+                opacity: 0.2,
+                side: THREE.DoubleSide
+            });
+            const edgeGlow = new THREE.Mesh(edgeGlowGeo, edgeGlowMat);
+            edgeGlow.position.copy(player.position);
+            edgeGlow.position.y = 1.5;
+            edgeGlow.rotation.x = -Math.PI / 2;
+            edgeGlow.rotation.z = player.rotation.y;
+            edgeGlow.userData = { life: 1, type: 'halo', rotSpeed: -0.08 };
+            scene.add(edgeGlow);
+            particles.push(edgeGlow);
         }
 
         // 击杀怪物
@@ -3675,29 +3662,24 @@
                 playerSword.rotation.z = Math.sin(Date.now() * 0.003) * 0.1;
             }
 
-            // 翅膀动画 - 更精美更自然的扇动效果
+            // 翅膀动画 - 简洁优雅的扇动
             if (playerWing) {
                 const time = Date.now() * 0.005;
                 const isFlying = gameState.player.flying;
-                const wingIndex = gameState.equippedWing;
-                const flapSpeed = isFlying ? 3 : 1.5; // 飞行时扇动更快
-                const flapIntensity = isFlying ? 0.5 : 0.3; // 飞行时幅度更大
+                const flapSpeed = isFlying ? 2 : 1;
+                const flapIntensity = isFlying ? 0.3 : 0.15;
 
                 playerWing.children.forEach((child) => {
-                    if (child.userData.wingIndex !== undefined) {
-                        // 羽毛层，每层有不同的扇动
-                        const idx = child.userData.wingIndex;
-                        const side = child.userData.side === 'left' ? 1 : -1;
-
-                        // 上下扇动
-                        child.rotation.z = side * (0.1 + idx * 0.05) + Math.sin(time * flapSpeed + idx * 0.5) * flapIntensity;
-                        // 前后摆动
-                        child.rotation.y += Math.sin(time * flapSpeed * 0.7 + idx) * 0.02;
+                    // 简洁的上下扇动
+                    if (child.userData.side === 'left') {
+                        child.rotation.z = 0.3 + Math.sin(time * flapSpeed) * flapIntensity;
+                    } else if (child.userData.side === 'right') {
+                        child.rotation.z = -0.3 + Math.sin(time * flapSpeed + Math.PI) * flapIntensity;
                     }
                 });
 
-                // 飞行时翅膀位置升高
-                const targetY = isFlying ? 4 : 2;
+                // 翅膀位置跟随飞行状态
+                const targetY = isFlying ? 3.5 : 2;
                 playerWing.position.y += (targetY - playerWing.position.y) * 0.1;
             }
 
