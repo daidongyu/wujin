@@ -648,27 +648,6 @@
             padding: 8px 16px;
         }
 
-        /* 飞行按钮 - 更醒目 */
-        .flying-btn {
-            position: absolute;
-            bottom: 20px;
-            left: 160px;
-            width: auto;
-            height: 50px;
-            font-size: 16px;
-            font-weight: bold;
-            background: linear-gradient(135deg, rgba(100, 100, 255, 0.8), rgba(150, 100, 255, 0.8));
-            border: 3px solid #8888ff;
-            box-shadow: 0 0 15px rgba(100, 100, 255, 0.5);
-            z-index: 55;
-        }
-
-        .flying-btn.flying {
-            background: linear-gradient(135deg, rgba(100, 255, 100, 0.8), rgba(100, 200, 100, 0.8));
-            border-color: #66ff66;
-            box-shadow: 0 0 20px rgba(100, 255, 100, 0.6);
-        }
-
         /* 虚拟摇杆 */
         #joystickContainer {
             position: absolute;
@@ -768,12 +747,6 @@
             font-size: 20px;
         }
 
-        #mobileMenu.flying {
-            flex-direction: row;
-            top: auto;
-            bottom: 280px;
-        }
-
         /* 移动端隐藏PC控制提示 */
         @media (max-width: 768px) {
             #statusBar {
@@ -860,12 +833,6 @@
                 width: 48px;
                 height: 48px;
                 font-size: 20px;
-            }
-
-            /* 飞行按钮位置调整 */
-            .flying-btn {
-                bottom: 30px;
-                left: 150px;
             }
 
             /* 显示移动端控件 */
@@ -1174,9 +1141,6 @@
         <!-- 移动端闪避按钮 - 攻击按钮上方 -->
         <div id="dodgeBtn">💨</div>
 
-        <!-- 移动端飞行按钮 - 独立按钮更明显 -->
-        <button id="flyBtn" class="mobile-btn flying-btn">🪽 飞行</button>
-
         <!-- 移动端菜单按钮 - 右上角 -->
         <div id="mobileMenu">
             <button id="shopBtn" class="mobile-btn">🛒</button>
@@ -1199,11 +1163,6 @@
                 <h2 class="shop-title">🏪 商店</h2>
                 <div style="text-align: center; margin-bottom: 20px;">
                     <span style="color: #ffd700; font-size: 20px;">💰 金币: <span id="shopGold">0</span></span>
-                </div>
-
-                <div class="shop-section">
-                    <h3>🪶 翅膀商店</h3>
-                    <div class="shop-grid" id="wingShopGrid"></div>
                 </div>
 
                 <div class="shop-section">
@@ -1245,6 +1204,7 @@
 
     <!-- Three.js -->
     <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/loaders/FBXLoader.js"></script>
     <script>
         // ==================== 游戏配置 ====================
         const CONFIG = {
@@ -1287,30 +1247,6 @@
             { id: 18, name: '星辰剑', icon: '✨', baseDamage: 130, color: 0x00ffff },
             { id: 19, name: '混沌之剑', icon: '🌌', baseDamage: 140, color: 0x9400d3 },
             { id: 20, name: '创世神剑', icon: '👑', baseDamage: 150, color: 0xffd700 }
-        ];
-
-        // 翅膀数据 - 20级
-        const WINGS = [
-            { id: 1, name: '新手羽翼', icon: '🪶', price: 0, speedBonus: 0 },
-            { id: 2, name: '学徒之翼', icon: '🦋', price: 100, speedBonus: 0.05 },
-            { id: 3, name: '精灵之翼', icon: '🧚', price: 300, speedBonus: 0.1 },
-            { id: 4, name: '天使之翼', icon: '😇', price: 600, speedBonus: 0.15 },
-            { id: 5, name: '恶魔之翼', icon: '👿', price: 1000, speedBonus: 0.2 },
-            { id: 6, name: '龙族之翼', icon: '🐉', price: 1500, speedBonus: 0.25 },
-            { id: 7, name: '凤凰之翼', icon: '🔥', price: 2200, speedBonus: 0.3 },
-            { id: 8, name: '雷电之翼', icon: '⚡', price: 3000, speedBonus: 0.35 },
-            { id: 9, name: '冰霜之翼', icon: '❄️', price: 4000, speedBonus: 0.4 },
-            { id: 10, name: '烈焰之翼', icon: '🌟', price: 5500, speedBonus: 0.45 },
-            { id: 11, name: '星空之翼', icon: '🌌', price: 7500, speedBonus: 0.5 },
-            { id: 12, name: '暗影之翼', icon: '🌑', price: 10000, speedBonus: 0.55 },
-            { id: 13, name: '神圣之翼', icon: '✨', price: 13000, speedBonus: 0.6 },
-            { id: 14, name: '混沌之翼', icon: '🌀', price: 17000, speedBonus: 0.65 },
-            { id: 15, name: '时空之翼', icon: '⏰', price: 22000, speedBonus: 0.7 },
-            { id: 16, name: '永恒之翼', icon: '♾️', price: 28000, speedBonus: 0.75 },
-            { id: 17, name: '命运之翼', icon: '🎭', price: 35000, speedBonus: 0.8 },
-            { id: 18, name: '神王之翼', icon: '👑', price: 45000, speedBonus: 0.85 },
-            { id: 19, name: '天道之翼', icon: '☯️', price: 60000, speedBonus: 0.9 },
-            { id: 20, name: '创世之翼', icon: '🌈', price: 80000, speedBonus: 1.0 }
         ];
 
         // 怪物类型
@@ -1363,7 +1299,7 @@
         // 技能冷却状态
         let skillCooldowns = [0, 0, 0, 0];
 
-        // ==================== 游戏状态 ====================
+        // 游戏状态
         let gameState = {
             playing: false,
             paused: false,
@@ -1376,11 +1312,8 @@
                 gold: 0,
                 weaponIndex: 0,
                 weaponLevel: 1,
-                wingIndex: 0,
                 attackPower: 10
             },
-            ownedWings: [0],
-            equippedWing: 0,
             unlockedWeapons: [0],
             wave: 1,
             killCount: 0
@@ -1388,7 +1321,7 @@
 
         // ==================== Three.js 全局变量 ====================
         let scene, camera, renderer, clock;
-        let player, playerSword, playerWing;
+        let player, playerSword;
         let monsters = [];
         let particles = [];
         let worldObjects = [];
@@ -1734,16 +1667,17 @@
             scene.add(hemi);
         }
 
-        // 创建玩家（孙悟空）
+        // 创建玩家（加载FBX模型）
         function createPlayer() {
             const group = new THREE.Group();
 
+            // 备用角色 - FBX加载失败时显示
+            const fallbackMat = new THREE.MeshStandardMaterial({ color: 0xffd700 });
+
             // 身体
             const bodyGeo = new THREE.CylinderGeometry(0.5, 0.6, 1.5, 8);
-            const bodyMat = new THREE.MeshStandardMaterial({ color: 0xffd700 });
-            const body = new THREE.Mesh(bodyGeo, bodyMat);
+            const body = new THREE.Mesh(bodyGeo, fallbackMat);
             body.position.y = 1.25;
-            body.castShadow = true;
             group.add(body);
 
             // 头部
@@ -1751,7 +1685,6 @@
             const headMat = new THREE.MeshStandardMaterial({ color: 0xffcc99 });
             const head = new THREE.Mesh(headGeo, headMat);
             head.position.y = 2.5;
-            head.castShadow = true;
             group.add(head);
 
             // 紧箍
@@ -1762,55 +1695,25 @@
             halo.rotation.x = Math.PI / 2;
             group.add(halo);
 
-            // 帽子（唐僧帽）
-            const hatGeo = new THREE.ConeGeometry(0.6, 0.5, 8);
-            const hatMat = new THREE.MeshStandardMaterial({ color: 0x8b4513 });
-            const hat = new THREE.Mesh(hatGeo, hatMat);
-            hat.position.y = 3.1;
-            group.add(hat);
-
-            // 眼睛
-            const eyeGeo = new THREE.SphereGeometry(0.08, 8, 8);
-            const eyeMat = new THREE.MeshStandardMaterial({ color: 0x000000 });
-            const leftEye = new THREE.Mesh(eyeGeo, eyeMat);
-            leftEye.position.set(-0.15, 2.55, 0.45);
-            group.add(leftEye);
-            const rightEye = new THREE.Mesh(eyeGeo, eyeMat);
-            rightEye.position.set(0.15, 2.55, 0.45);
-            group.add(rightEye);
-
-            // 手臂
-            const armGeo = new THREE.CylinderGeometry(0.12, 0.12, 0.8, 8);
-            const armMat = new THREE.MeshStandardMaterial({ color: 0xffcc99 });
-
-            const leftArm = new THREE.Mesh(armGeo, armMat);
-            leftArm.position.set(-0.7, 1.5, 0);
-            leftArm.rotation.z = Math.PI / 4;
-            group.add(leftArm);
-
-            const rightArm = new THREE.Mesh(armGeo, armMat);
-            rightArm.position.set(0.7, 1.5, 0);
-            rightArm.rotation.z = -Math.PI / 4;
-            group.add(rightArm);
-
-            // 腿
-            const legGeo = new THREE.CylinderGeometry(0.15, 0.15, 0.8, 8);
-            const legMat = new THREE.MeshStandardMaterial({ color: 0xffd700 });
-
-            const leftLeg = new THREE.Mesh(legGeo, legMat);
-            leftLeg.position.set(-0.25, 0.4, 0);
-            group.add(leftLeg);
-
-            const rightLeg = new THREE.Mesh(legGeo, legMat);
-            rightLeg.position.set(0.25, 0.4, 0);
-            group.add(rightLeg);
-
-            // 尾巴
-            const tailGeo = new THREE.CylinderGeometry(0.05, 0.08, 1, 8);
-            const tail = new THREE.Mesh(tailGeo, new THREE.MeshStandardMaterial({ color: 0xffd700 }));
-            tail.position.set(0, 1.2, -0.6);
-            tail.rotation.x = Math.PI / 4;
-            group.add(tail);
+            // 尝试加载FBX模型
+            const loader = new THREE.FBXLoader();
+            loader.load('./model.FBX', function(object) {
+                // 移除备用角色
+                while(group.children.length > 0) {
+                    group.remove(group.children[0]);
+                }
+                // 添加模型
+                object.scale.set(0.05, 0.05, 0.05);
+                object.traverse(function(child) {
+                    if (child.isMesh) {
+                        child.castShadow = true;
+                        child.receiveShadow = true;
+                    }
+                });
+                group.add(object);
+            }, undefined, function(error) {
+                console.log('FBX加载失败，使用备用角色');
+            });
 
             group.position.y = 0;
             scene.add(group);
@@ -1914,116 +1817,6 @@
                 glow.position.y = bladeLength / 2 + 0.3;
                 group.add(glow);
             }
-
-            return group;
-        }
-
-        // 创建翅膀 - 简洁优雅的翅膀形状，带光晕
-        function createWing(wingIndex) {
-            const group = new THREE.Group();
-
-            // 翅膀颜色根据等级变化
-            const wingColors = [
-                0xffffff, 0x87ceeb, 0xffd700, 0xff69b4, 0x9932cc,
-                0xff4500, 0x00ff00, 0x00ffff, 0xff0000, 0xffffff,
-                0x4a0080, 0x8b008b, 0x000080, 0x228b22, 0xff6347,
-                0x9400d3, 0x00ced1, 0xff1493, 0xffd700, 0xffffff
-            ];
-            const wingColor = wingColors[wingIndex % wingColors.length];
-
-            // 翅膀大小随等级增加
-            const wingSize = 1.5 + wingIndex * 0.05;
-            const wingHeight = 1.2 + wingIndex * 0.03;
-
-            // 创建单个翅膀面板（羽翼形状）
-            function createWingPanel(side) {
-                const panel = new THREE.Group();
-                const dir = side === 'left' ? -1 : 1;
-
-                // 翅膀主体 - 优雅的弧形羽翼
-                const shape = new THREE.Shape();
-                shape.moveTo(0, 0);
-                shape.bezierCurveTo(dir * wingSize * 0.5, wingHeight * 0.3, dir * wingSize * 0.9, wingHeight * 0.5, dir * wingSize, wingHeight * 0.2);
-                shape.bezierCurveTo(dir * wingSize * 1.1, wingHeight * 0.0, dir * wingSize * 0.8, -wingHeight * 0.2, dir * wingSize * 0.3, -wingHeight * 0.3);
-                shape.bezierCurveTo(dir * 0.1, -wingHeight * 0.15, 0, 0, 0, 0);
-
-                const wingGeo = new THREE.ShapeGeometry(shape);
-                const wingMat = new THREE.MeshStandardMaterial({
-                    color: wingColor,
-                    transparent: true,
-                    opacity: 0.75,
-                    side: THREE.DoubleSide,
-                    emissive: wingColor,
-                    emissiveIntensity: 0.2
-                });
-                const wingMesh = new THREE.Mesh(wingGeo, wingMat);
-                panel.add(wingMesh);
-
-                // 翅膀内部纹理线
-                for (let i = 1; i <= 3; i++) {
-                    const lineMat = new THREE.LineBasicMaterial({ color: wingColor, transparent: true, opacity: 0.4 });
-                    const points = [
-                        new THREE.Vector3(0, 0, 0.01),
-                        new THREE.Vector3(dir * wingSize * (0.2 + i * 0.2), wingHeight * (0.1 + i * 0.1), 0.01)
-                    ];
-                    const lineGeo = new THREE.BufferGeometry().setFromPoints(points);
-                    const line = new THREE.Line(lineGeo, lineMat);
-                    panel.add(line);
-                }
-
-                // 翅膀光晕 - 柔和的发光效果
-                const glowGeo = new THREE.PlaneGeometry(wingSize * 1.8, wingHeight * 1.2);
-                const glowMat = new THREE.MeshBasicMaterial({
-                    color: wingColor,
-                    transparent: true,
-                    opacity: 0.15,
-                    side: THREE.DoubleSide
-                });
-                const glow = new THREE.Mesh(glowGeo, glowMat);
-                glow.position.z = -0.05;
-                panel.add(glow);
-
-                return panel;
-            }
-
-            // 左翼
-            const leftWing = createWingPanel('left');
-            leftWing.position.set(-0.3, 0, 0);
-            leftWing.rotation.y = Math.PI / 6;
-            leftWing.userData.side = 'left';
-            group.add(leftWing);
-
-            // 右翼
-            const rightWing = createWingPanel('right');
-            rightWing.position.set(0.3, 0, 0);
-            rightWing.rotation.y = -Math.PI / 6;
-            rightWing.userData.side = 'right';
-            group.add(rightWing);
-
-            // 核心发光球体 - 表示翅膀能量中心
-            const coreGeo = new THREE.SphereGeometry(0.15 + wingIndex * 0.01, 16, 16);
-            const coreMat = new THREE.MeshBasicMaterial({ color: wingColor, transparent: true, opacity: 0.9 });
-            const core = new THREE.Mesh(coreGeo, coreMat);
-            group.add(core);
-
-            // 高级翅膀添加外圈光环
-            if (wingIndex >= 5) {
-                const haloGeo = new THREE.RingGeometry(0.3, wingSize * 0.6, 32);
-                const haloMat = new THREE.MeshBasicMaterial({
-                    color: wingColor,
-                    transparent: true,
-                    opacity: 0.2,
-                    side: THREE.DoubleSide
-                });
-                const halo = new THREE.Mesh(haloGeo, haloMat);
-                halo.rotation.x = Math.PI / 2;
-                halo.position.y = wingHeight * 0.3;
-                group.add(halo);
-            }
-
-            group.userData.baseY = 2;
-            group.userData.wingIndex = wingIndex;
-            group.position.y = 2;
 
             return group;
         }
@@ -2952,12 +2745,6 @@
                 // 金币充足
                 gameState.player.gold += 100000;
 
-                // 翅膀满级并装备
-                if (!gameState.ownedWings.includes(19)) {
-                    gameState.ownedWings.push(19);
-                }
-                gameState.equippedWing = 19;
-
                 // 更新武器
                 if (playerSword) {
                     player.remove(playerSword);
@@ -2967,20 +2754,13 @@
                 playerSword.rotation.set(Math.PI / 6, 0, 0);
                 player.add(playerSword);
 
-                // 更新翅膀
-                if (playerWing) {
-                    scene.remove(playerWing);
-                }
-                playerWing = createWing(19);
-                player.add(playerWing);
-
                 // 满血
                 gameState.player.maxHp = 10000;
                 gameState.player.hp = 10000;
 
                 updateHUD();
 
-                messageEl.textContent = '🦅 终极变身！武器翅膀全满级！';
+                messageEl.textContent = '⚔️ 终极变身！武器满级！';
                 messageEl.style.color = '#ffd700';
 
                 // 终极变身特效
@@ -3098,34 +2878,6 @@
                 shopGoldEl.textContent = gameState.player.gold;
             }
 
-            // 翅膀商店
-            const wingGrid = document.getElementById('wingShopGrid');
-            wingGrid.innerHTML = '';
-
-            WINGS.forEach((wing, index) => {
-                const owned = gameState.ownedWings.includes(index);
-                const equipped = gameState.equippedWing === index;
-                const canAfford = gameState.player.gold >= wing.price;
-
-                const item = document.createElement('div');
-                item.className = `shop-item ${owned ? 'owned' : ''} ${equipped ? 'equipped' : ''} ${!owned && !canAfford ? 'disabled' : ''}`;
-                item.innerHTML = `
-                    <div class="shop-item-icon">${wing.icon}</div>
-                    <div class="shop-item-name">${wing.name}</div>
-                    <div class="shop-item-price">${owned ? (equipped ? '✅ 已装备' : '👆 点击装备') : `💰 ${wing.price}`}</div>
-                    <div class="shop-item-level">速度+${Math.round(wing.speedBonus * 100)}%</div>
-                `;
-
-                item.onclick = () => {
-                    if (!owned && !canAfford) {
-                        showMessage(`金币不足！需要 ${wing.price} 💰`);
-                        return;
-                    }
-                    buyWing(index);
-                };
-                wingGrid.appendChild(item);
-            });
-
             // 武器商店
             const weaponGrid = document.getElementById('weaponShopGrid');
             weaponGrid.innerHTML = '';
@@ -3161,45 +2913,6 @@
                 };
                 weaponGrid.appendChild(item);
             });
-        }
-
-        // 购买翅膀
-        function buyWing(index) {
-            if (!gameState.playing) return;
-
-            const wing = WINGS[index];
-
-            if (gameState.ownedWings.includes(index)) {
-                // 已经拥有，装备翅膀
-                gameState.equippedWing = index;
-                if (playerWing) {
-                    scene.remove(playerWing);
-                }
-                playerWing = createWing(index);
-                player.add(playerWing);
-                updateHUD();
-                updateShop();
-                showMessage(`装备 ${wing.name}!`);
-                return;
-            }
-
-            if (gameState.player.gold >= wing.price) {
-                gameState.player.gold -= wing.price;
-                gameState.ownedWings.push(index);
-                gameState.equippedWing = index;
-
-                if (playerWing) {
-                    scene.remove(playerWing);
-                }
-                playerWing = createWing(index);
-                player.add(playerWing);
-
-                updateHUD();
-                updateShop();
-                showMessage(`获得 ${wing.name}!`);
-            } else {
-                showMessage(`金币不足！需要 ${wing.price} 💰`);
-            }
         }
 
         // 选择武器
@@ -3305,30 +3018,6 @@
         }
 
         // 飞行切换
-        function toggleFly() {
-            if (!gameState.playing || gameState.paused) return;
-
-            // 检查是否有翅膀
-            if (gameState.equippedWing === 0) {
-                showMessage('需要装备翅膀才能飞行！');
-                return;
-            }
-
-            gameState.player.flying = !gameState.player.flying;
-
-            const flyBtn = document.getElementById('flyBtn');
-
-            if (gameState.player.flying) {
-                flyBtn.textContent = '🛬 飞行中';
-                flyBtn.classList.add('flying');
-                showMessage('🦅 起飞！怪物打不到你！');
-            } else {
-                flyBtn.textContent = '🪽 飞行';
-                flyBtn.classList.remove('flying');
-                showMessage('🪖 落地！');
-            }
-        }
-
         // 切换武器升级界面
         function toggleUpgrade() {
             const upgrade = document.getElementById('upgradeScreen');
@@ -3412,11 +3101,8 @@
                     gold: 0,
                     weaponIndex: 0,
                     weaponLevel: 1,
-                    attackPower: 10,
-                    flying: false
+                    attackPower: 10
                 },
-                ownedWings: [0],
-                equippedWing: 0,
                 unlockedWeapons: [0],
                 wave: 1,
                 killCount: 0
@@ -3431,10 +3117,6 @@
             playerSword.position.set(0, 1.8, 1.8);
             playerSword.rotation.set(Math.PI / 6, 0, 0);
             player.add(playerSword);
-
-            // 创建翅膀
-            playerWing = createWing(0);
-            player.add(playerWing);
 
             // 重置技能冷却
             skillCooldowns = [0, 0, 0, 0];
@@ -3481,17 +3163,11 @@
 
             const delta = clock.getDelta();
 
-            // 玩家移动 - 飞行时速度增加
-            const wingSpeedBonus = WINGS[gameState.equippedWing].speedBonus;
-            const flySpeedBonus = gameState.player.flying ? 0.5 : 0; // 飞行额外速度加成
-            const speed = CONFIG.PLAYER_SPEED * (1 + wingSpeedBonus + flySpeedBonus);
+            // 玩家移动
+            const speed = CONFIG.PLAYER_SPEED;
 
             // 检测是否为移动端
             const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
-
-            // 飞行高度处理 - 飞高一些让怪物打不到
-            const flyHeight = gameState.player.flying ? 8 : 0;
-            player.position.y += (flyHeight - player.position.y) * 0.1;
 
             if (isMobile) {
                 // 移动端：使用摇杆直接控制移动方向
@@ -3558,17 +3234,14 @@
                 const dz = player.position.z - monster.position.z;
                 const distance = Math.sqrt(dx * dx + dz * dz);
 
-                // 飞行时怪物无法攻击（玩家飞得太高）
-                const isFlying = gameState.player.flying && player.position.y > 4;
-
                 if (distance > 2) {
                     monster.position.x += (dx / distance) * monster.userData.speed;
                     monster.position.z += (dz / distance) * monster.userData.speed;
 
                     // 面向玩家
                     monster.rotation.y = Math.atan2(dx, dz);
-                } else if (!isFlying) {
-                    // 攻击玩家 - 只有在地面时才能被攻击
+                } else {
+                    // 攻击玩家
                     const now = Date.now();
                     if (now - monster.userData.lastAttack > 1000) {
                         monster.userData.lastAttack = now;
@@ -3588,9 +3261,6 @@
 
                         updateHUD();
                     }
-                } else {
-                    // 飞行时怪物只能干瞪眼
-                    monster.rotation.y = Math.atan2(dx, dz);
                 }
             });
 
@@ -3660,27 +3330,6 @@
             // 剑动画
             if (playerSword && !isAttacking) {
                 playerSword.rotation.z = Math.sin(Date.now() * 0.003) * 0.1;
-            }
-
-            // 翅膀动画 - 简洁优雅的扇动
-            if (playerWing) {
-                const time = Date.now() * 0.005;
-                const isFlying = gameState.player.flying;
-                const flapSpeed = isFlying ? 2 : 1;
-                const flapIntensity = isFlying ? 0.3 : 0.15;
-
-                playerWing.children.forEach((child) => {
-                    // 简洁的上下扇动
-                    if (child.userData.side === 'left') {
-                        child.rotation.z = 0.3 + Math.sin(time * flapSpeed) * flapIntensity;
-                    } else if (child.userData.side === 'right') {
-                        child.rotation.z = -0.3 + Math.sin(time * flapSpeed + Math.PI) * flapIntensity;
-                    }
-                });
-
-                // 翅膀位置跟随飞行状态
-                const targetY = isFlying ? 3.5 : 2;
-                playerWing.position.y += (targetY - playerWing.position.y) * 0.1;
             }
 
             // 更新小地图
@@ -3790,7 +3439,6 @@
 
 【商店】
 💰 金币: 击杀怪物获得
-🪶 翅膀: 增加移动速度
 ⚔️ 武器: 20种武器各10级
 
 【怪物】
@@ -3821,7 +3469,6 @@
 
 【商店】
 💰 金币: 击杀怪物获得
-🪶 翅膀: 增加移动速度
 ⚔️ 武器: 20种武器各10级
 
 【怪物】
