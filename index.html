@@ -5,7 +5,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="format-detection" content="telephone=no">
-    <title>老七大冒险 - 老七的西游记</title>
+    <title>翠翠大冒险</title>
     <style>
         * {
             margin: 0;
@@ -1040,7 +1040,7 @@
             <div id="statusBar">
                 <div class="status-item">
                     <div class="status-label">等级 Lv.<span id="levelDisplay">1</span></div>
-                    <div class="status-value">老七</div>
+                    <div class="status-value">翠翠</div>
                     <div class="exp-bar">
                         <div class="exp-fill" id="expFill" style="width: 0%"></div>
                     </div>
@@ -1150,8 +1150,8 @@
 
     <!-- 开始界面 -->
     <div id="startScreen">
-            <h1>老七大冒险</h1>
-            <h2>老七的西游记</h2>
+            <h1>翠翠大冒险</h1>
+            <h2>翠翠的西游记</h2>
             <button class="menu-btn" onclick="startGame()">开始游戏</button>
             <button class="menu-btn" onclick="showControls()">游戏说明</button>
         </div>
@@ -1190,8 +1190,8 @@
                 </div>
                 <div class="cheat-hints">
                     <p>💡 提示：</p>
-                    <p>🔹 <strong>老七变身</strong> - 武器强化2级</p>
-                    <p>🔹 <strong>老七牛逼</strong> - 终极变身状态</p>
+                    <p>🔹 <strong>翠翠变身</strong> - 武器强化2级</p>
+                    <p>🔹 <strong>翠翠牛逼</strong> - 终极变身状态</p>
                 </div>
                 <div class="cheat-input-wrapper">
                     <input type="text" id="cheatInput" class="cheat-input" placeholder="输入口令..." autocomplete="off">
@@ -1251,9 +1251,9 @@
 
         // 怪物类型
         const MONSTER_TYPES = {
-            wild: { name: '野哥', emoji: '👹', baseHP: 50, baseDamage: 2, exp: 10, gold: 5 },
+            wild: { name: '哥', emoji: '👹', baseHP: 50, baseDamage: 2, exp: 10, gold: 5 },
             daKai: { name: '大开', emoji: '👺', baseHP: 100, baseDamage: 3, exp: 25, gold: 15 },
-            boss: { name: '野哥终极体', emoji: '👿', baseHP: 500, baseDamage: 5, exp: 100, gold: 100 }
+            boss: { name: '哥终极体', emoji: '👿', baseHP: 500, baseDamage: 5, exp: 100, gold: 100 }
         };
 
         // 技能系统 - 4个技能
@@ -1830,7 +1830,7 @@
 
             // 随机生成怪物名字
             const prefix = MONSTER_PREFIXES[Math.floor(Math.random() * MONSTER_PREFIXES.length)];
-            const typeName = type === 'boss' ? '魔王' : (type === 'daKai' ? '大开' : '野哥');
+            const typeName = type === 'boss' ? '魔王' : (type === 'daKai' ? '大开' : '哥');
             const monsterName = prefix + typeName;
 
             // 身体
@@ -2709,7 +2709,7 @@
                 return;
             }
 
-            if (input === '老七变身') {
+            if (input === '翠翠变身') {
                 // 口令1：武器强化2级
                 if (gameState.player.weaponLevel >= 10) {
                     messageEl.textContent = '武器已满级！';
@@ -2736,7 +2736,7 @@
                 // 变身特效
                 createTransformEffect();
 
-            } else if (input === '老七牛逼') {
+            } else if (input === '翠翠牛逼') {
                 // 口令2：终极变身
                 // 武器满级
                 gameState.player.weaponLevel = 10;
@@ -3425,7 +3425,7 @@
 
             if (isMobile) {
                 alert(`
-🎮 老七大冒险 - 操作说明（移动端）
+🎮 翠翠大冒险 - 操作说明（移动端）
 
 【移动端控制】
 📱 左侧摇杆: 移动角色
@@ -3442,15 +3442,15 @@
 ⚔️ 武器: 20种武器各10级
 
 【怪物】
-👹 野哥: 普通怪物
+👹 哥: 普通怪物
 👺 大开: 精英怪物
-👿 野哥终极体: 每10波出现
+👿 哥终极体: 每10波出现
 
 祝游戏愉快!
                 `);
             } else {
                 alert(`
-🎮 老七大冒险 - 操作说明
+🎮 翠翠大冒险 - 操作说明
 
 【移动】
 - W/↑: 前进
@@ -3472,9 +3472,9 @@
 ⚔️ 武器: 20种武器各10级
 
 【怪物】
-👹 野哥: 普通怪物
+👹 哥: 普通怪物
 👺 大开: 精英怪物
-👿 野哥终极体: 每10波出现
+👿 哥终极体: 每10波出现
 
 祝游戏愉快!
                 `);
