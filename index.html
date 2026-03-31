@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>翠在江湖2.0</title>
+    <title>翠在江湖3.0</title>
     <style>
         * {
             margin: 0;
@@ -530,16 +530,16 @@
         // 关卡配置 - 增强难度
         const LEVELS = [];
         for (let i = 1; i <= 20; i++) {
-            const difficultyMultiplier = i > 10 ? 5 : 1; // 10关后难度翻5倍
+            const difficultyMultiplier = i > 10 ? 2 : 0.6; // 前10关降低难度，后10关适度增加
             LEVELS.push({
                 name: `第${i}关`,
                 platforms: generatePlatforms(i),
                 enemies: generateEnemies(i),
                 bgColor: `hsl(${(i * 18) % 360}, 30%, ${25 - Math.min(i, 10)}%)`,
                 groundColor: `hsl(${(i * 18 + 60) % 360}, 50%, ${35 - Math.min(i, 15)}%)`,
-                enemyCount: Math.min(8 + Math.floor(i * 2.5), 25) * difficultyMultiplier,
+                enemyCount: Math.min(5 + Math.floor(i * 1.5), 15) * Math.max(difficultyMultiplier, 1),
                 enemyTypes: i < 5 ? ['嘉姐'] : i < 10 ? ['嘉姐', '万总'] : i < 15 ? ['嘉姐', '万总', '二叔'] : ['嘉姐', '万总', '二叔', '二婶'],
-                spawnRate: Math.max(1500 - i * 80, 400) / difficultyMultiplier,
+                spawnRate: Math.max(2000 - i * 80, 600) / Math.max(difficultyMultiplier, 1),
                 difficultyMultiplier: difficultyMultiplier,
                 boss: getBossForLevel(i),
                 goalX: 3000 + (i - 1) * 500 // 每关终点更远
@@ -818,8 +818,8 @@
                     x: cameraX + W + 100 + Math.random() * 200,
                     y: H - 60 - template.size,
                     ...template,
-                    maxHp: template.hp * difficulty * (1 + currentLevel * 0.15),
-                    hp: template.hp * difficulty * (1 + currentLevel * 0.15),
+                    maxHp: template.hp * difficulty * (1 + currentLevel * 0.05),
+                    hp: template.hp * difficulty * (1 + currentLevel * 0.05),
                     vx: 0,
                     vy: 0,
                     attackTimer: 0,
@@ -845,7 +845,7 @@
             });
 
             // 发射炫酷粒子特效
-            for (let i = 0; i < 20; i++) {
+            for (let i = 0; i < 6; i++) {
                 const angle = (Math.random() - 0.5) * 1.5;
                 const speed = Math.random() * 8 + 4;
                 particles.push({
@@ -859,7 +859,7 @@
             }
 
             // 额外特效 - 能量波纹
-            for (let i = 0; i < 8; i++) {
+            for (let i = 0; i < 4; i++) {
                 const angle = (i / 8) * Math.PI * 2;
                 particles.push({
                     x: x + Math.cos(angle) * 20,
@@ -908,7 +908,7 @@
             });
 
             // 发射特效
-            for (let i = 0; i < 8; i++) {
+            for (let i = 0; i < 4; i++) {
                 particles.push({
                     x: bossCenterX,
                     y: bossCenterY,
@@ -1131,7 +1131,7 @@
                     const centerY = e.y + e.size/2;
 
                     // 大爆炸粒子
-                    for (let i = 0; i < 40; i++) {
+                    for (let i = 0; i < 10; i++) {
                         const angle = Math.random() * Math.PI * 2;
                         const speed = Math.random() * 15 + 8;
                         particles.push({
@@ -1146,7 +1146,7 @@
                     }
 
                     // 白色闪光粒子
-                    for (let i = 0; i < 15; i++) {
+                    for (let i = 0; i < 5; i++) {
                         const angle = Math.random() * Math.PI * 2;
                         const speed = Math.random() * 8 + 3;
                         particles.push({
@@ -1161,8 +1161,8 @@
                     }
 
                     // 冲击波
-                    for (let i = 0; i < 20; i++) {
-                        const angle = (i / 20) * Math.PI * 2;
+                    for (let i = 0; i < 6; i++) {
+                        const angle = (i / 6) * Math.PI * 2;
                         particles.push({
                             x: centerX + Math.cos(angle) * 20,
                             y: centerY + Math.sin(angle) * 20,
@@ -1189,7 +1189,7 @@
                     boss.rageMode = true;
                     boss.speed *= 1.5;
                     // 狂暴特效
-                    for (let i = 0; i < 30; i++) {
+                    for (let i = 0; i < 8; i++) {
                         particles.push({
                             x: boss.x + boss.size/2,
                             y: boss.y + boss.size/2,
@@ -1214,7 +1214,7 @@
                             boss.x = player.x + (Math.random() - 0.5) * 400;
                             boss.y = H - 60 - boss.size;
                             // 瞬移特效
-                            for (let i = 0; i < 20; i++) {
+                            for (let i = 0; i < 5; i++) {
                                 particles.push({
                                     x: boss.x + boss.size/2,
                                     y: boss.y + boss.size/2,
@@ -1234,7 +1234,7 @@
                         // 吸血特效
                         if (Math.random() < 0.05) {
                             boss.hp = Math.min(boss.maxHp, boss.hp + boss.drainAmount);
-                            for (let i = 0; i < 10; i++) {
+                            for (let i = 0; i < 5; i++) {
                                 particles.push({
                                     x: boss.x + boss.size/2,
                                     y: boss.y + boss.size/2,
@@ -1310,7 +1310,7 @@
                     // 超大爆炸特效
                     const centerX = boss.x + boss.size/2;
                     const centerY = boss.y + boss.size/2;
-                    for (let i = 0; i < 100; i++) {
+                    for (let i = 0; i < 20; i++) {
                         const angle = Math.random() * Math.PI * 2;
                         const speed = Math.random() * 20 + 10;
                         particles.push({
@@ -1351,7 +1351,7 @@
                         b.life = 0;
 
                         // 击中炫酷特效
-                        for (let i = 0; i < 25; i++) {
+                        for (let i = 0; i < 8; i++) {
                             const angle = Math.random() * Math.PI * 2;
                             const speed = Math.random() * 10 + 5;
                             particles.push({
@@ -1366,8 +1366,8 @@
                         }
 
                         // 冲击波特效
-                        for (let i = 0; i < 12; i++) {
-                            const angle = (i / 12) * Math.PI * 2;
+                        for (let i = 0; i < 4; i++) {
+                            const angle = (i / 4) * Math.PI * 2;
                             particles.push({
                                 x: b.x + Math.cos(angle) * 10,
                                 y: b.y + Math.sin(angle) * 10,
@@ -1385,7 +1385,7 @@
                                 if (e2 !== e && Math.abs(e2.x - e.x) < 150) {
                                     e2.hp -= b.damage * 0.5;
                                     // 链式闪电特效
-                                    for (let i = 0; i < 8; i++) {
+                                    for (let i = 0; i < 4; i++) {
                                         particles.push({
                                             x: (e.x + e2.x) / 2,
                                             y: (e.y + e2.y) / 2,
@@ -1403,7 +1403,7 @@
                         // 冰霜减速特效
                         if (b.freeze) {
                             e.speed *= 0.5;
-                            for (let i = 0; i < 15; i++) {
+                            for (let i = 0; i < 5; i++) {
                                 particles.push({
                                     x: e.x + e.size/2,
                                     y: e.y + e.size/2,
@@ -1438,7 +1438,7 @@
                         b.life = 0;
                         pb.life = 0;
                         // 击碎特效
-                        for (let i = 0; i < 10; i++) {
+                        for (let i = 0; i < 5; i++) {
                             particles.push({
                                 x: b.x,
                                 y: b.y,
@@ -1487,12 +1487,12 @@
                             gold += 10;
                             break;
                         case 'speed':
-                            player.attackSpeedBoost += 3; // 增加攻速
-                            player.boostTimer = 300; // 持续时间
+                            player.attackSpeedBoost += 5; // 大幅增加攻速
+                            player.boostTimer = 400; // 更长持续时间
                             break;
                         case 'damage':
-                            player.damageBoost += 0.3; // 增加30%伤害
-                            player.boostTimer = 300;
+                            player.damageBoost += 0.5; // 大幅增加伤害
+                            player.boostTimer = 400;
                             break;
                         case 'hp':
                             player.hp = Math.min(player.maxHp, player.hp + 30);
@@ -1825,7 +1825,7 @@
             }
 
             // 倒计时条
-            const barWidth = 100 * (player.boostTimer / 300);
+            const barWidth = 100 * (player.boostTimer / 400);
             ctx.fillStyle = '#4CAF50';
             ctx.fillRect(20, 200, barWidth, 5);
 
