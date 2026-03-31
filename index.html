@@ -1,841 +1,1464 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="zh-CN">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="mobile-web-app-capable" content="yes" />
-    <meta name="theme-color" content="#0a0a1a" />
-    <title>古风飞仙</title>
+    <title>古风闯关 - 冒险岛</title>
     <style>
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        -webkit-tap-highlight-color: transparent;
-      }
-      html, body {
-        width: 100%;
-        height: 100%;
-        overflow: hidden;
-        touch-action: none;
-        -webkit-touch-callout: none;
-        -webkit-user-select: none;
-        user-select: none;
-      }
-      body {
-        background: #0a0a1a;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-      }
-      canvas {
-        display: block;
-        touch-action: none;
-      }
-
-      .hint {
-        position: fixed;
-        bottom: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        color: rgba(255, 255, 255, 0.5);
-        font-family: 'Helvetica Neue', Arial, sans-serif;
-        font-size: 14px;
-        text-align: center;
-        pointer-events: none;
-        animation: fadeHint 3s ease-out forwards;
-      }
-
-      @keyframes fadeHint {
-        0%, 70% { opacity: 1; }
-        100% { opacity: 0; }
-      }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            touch-action: none;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
+            background: #1a1a2e;
+        }
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+        }
+        canvas {
+            display: block;
+            image-rendering: pixelated;
+        }
+        .ui-overlay {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            pointer-events: none;
+            z-index: 10;
+        }
+        .stats {
+            background: rgba(0,0,0,0.7);
+            padding: 10px 15px;
+            border-radius: 10px;
+            color: #fff;
+            font-family: 'SimHei', sans-serif;
+            font-size: 16px;
+            border: 2px solid #f1c40f;
+        }
+        .stats div {
+            margin: 5px 0;
+        }
+        .level-title {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: 'SimHei', sans-serif;
+            font-size: 48px;
+            color: #f1c40f;
+            text-shadow: 0 0 20px #f39c12, 0 0 40px #e74c3c;
+            opacity: 0;
+            transition: opacity 0.5s;
+            pointer-events: none;
+            z-index: 20;
+        }
+        .controls-hint {
+            position: fixed;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255,255,255,0.6);
+            font-size: 12px;
+            font-family: sans-serif;
+            pointer-events: none;
+            text-align: center;
+        }
+        .game-over, .level-complete {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.85);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+        .game-over h1 {
+            font-size: 60px;
+            color: #e74c3c;
+            text-shadow: 0 0 30px #c0392b;
+            margin-bottom: 30px;
+        }
+        .level-complete h1 {
+            font-size: 48px;
+            color: #f1c40f;
+            text-shadow: 0 0 30px #f39c12;
+            margin-bottom: 30px;
+        }
+        .btn {
+            padding: 15px 40px;
+            font-size: 20px;
+            background: linear-gradient(135deg, #9b59b6, #8e44ad);
+            color: #fff;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            margin: 10px;
+            font-family: 'SimHei', sans-serif;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px #9b59b6;
+        }
+        .skill-bar {
+            position: fixed;
+            bottom: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            pointer-events: auto;
+        }
+        .skill-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 3px solid #fff;
+            background: rgba(0,0,0,0.7);
+            color: #fff;
+            font-size: 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .skill-btn.active {
+            border-color: #f1c40f;
+            box-shadow: 0 0 15px #f1c40f;
+        }
+        .skill-btn.locked {
+            opacity: 0.4;
+            border-color: #666;
+        }
     </style>
-  </head>
-  <body>
-    <canvas id="canvas"></canvas>
-    <div class="hint">触摸屏幕引导仙子飞行</div>
+</head>
+<body>
+    <canvas id="game"></canvas>
+
+    <div class="ui-overlay">
+        <div class="stats">
+            <div style="font-size:20px;font-weight:bold;color:#f1c40f;">👑 翠翠</div>
+            <div>关卡: <span id="level">1</span>/20</div>
+            <div>生命: <span id="hp">100</span></div>
+            <div>金币: <span id="gold">0</span></div>
+            <div>技能: <span id="currentSkill">火焰</span></div>
+            <div>击杀: <span id="kills">0</span></div>
+        </div>
+    </div>
+
+    <!-- 进度条 -->
+    <div style="position:fixed;bottom:60px;left:50%;transform:translateX(-50%);width:200px;pointer-events:none;z-index:10;">
+        <div style="background:rgba(0,0,0,0.7);padding:8px 12px;border-radius:8px;border:2px solid #f1c40f;">
+            <div style="color:#f1c40f;font-size:12px;text-align:center;margin-bottom:5px;">终点进度</div>
+            <div style="background:#333;height:10px;border-radius:5px;overflow:hidden;">
+                <div id="progressBar" style="background:linear-gradient(90deg,#f39c12,#f1c40f);height:100%;width:0%;transition:width 0.3s;"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="level-title" id="levelTitle"></div>
+    <div class="controls-hint">方向键/WASD移动 | 空格/上跳跃 | S/下下蹲 | J攻击 | K技能 | 1-5切换技能</div>
+
+    <div class="skill-bar" id="skillBar"></div>
+
+    <div class="game-over" id="gameOver">
+        <h1>游戏结束</h1>
+        <p style="color:#fff;font-size:20px;margin-bottom:20px;">坚持到第 <span id="finalLevel">1</span> 关</p>
+        <button class="btn" onclick="restartGame()">重新开始</button>
+    </div>
+
+    <div class="level-complete" id="levelComplete">
+        <h1>关卡完成!</h1>
+        <p style="color:#fff;font-size:18px;margin-bottom:20px;">获得金币: <span id="levelGold">0</span></p>
+        <button class="btn" onclick="nextLevel()">下一关</button>
+    </div>
+
     <script>
-      const canvas = document.getElementById('canvas')
-      const ctx = canvas.getContext('2d')
+        const canvas = document.getElementById('game');
+        const ctx = canvas.getContext('2d');
 
-      let width, height
-      const isMobile = /Android|iPhone|iPad|iPod|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
-      const dpr = Math.min(window.devicePixelRatio || 1, 2) // 限制最大2倍像素比
+        let W, H;
+        const TILE = 40;
+        const GRAVITY = 0.6;
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
-      function resize() {
-        width = canvas.width = window.innerWidth * dpr
-        height = canvas.height = window.innerHeight * dpr
-        canvas.style.width = window.innerWidth + 'px'
-        canvas.style.height = window.innerHeight + 'px'
-        ctx.scale(dpr, dpr)
-        width = window.innerWidth
-        height = window.innerHeight
-      }
-      resize()
-      window.addEventListener('resize', () => {
-        ctx.setTransform(1, 0, 0, 1, 0, 0)
-        resize()
-      })
+        function resize() {
+            W = Math.min(window.innerWidth, 1200);
+            H = Math.min(window.innerHeight, 600);
+            canvas.width = W * dpr;
+            canvas.height = H * dpr;
+            canvas.style.width = W + 'px';
+            canvas.style.height = H + 'px';
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+            ctx.scale(dpr, dpr);
+        }
+        resize();
+        window.addEventListener('resize', resize);
 
-      // 粒子系统
-      class Particle {
-        constructor(x, y, color, size, speedX, speedY, life) {
-          this.x = x
-          this.y = y
-          this.color = color
-          this.size = size
-          this.speedX = speedX
-          this.speedY = speedY
-          this.life = life
-          this.maxLife = life
+        // 加载头像
+        const playerImg = new Image();
+        playerImg.src = './cuicui.jpg';
+        let playerImgLoaded = false;
+        playerImg.onload = () => playerImgLoaded = true;
+
+        // 技能配置
+        const SKILLS = [
+            { name: '火焰', icon: '🔥', color: '#e74c3c', bulletColor: '#f39c12', speed: 12, damage: 20, size: 8 },
+            { name: '风暴', icon: '🌀', color: '#3498db', bulletColor: '#85c1e9', speed: 15, damage: 15, size: 12, pierce: true },
+            { name: '雷电', icon: '⚡', color: '#f1c40f', bulletColor: '#fff', speed: 20, damage: 35, size: 6, chain: true },
+            { name: '光剑', icon: '⚔️', color: '#9b59b6', bulletColor: '#e8daef', speed: 18, damage: 50, size: 5, range: 100 },
+            { name: '冰霜', icon: '❄️', color: '#00cec9', bulletColor: '#81ecec', speed: 10, damage: 12, size: 10, freeze: true }
+        ];
+
+        // 敌人配置
+        const ENEMIES = {
+            '嘉姐': { hp: 80, speed: 2, damage: 15, color: '#e91e63', size: 35, pattern: 'chase', gold: 50 },
+            '万总': { hp: 150, speed: 1.5, damage: 25, color: '#673ab7', size: 45, pattern: 'patrol', gold: 100 },
+            '二叔': { hp: 200, speed: 1, damage: 30, color: '#ff5722', size: 50, pattern: 'shoot', gold: 150 },
+            '二婶': { hp: 300, speed: 0.8, damage: 40, color: '#795548', size: 55, pattern: 'boss', gold: 300 }
+        };
+
+        // 关卡配置
+        const LEVELS = [];
+        for (let i = 1; i <= 20; i++) {
+            LEVELS.push({
+                name: `第${i}关`,
+                platforms: generatePlatforms(i),
+                enemies: generateEnemies(i),
+                bgColor: `hsl(${(i * 18) % 360}, 30%, ${25 - Math.min(i, 10)}%)`,
+                groundColor: `hsl(${(i * 18 + 60) % 360}, 50%, ${35 - Math.min(i, 15)}%)`,
+                enemyCount: Math.min(5 + Math.floor(i * 2), 20), // 更多敌人
+                enemyTypes: i < 5 ? ['嘉姐'] : i < 10 ? ['嘉姐', '万总'] : i < 15 ? ['嘉姐', '万总', '二叔'] : ['嘉姐', '万总', '二叔', '二婶'],
+                spawnRate: Math.max(2000 - i * 100, 800), // 更快的刷新
+                requiredKills: 3 + i * 2 // 需要击杀的敌人数量
+            });
         }
 
-        update() {
-          this.x += this.speedX
-          this.y += this.speedY
-          this.life--
-          this.size *= 0.98
+        function generatePlatforms(level) {
+            const platforms = [];
+            const platformCount = 5 + Math.min(level, 10);
+
+            for (let i = 0; i < platformCount; i++) {
+                platforms.push({
+                    x: 100 + (i * (W - 200) / platformCount) + Math.random() * 50,
+                    y: H - 150 - Math.random() * 200,
+                    w: 80 + Math.random() * 60,
+                    h: 20,
+                    type: level > 10 && Math.random() > 0.7 ? 'moving' : 'static',
+                    moveSpeed: 1 + Math.random()
+                });
+            }
+            return platforms;
         }
 
-        draw() {
-          const alpha = this.life / this.maxLife
-          ctx.save()
-          ctx.globalAlpha = alpha
-          ctx.fillStyle = this.color
-          ctx.shadowBlur = 15
-          ctx.shadowColor = this.color
-          ctx.beginPath()
-          ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2)
-          ctx.fill()
-          ctx.restore()
+        function generateEnemies(level) {
+            const enemies = [];
+            const types = level < 5 ? ['嘉姐'] : level < 10 ? ['嘉姐', '万总'] : level < 15 ? ['嘉姐', '万总', '二叔'] : ['嘉姐', '万总', '二叔', '二婶'];
+            const count = Math.min(4 + level, 12); // 初始更多敌人
+
+            for (let i = 0; i < count; i++) {
+                const type = types[Math.floor(Math.random() * types.length)];
+                enemies.push({
+                    type,
+                    x: W + 200 + i * 150 + Math.random() * 100, // 分散分布
+                    y: H - 100 - Math.random() * 200,
+                    ...ENEMIES[type]
+                });
+            }
+            return enemies;
         }
 
-        isDead() {
-          return this.life <= 0 || this.size < 0.5
+        // 游戏状态
+        let gameState = 'playing';
+        let currentLevel = 1;
+        let gold = 0;
+        let cameraX = 0;
+        let levelWidth = 3000;
+        let goalX = levelWidth - 200; // 终点位置
+        let levelKills = 0;
+        let totalKillsThisLevel = 0;
+
+        // 玩家
+        const player = {
+            x: 100,
+            y: H - 150,
+            w: 40,
+            h: 60,
+            vx: 0,
+            vy: 0,
+            hp: 100,
+            maxHp: 100,
+            speed: 5,
+            jumpForce: -14,
+            facing: 1,
+            grounded: false,
+            crouching: false,
+            invincible: 0,
+            attackCooldown: 0,
+            skillCooldown: 0,
+            currentSkill: 0,
+            unlockedSkills: [true, true, true, true, true], // 全部解锁
+            animation: 0,
+            attackSpeedBoost: 0, // 攻速加成
+            damageBoost: 0, // 伤害加成
+            boostTimer: 0 // 增益持续时间
+        };
+
+        // 游戏对象
+        let platforms = [];
+        let enemies = [];
+        let bullets = [];
+        let particles = [];
+        let drops = [];
+        let enemyBullets = [];
+
+        // 输入
+        const keys = {};
+        document.addEventListener('keydown', e => {
+            keys[e.key.toLowerCase()] = true;
+            if (e.key >= '1' && e.key <= '5' && player.unlockedSkills[parseInt(e.key) - 1]) {
+                player.currentSkill = parseInt(e.key) - 1;
+                updateSkillUI();
+            }
+        });
+        document.addEventListener('keyup', e => keys[e.key.toLowerCase()] = false);
+
+        // 触控按钮
+        function createTouchControls() {
+            const controls = document.createElement('div');
+            controls.style.cssText = 'position:fixed;bottom:10px;left:0;right:0;display:flex;justify-content:space-between;padding:0 20px;pointer-events:none;';
+            controls.innerHTML = `
+                <div style="display:flex;gap:10px;pointer-events:auto;">
+                    <button id="btnLeft" style="width:50px;height:50px;border-radius:50%;background:rgba(255,255,255,0.3);border:2px solid #fff;color:#fff;font-size:20px;">◀</button>
+                    <button id="btnRight" style="width:50px;height:50px;border-radius:50%;background:rgba(255,255,255,0.3);border:2px solid #fff;color:#fff;font-size:20px;">▶</button>
+                </div>
+                <div style="display:flex;gap:10px;pointer-events:auto;">
+                    <button id="btnJump" style="width:50px;height:50px;border-radius:50%;background:rgba(255,255,255,0.3);border:2px solid #fff;color:#fff;font-size:20px;">▲</button>
+                    <button id="btnCrouch" style="width:50px;height:50px;border-radius:50%;background:rgba(255,255,255,0.3);border:2px solid #fff;color:#fff;font-size:20px;">▼</button>
+                    <button id="btnAttack" style="width:50px;height:50px;border-radius:50%;background:rgba(255,100,100,0.5);border:2px solid #e74c3c;color:#fff;font-size:16px;">攻击</button>
+                </div>
+            `;
+            document.body.appendChild(controls);
+
+            const btnLeft = document.getElementById('btnLeft');
+            const btnRight = document.getElementById('btnRight');
+            const btnJump = document.getElementById('btnJump');
+            const btnCrouch = document.getElementById('btnCrouch');
+            const btnAttack = document.getElementById('btnAttack');
+
+            btnLeft.addEventListener('touchstart', e => { e.preventDefault(); keys['a'] = true; });
+            btnLeft.addEventListener('touchend', e => { e.preventDefault(); keys['a'] = false; });
+            btnRight.addEventListener('touchstart', e => { e.preventDefault(); keys['d'] = true; });
+            btnRight.addEventListener('touchend', e => { e.preventDefault(); keys['d'] = false; });
+            btnJump.addEventListener('touchstart', e => { e.preventDefault(); keys[' '] = true; });
+            btnJump.addEventListener('touchend', e => { e.preventDefault(); keys[' '] = false; });
+            btnCrouch.addEventListener('touchstart', e => { e.preventDefault(); keys['s'] = true; });
+            btnCrouch.addEventListener('touchend', e => { e.preventDefault(); keys['s'] = false; });
+            btnAttack.addEventListener('touchstart', e => { e.preventDefault(); keys['j'] = true; });
+            btnAttack.addEventListener('touchend', e => { e.preventDefault(); keys['j'] = false; });
         }
-      }
+        createTouchControls();
 
-      // 翅膀羽毛
-      class WingFeather {
-        constructor(x, y, angle, length, color, isLeft) {
-          this.baseX = x
-          this.baseY = y
-          this.angle = angle
-          this.length = length
-          this.color = color
-          this.isLeft = isLeft
-          this.phase = Math.random() * Math.PI * 2
-          this.waveAmplitude = 0.1 + Math.random() * 0.1
+        // 技能UI
+        function createSkillUI() {
+            const bar = document.getElementById('skillBar');
+            SKILLS.forEach((skill, i) => {
+                const btn = document.createElement('div');
+                btn.className = 'skill-btn' + (player.unlockedSkills[i] ? '' : ' locked');
+                btn.innerHTML = skill.icon;
+                btn.title = skill.name;
+                btn.onclick = () => {
+                    if (player.unlockedSkills[i]) {
+                        player.currentSkill = i;
+                        updateSkillUI();
+                    }
+                };
+                bar.appendChild(btn);
+            });
         }
+        createSkillUI();
 
-        update(time, breathOffset) {
-          this.currentAngle =
-            this.angle +
-            Math.sin(time * 0.003 + this.phase) * this.waveAmplitude +
-            breathOffset * 0.5
+        function updateSkillUI() {
+            const btns = document.querySelectorAll('.skill-btn');
+            btns.forEach((btn, i) => {
+                btn.classList.toggle('active', i === player.currentSkill);
+            });
+            document.getElementById('currentSkill').textContent = SKILLS[player.currentSkill].name;
         }
+        updateSkillUI();
 
-        draw(ctx) {
-          ctx.save()
-          ctx.translate(this.baseX, this.baseY)
-          ctx.rotate(this.currentAngle)
+        // 初始化关卡
+        function initLevel(level) {
+            const config = LEVELS[level - 1];
+            platforms = config.platforms.map(p => ({...p, ox: p.x}));
+            enemies = config.enemies.map(e => ({...e, maxHp: e.hp}));
+            bullets = [];
+            particles = [];
+            drops = [];
+            enemyBullets = [];
+            cameraX = 0;
+            levelKills = 0;
+            goalX = levelWidth - 200; // 重置终点位置
+            player.x = 100;
+            player.y = H - 150;
+            player.vx = 0;
+            player.vy = 0;
 
-          // 羽毛渐变
-          const gradient = ctx.createLinearGradient(0, 0, this.length, 0)
-          gradient.addColorStop(0, this.color)
-          gradient.addColorStop(0.5, this.lightenColor(this.color, 30))
-          gradient.addColorStop(1, 'rgba(255, 255, 255, 0.3)')
+            // 显示关卡标题
+            const title = document.getElementById('levelTitle');
+            title.textContent = config.name + ' - 击杀敌人后到达终点！';
+            title.style.opacity = 1;
+            setTimeout(() => title.style.opacity = 0, 2000);
 
-          ctx.fillStyle = gradient
-          ctx.shadowBlur = 20
-          ctx.shadowColor = this.color
-
-          ctx.beginPath()
-          ctx.moveTo(0, 0)
-          ctx.quadraticCurveTo(
-            this.length * 0.5,
-            -this.length * 0.15,
-            this.length,
-            0,
-          )
-          ctx.quadraticCurveTo(this.length * 0.5, this.length * 0.15, 0, 0)
-          ctx.fill()
-
-          ctx.restore()
-        }
-
-        lightenColor(color, amount) {
-          const hex = color.replace('#', '')
-          const r = Math.min(255, parseInt(hex.substr(0, 2), 16) + amount)
-          const g = Math.min(255, parseInt(hex.substr(2, 2), 16) + amount)
-          const b = Math.min(255, parseInt(hex.substr(4, 2), 16) + amount)
-          return `rgb(${r}, ${g}, ${b})`
-        }
-      }
-
-      // 云朵
-      class Cloud {
-        constructor() {
-          this.reset()
-        }
-
-        reset() {
-          this.x = Math.random() * width
-          this.y = Math.random() * height
-          this.speed = 0.2 + Math.random() * 0.3
-          this.size = 30 + Math.random() * 60
-          this.opacity = 0.1 + Math.random() * 0.2
-        }
-
-        update() {
-          this.x += this.speed
-          if (this.x > width + 100) {
-            this.x = -100
-            this.y = Math.random() * height
-          }
-        }
-
-        draw() {
-          ctx.save()
-          ctx.globalAlpha = this.opacity
-          ctx.fillStyle = '#fff'
-
-          for (let i = 0; i < 5; i++) {
-            ctx.beginPath()
-            ctx.arc(
-              this.x + i * this.size * 0.3,
-              this.y + Math.sin(i) * this.size * 0.2,
-              this.size * (0.5 + Math.sin(i * 0.5) * 0.2),
-              0,
-              Math.PI * 2,
-            )
-            ctx.fill()
-          }
-          ctx.restore()
-        }
-      }
-
-      // 古风人物类
-      class GuFengCharacter {
-        constructor() {
-          this.x = width / 2
-          this.y = height / 2
-          this.time = 0
-          this.particles = []
-          this.clouds = []
-
-          // 翅膀设置
-          this.wingColors = [
-            { primary: '#6366f1', secondary: '#8b5cf6', glow: '#a855f7' },
-            { primary: '#06b6d4', secondary: '#3b82f6', glow: '#60a5fa' },
-            { primary: '#ec4899', secondary: '#f472b6', glow: '#fb7185' },
-          ]
-          this.currentWingColor = 0
-          this.leftWings = []
-          this.rightWings = []
-          this.initWings()
-
-          // 初始化云朵
-          const cloudCount = isMobile ? 8 : 15
-          for (let i = 0; i < cloudCount; i++) {
-            this.clouds.push(new Cloud())
-          }
-
-          // 飘带
-          this.ribbons = []
-          for (let i = 0; i < 4; i++) {
-            this.ribbons.push({
-              phase: i * Math.PI * 0.5,
-              amplitude: 30 + i * 10,
-              frequency: 0.02 + i * 0.005,
-              length: 80 + i * 30,
-              color: this.wingColors[this.currentWingColor].primary,
-            })
-          }
-        }
-
-        initWings() {
-          this.leftWings = []
-          this.rightWings = []
-
-          // 左翅膀
-          for (let i = 0; i < 8; i++) {
-            const angle = -Math.PI * 0.8 - i * 0.15
-            const length = 80 + Math.sin(i * 0.5) * 30
-            const color = this.wingColors[this.currentWingColor].primary
-            this.leftWings.push(
-              new WingFeather(this.x - 30, this.y, angle, length, color, true),
-            )
-          }
-
-          // 右翅膀
-          for (let i = 0; i < 8; i++) {
-            const angle = -Math.PI * 0.2 + i * 0.15
-            const length = 80 + Math.sin(i * 0.5) * 30
-            const color = this.wingColors[this.currentWingColor].primary
-            this.rightWings.push(
-              new WingFeather(this.x + 30, this.y, angle, length, color, false),
-            )
-          }
+            document.getElementById('level').textContent = level;
         }
 
-        update(deltaTime) {
-          this.time += deltaTime
-
-          // 触控引导飞行
-          let targetX = width / 2
-          let targetY = height / 2
-
-          if (isTouching) {
-            targetX = touchTarget.x
-            targetY = touchTarget.y
-          } else {
-            // 自由飞行轨迹
-            targetX = width / 2 + Math.sin(this.time * 0.001) * 100
-            targetY = height / 2 + Math.cos(this.time * 0.0015) * 50 + Math.sin(this.time * 0.002) * 20
-          }
-
-          // 平滑跟随
-          this.x += (targetX - this.x) * 0.03
-          this.y += (targetY - this.y) * 0.03
-
-          // 呼吸效果
-          const breathOffset = Math.sin(this.time * 0.003) * 5
-
-          // 更新翅膀
-          this.leftWings.forEach((wing, i) => {
-            wing.baseX = this.x - 30 + breathOffset
-            wing.baseY = this.y + breathOffset
-            wing.update(this.time, breathOffset)
-            wing.angle =
-              -Math.PI * 0.7 -
-              i * 0.12 -
-              Math.sin(this.time * 0.005 + i * 0.3) * 0.2
-          })
-
-          this.rightWings.forEach((wing, i) => {
-            wing.baseX = this.x + 30 + breathOffset
-            wing.baseY = this.y + breathOffset
-            wing.update(this.time, breathOffset)
-            wing.angle =
-              -Math.PI * 0.3 +
-              i * 0.12 +
-              Math.sin(this.time * 0.005 + i * 0.3) * 0.2
-          })
-
-          // 更新云朵
-          this.clouds.forEach((cloud) => cloud.update())
-
-          // 生成翅膀粒子
-          if (Math.random() < 0.3) {
-            const wing =
-              this.leftWings[Math.floor(Math.random() * this.leftWings.length)]
-            this.particles.push(
-              new Particle(
-                wing.baseX + Math.random() * 50,
-                wing.baseY + Math.random() * 20 - 10,
-                this.wingColors[this.currentWingColor].glow,
-                2 + Math.random() * 3,
-                -1 - Math.random(),
-                (Math.random() - 0.5) * 2,
-                60 + Math.random() * 40,
-              ),
-            )
-          }
-
-          if (Math.random() < 0.3) {
-            const wing =
-              this.rightWings[
-                Math.floor(Math.random() * this.rightWings.length)
-              ]
-            this.particles.push(
-              new Particle(
-                wing.baseX - Math.random() * 50,
-                wing.baseY + Math.random() * 20 - 10,
-                this.wingColors[this.currentWingColor].glow,
-                2 + Math.random() * 3,
-                1 + Math.random(),
-                (Math.random() - 0.5) * 2,
-                60 + Math.random() * 40,
-              ),
-            )
-          }
-
-          // 更新粒子
-          this.particles.forEach((p) => p.update())
-          this.particles = this.particles.filter((p) => !p.isDead())
-
-          // 限制粒子数量以优化移动端性能
-          const maxParticles = isMobile ? 80 : 200
-          if (this.particles.length > maxParticles) {
-            this.particles = this.particles.slice(-maxParticles)
-          }
-
-          // 定期改变翅膀颜色
-          if (
-            Math.floor(this.time / 5000) !==
-            Math.floor((this.time - deltaTime) / 5000)
-          ) {
-            this.currentWingColor =
-              (this.currentWingColor + 1) % this.wingColors.length
-            this.initWings()
-          }
+        // 生成敌人
+        let lastSpawn = 0;
+        function spawnEnemy() {
+            const config = LEVELS[currentLevel - 1];
+            if (enemies.length < config.enemyCount && Date.now() - lastSpawn > config.spawnRate) {
+                const type = config.enemyTypes[Math.floor(Math.random() * config.enemyTypes.length)];
+                const template = ENEMIES[type];
+                enemies.push({
+                    type,
+                    x: cameraX + W + 100 + Math.random() * 200, // 在玩家前方生成
+                    y: H - 100 - Math.random() * 150,
+                    ...template,
+                    maxHp: template.hp * (1 + currentLevel * 0.15), // 更高的HP增长
+                    hp: template.hp * (1 + currentLevel * 0.15),
+                    vx: 0,
+                    vy: 0,
+                    attackTimer: 0,
+                    facing: -1
+                });
+                lastSpawn = Date.now();
+            }
         }
 
-        drawBackground() {
-          // 渐变背景
-          const gradient = ctx.createRadialGradient(
-            width / 2,
-            height / 2,
-            0,
-            width / 2,
-            height / 2,
-            Math.max(width, height),
-          )
-          gradient.addColorStop(0, '#1a1a3e')
-          gradient.addColorStop(0.5, '#0f0f2a')
-          gradient.addColorStop(1, '#050510')
-          ctx.fillStyle = gradient
-          ctx.fillRect(0, 0, width, height)
+        // 创建子弹
+        function createBullet(x, y, dir, skill) {
+            const s = SKILLS[skill];
+            const damageBoost = player.damageBoost > 0 ? 1 + player.damageBoost : 1;
 
-          // 星星 - 移动端减少数量
-          const starCount = isMobile ? 50 : 100
-          for (let i = 0; i < starCount; i++) {
-            const x = (i * 137.5) % width
-            const y = (i * 73.7) % height
-            const size = 0.5 + Math.sin(this.time * 0.001 + i) * 0.5
-            const twinkle = Math.sin(this.time * 0.005 + i * 0.5) * 0.5 + 0.5
+            bullets.push({
+                x, y,
+                vx: dir * s.speed,
+                vy: 0,
+                ...s,
+                damage: s.damage * damageBoost, // 应用伤害加成
+                life: 100,
+                fromPlayer: true
+            });
 
-            ctx.save()
-            ctx.globalAlpha = twinkle * 0.8
-            ctx.fillStyle = '#fff'
-            ctx.shadowBlur = 10
-            ctx.shadowColor = '#fff'
-            ctx.beginPath()
-            ctx.arc(x, y, size, 0, Math.PI * 2)
-            ctx.fill()
-            ctx.restore()
-          }
-
-          // 云朵
-          this.clouds.forEach((cloud) => cloud.draw())
+            // 发射粒子
+            for (let i = 0; i < 10; i++) {
+                particles.push({
+                    x, y,
+                    vx: dir * (Math.random() * 5 + 2),
+                    vy: (Math.random() - 0.5) * 4,
+                    color: s.bulletColor,
+                    size: Math.random() * 4 + 2,
+                    life: 20
+                });
+            }
         }
 
-        drawRibbon(x, y, ribbon) {
-          ctx.save()
-          ctx.strokeStyle = this.wingColors[this.currentWingColor].primary
-          ctx.lineWidth = 3
-          ctx.shadowBlur = 15
-          ctx.shadowColor = this.wingColors[this.currentWingColor].glow
-          ctx.lineCap = 'round'
-
-          ctx.beginPath()
-          for (let i = 0; i <= ribbon.length; i++) {
-            const px = x - 20 - i * 0.5
-            const py =
-              y +
-              50 +
-              i * 0.3 +
-              Math.sin(this.time * ribbon.frequency + ribbon.phase + i * 0.1) *
-                ribbon.amplitude
-            if (i === 0) ctx.moveTo(px, py)
-            else ctx.lineTo(px, py)
-          }
-          ctx.stroke()
-          ctx.restore()
+        // 创建敌人子弹
+        function createEnemyBullet(enemy) {
+            const dir = enemy.facing;
+            enemyBullets.push({
+                x: enemy.x,
+                y: enemy.y,
+                vx: dir * 6,
+                vy: -2,
+                color: enemy.color,
+                size: 8,
+                damage: enemy.damage,
+                life: 150
+            });
         }
 
-        drawCharacter() {
-          const breathOffset = Math.sin(this.time * 0.003) * 3
-
-          // 绘制飘带
-          for (let i = 0; i < 2; i++) {
-            this.drawRibbon(this.x, this.y, this.ribbons[i])
-            this.drawRibbon(this.x, this.y, this.ribbons[i + 2])
-          }
-
-          // 发光效果
-          ctx.save()
-          const glowGradient = ctx.createRadialGradient(
-            this.x,
-            this.y,
-            0,
-            this.x,
-            this.y,
-            150,
-          )
-          glowGradient.addColorStop(
-            0,
-            `${this.wingColors[this.currentWingColor].glow}33`,
-          )
-          glowGradient.addColorStop(1, 'transparent')
-          ctx.fillStyle = glowGradient
-          ctx.beginPath()
-          ctx.arc(this.x, this.y, 150, 0, Math.PI * 2)
-          ctx.fill()
-          ctx.restore()
-
-          // 身体（古风长裙）
-          ctx.save()
-          ctx.translate(this.x, this.y)
-
-          // 长裙
-          const dressGradient = ctx.createLinearGradient(0, -20, 0, 100)
-          dressGradient.addColorStop(0, '#e8d5f0')
-          dressGradient.addColorStop(0.5, '#d4a5e8')
-          dressGradient.addColorStop(1, '#9b59b6')
-
-          ctx.fillStyle = dressGradient
-          ctx.shadowBlur = 20
-          ctx.shadowColor = '#9b59b6'
-
-          ctx.beginPath()
-          ctx.moveTo(-25, 0)
-          ctx.quadraticCurveTo(-35, 50, -40 + breathOffset, 100)
-          ctx.lineTo(40 - breathOffset, 100)
-          ctx.quadraticCurveTo(35, 50, 25, 0)
-          ctx.closePath()
-          ctx.fill()
-
-          // 裙子装饰
-          ctx.strokeStyle = '#f1c40f'
-          ctx.lineWidth = 2
-          ctx.shadowColor = '#f1c40f'
-          for (let i = 0; i < 3; i++) {
-            ctx.beginPath()
-            ctx.moveTo(-20 + i * 5, 20 + i * 25)
-            ctx.quadraticCurveTo(0, 30 + i * 25, 20 - i * 5, 20 + i * 25)
-            ctx.stroke()
-          }
-
-          // 上衣
-          ctx.fillStyle = '#faf0fa'
-          ctx.shadowBlur = 10
-          ctx.beginPath()
-          ctx.moveTo(-20, -40)
-          ctx.lineTo(-25, 10)
-          ctx.lineTo(25, 10)
-          ctx.lineTo(20, -40)
-          ctx.closePath()
-          ctx.fill()
-
-          // 衣领装饰
-          ctx.strokeStyle = '#9b59b6'
-          ctx.lineWidth = 2
-          ctx.beginPath()
-          ctx.moveTo(-15, -35)
-          ctx.quadraticCurveTo(0, -25, 15, -35)
-          ctx.stroke()
-
-          // 袖子
-          ctx.fillStyle = '#f5e6f5'
-          ctx.shadowColor = '#9b59b6'
-
-          // 左袖
-          ctx.beginPath()
-          ctx.moveTo(-20, -30)
-          ctx.quadraticCurveTo(-60, -20, -70 + breathOffset, 20)
-          ctx.quadraticCurveTo(-50, 30, -20, 10)
-          ctx.closePath()
-          ctx.fill()
-
-          // 右袖
-          ctx.beginPath()
-          ctx.moveTo(20, -30)
-          ctx.quadraticCurveTo(60, -20, 70 - breathOffset, 20)
-          ctx.quadraticCurveTo(50, 30, 20, 10)
-          ctx.closePath()
-          ctx.fill()
-
-          ctx.restore()
-
-          // 头部
-          ctx.save()
-          ctx.translate(this.x, this.y - 55 + breathOffset)
-
-          // 脸
-          ctx.fillStyle = '#fce4d6'
-          ctx.shadowBlur = 15
-          ctx.shadowColor = '#fce4d6'
-          ctx.beginPath()
-          ctx.arc(0, 0, 18, 0, Math.PI * 2)
-          ctx.fill()
-
-          // 眼睛
-          ctx.fillStyle = '#2c1810'
-          ctx.beginPath()
-          ctx.ellipse(-7, -2, 3, 4, 0, 0, Math.PI * 2)
-          ctx.ellipse(7, -2, 3, 4, 0, 0, Math.PI * 2)
-          ctx.fill()
-
-          // 眼睛高光
-          ctx.fillStyle = '#fff'
-          ctx.beginPath()
-          ctx.arc(-6, -3, 1.5, 0, Math.PI * 2)
-          ctx.arc(8, -3, 1.5, 0, Math.PI * 2)
-          ctx.fill()
-
-          // 眉毛
-          ctx.strokeStyle = '#2c1810'
-          ctx.lineWidth = 1.5
-          ctx.beginPath()
-          ctx.moveTo(-12, -8)
-          ctx.quadraticCurveTo(-7, -12, -2, -8)
-          ctx.moveTo(12, -8)
-          ctx.quadraticCurveTo(7, -12, 2, -8)
-          ctx.stroke()
-
-          // 嘴唇
-          ctx.fillStyle = '#e74c3c'
-          ctx.beginPath()
-          ctx.arc(0, 5, 4, 0, Math.PI)
-          ctx.fill()
-
-          // 腮红
-          ctx.fillStyle = 'rgba(255, 150, 150, 0.3)'
-          ctx.beginPath()
-          ctx.ellipse(-12, 2, 4, 2, 0, 0, Math.PI * 2)
-          ctx.ellipse(12, 2, 4, 2, 0, 0, Math.PI * 2)
-          ctx.fill()
-
-          ctx.restore()
-
-          // 发型
-          ctx.save()
-          ctx.translate(this.x, this.y - 55 + breathOffset)
-
-          // 发髻基础
-          const hairGradient = ctx.createRadialGradient(0, -5, 0, 0, -5, 30)
-          hairGradient.addColorStop(0, '#1a1a2e')
-          hairGradient.addColorStop(1, '#0f0f1a')
-          ctx.fillStyle = hairGradient
-
-          // 后发
-          ctx.beginPath()
-          ctx.arc(0, 5, 20, 0, Math.PI * 2)
-          ctx.fill()
-
-          // 发髻
-          ctx.beginPath()
-          ctx.arc(0, -15, 15, 0, Math.PI * 2)
-          ctx.fill()
-
-          // 发髻装饰 - 簪子
-          ctx.strokeStyle = '#f1c40f'
-          ctx.lineWidth = 2
-          ctx.shadowBlur = 10
-          ctx.shadowColor = '#f1c40f'
-          ctx.beginPath()
-          ctx.moveTo(0, -25)
-          ctx.lineTo(15, -40)
-          ctx.stroke()
-
-          // 簪子头
-          ctx.fillStyle = '#f1c40f'
-          ctx.beginPath()
-          ctx.arc(15, -40, 4, 0, Math.PI * 2)
-          ctx.fill()
-
-          // 发丝飘动
-          ctx.strokeStyle = '#2c2c4a'
-          ctx.lineWidth = 1
-          for (let i = 0; i < 5; i++) {
-            const offset = Math.sin(this.time * 0.003 + i) * 5
-            ctx.beginPath()
-            ctx.moveTo(-15 + i * 3, 10)
-            ctx.quadraticCurveTo(
-              -20 + i * 4 + offset,
-              30,
-              -25 + i * 5,
-              50 + Math.sin(this.time * 0.002 + i) * 10,
-            )
-            ctx.stroke()
-          }
-
-          ctx.restore()
-
-          // 绘制翅膀
-          ctx.save()
-          ctx.translate(this.x, this.y)
-
-          // 翅膀光晕
-          const wingGlow = ctx.createRadialGradient(0, 0, 0, 0, 0, 120)
-          wingGlow.addColorStop(
-            0,
-            `${this.wingColors[this.currentWingColor].glow}44`,
-          )
-          wingGlow.addColorStop(
-            0.5,
-            `${this.wingColors[this.currentWingColor].primary}22`,
-          )
-          wingGlow.addColorStop(1, 'transparent')
-          ctx.fillStyle = wingGlow
-          ctx.beginPath()
-          ctx.arc(0, 0, 120, 0, Math.PI * 2)
-          ctx.fill()
-
-          ctx.restore()
-
-          // 绘制左右翅膀
-          this.leftWings.forEach((wing) => wing.draw(ctx))
-          this.rightWings.forEach((wing) => wing.draw(ctx))
-
-          // 翅膀外发光
-          this.leftWings.forEach((wing) => {
-            ctx.save()
-            ctx.globalAlpha = 0.3
-            ctx.translate(wing.baseX, wing.baseY)
-            ctx.rotate(wing.currentAngle)
-            ctx.fillStyle = this.wingColors[this.currentWingColor].glow
-            ctx.shadowBlur = 30
-            ctx.shadowColor = this.wingColors[this.currentWingColor].glow
-            ctx.beginPath()
-            ctx.ellipse(
-              wing.length * 0.5,
-              0,
-              wing.length * 0.3,
-              wing.length * 0.08,
-              0,
-              0,
-              Math.PI * 2,
-            )
-            ctx.fill()
-            ctx.restore()
-          })
-
-          this.rightWings.forEach((wing) => {
-            ctx.save()
-            ctx.globalAlpha = 0.3
-            ctx.translate(wing.baseX, wing.baseY)
-            ctx.rotate(wing.currentAngle)
-            ctx.fillStyle = this.wingColors[this.currentWingColor].glow
-            ctx.shadowBlur = 30
-            ctx.shadowColor = this.wingColors[this.currentWingColor].glow
-            ctx.beginPath()
-            ctx.ellipse(
-              wing.length * 0.5,
-              0,
-              wing.length * 0.3,
-              wing.length * 0.08,
-              0,
-              0,
-              Math.PI * 2,
-            )
-            ctx.fill()
-            ctx.restore()
-          })
+        // 创建掉落物
+        function createDrop(x, y, type) {
+            const types = ['gold', 'speed', 'damage', 'hp'];
+            drops.push({
+                x, y,
+                vy: -5,
+                type: type || types[Math.floor(Math.random() * types.length)],
+                life: 300,
+                collected: false
+            });
         }
 
-        drawParticles() {
-          this.particles.forEach((p) => p.draw())
+        // 碰撞检测
+        function collides(a, b) {
+            return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
         }
-      }
 
-      // 创建角色
-      const character = new GuFengCharacter()
-
-      // 触控交互
-      let touchTarget = { x: width / 2, y: height / 2 }
-      let isTouching = false
-
-      function getTouchPos(e) {
-        const rect = canvas.getBoundingClientRect()
-        if (e.touches && e.touches.length > 0) {
-          return {
-            x: e.touches[0].clientX - rect.left,
-            y: e.touches[0].clientY - rect.top,
-          }
+        function pointInRect(px, py, r) {
+            return px >= r.x && px <= r.x + r.w && py >= r.y && py <= r.y + r.h;
         }
-        return { x: e.clientX - rect.left, y: e.clientY - rect.top }
-      }
 
-      canvas.addEventListener('touchstart', (e) => {
-        e.preventDefault()
-        isTouching = true
-        touchTarget = getTouchPos(e)
-        // 触发震动反馈
-        if (navigator.vibrate) navigator.vibrate(10)
-        // 触摸时增加粒子
-        for (let i = 0; i < 15; i++) {
-          character.particles.push(
-            new Particle(
-              touchTarget.x + (Math.random() - 0.5) * 40,
-              touchTarget.y + (Math.random() - 0.5) * 40,
-              character.wingColors[character.currentWingColor].glow,
-              3 + Math.random() * 5,
-              (Math.random() - 0.5) * 4,
-              (Math.random() - 0.5) * 4,
-              80 + Math.random() * 40,
-            ),
-          )
+        // 更新玩家
+        function updatePlayer() {
+            // 移动
+            player.vx = 0;
+            if (keys['a'] || keys['arrowleft']) {
+                player.vx = -player.speed;
+                player.facing = -1;
+            }
+            if (keys['d'] || keys['arrowright']) {
+                player.vx = player.speed;
+                player.facing = 1;
+            }
+
+            // 下蹲
+            player.crouching = (keys['s'] || keys['arrowdown']) && player.grounded;
+            if (player.crouching) player.vx *= 0.3;
+
+            // 跳跃
+            if ((keys[' '] || keys['w'] || keys['arrowup']) && player.grounded && !player.crouching) {
+                player.vy = player.jumpForce;
+                player.grounded = false;
+            }
+
+            // 攻击
+            const speedBoost = player.attackSpeedBoost > 0 ? Math.max(5, 15 - player.attackSpeedBoost) : 15;
+            if ((keys['j']) && player.attackCooldown <= 0) {
+                createBullet(
+                    player.x + player.w/2 + player.facing * 30,
+                    player.y + player.h/2 - 10,
+                    player.facing,
+                    player.currentSkill
+                );
+                player.attackCooldown = speedBoost;
+            }
+
+            // 技能攻击
+            if ((keys['k']) && player.skillCooldown <= 0) {
+                const s = SKILLS[player.currentSkill];
+                const damageBoost = player.damageBoost > 0 ? 1 + player.damageBoost : 1;
+                // 发射多发子弹
+                for (let i = -1; i <= 1; i++) {
+                    bullets.push({
+                        x: player.x + player.w/2,
+                        y: player.y + player.h/2 - 10,
+                        vx: player.facing * s.speed * 0.8,
+                        vy: i * 3,
+                        ...s,
+                        damage: s.damage * damageBoost,
+                        life: 80
+                    });
+                }
+                player.skillCooldown = Math.max(30, 60 - player.attackSpeedBoost);
+            }
+
+            // 冷却
+            if (player.attackCooldown > 0) player.attackCooldown--;
+            if (player.skillCooldown > 0) player.skillCooldown--;
+            if (player.invincible > 0) player.invincible--;
+
+            // 重力
+            player.vy += GRAVITY;
+
+            // 移动
+            player.x += player.vx;
+            player.y += player.vy;
+
+            // 地面碰撞
+            player.grounded = false;
+            const groundY = H - 60;
+
+            if (player.y + player.h > groundY) {
+                player.y = groundY - player.h;
+                player.vy = 0;
+                player.grounded = true;
+            }
+
+            // 平台碰撞
+            platforms.forEach(p => {
+                if (p.type === 'moving') {
+                    p.x = p.ox + Math.sin(Date.now() * 0.002 * p.moveSpeed) * 50;
+                }
+
+                if (player.vy >= 0 &&
+                    player.x + player.w > p.x && player.x < p.x + p.w &&
+                    player.y + player.h > p.y && player.y + player.h < p.y + p.h + 20) {
+                    player.y = p.y - player.h;
+                    player.vy = 0;
+                    player.grounded = true;
+                }
+            });
+
+            // 边界
+            player.x = Math.max(cameraX, Math.min(levelWidth, player.x));
+
+            // 动画
+            if (Math.abs(player.vx) > 0) player.animation += 0.2;
         }
-      }, { passive: false })
 
-      canvas.addEventListener('touchmove', (e) => {
-        e.preventDefault()
-        touchTarget = getTouchPos(e)
-      }, { passive: false })
+        // 更新敌人
+        function updateEnemies() {
+            enemies.forEach((e, idx) => {
+                // AI行为
+                const dx = player.x - e.x;
+                const dy = player.y - e.y;
+                e.facing = dx > 0 ? 1 : -1;
 
-      canvas.addEventListener('touchend', () => {
-        isTouching = false
-      })
+                switch(e.pattern) {
+                    case 'chase':
+                        if (Math.abs(dx) > 100) e.vx = e.facing * e.speed;
+                        else e.vx = 0;
+                        break;
+                    case 'patrol':
+                        e.vx = e.facing * e.speed;
+                        if (Math.random() < 0.02) e.facing *= -1;
+                        break;
+                    case 'shoot':
+                        e.vx = Math.abs(dx) > 200 ? e.facing * e.speed : 0;
+                        e.attackTimer++;
+                        if (e.attackTimer > 90) {
+                            createEnemyBullet(e);
+                            e.attackTimer = 0;
+                        }
+                        break;
+                    case 'boss':
+                        if (Math.abs(dx) > 150) e.vx = e.facing * e.speed;
+                        else e.vx = 0;
+                        e.attackTimer++;
+                        if (e.attackTimer > 60) {
+                            createEnemyBullet(e);
+                            if (currentLevel >= 18) createEnemyBullet(e);
+                            e.attackTimer = 0;
+                        }
+                        break;
+                }
 
-      canvas.addEventListener('mousedown', (e) => {
-        isTouching = true
-        touchTarget = getTouchPos(e)
-        for (let i = 0; i < 15; i++) {
-          character.particles.push(
-            new Particle(
-              touchTarget.x + (Math.random() - 0.5) * 40,
-              touchTarget.y + (Math.random() - 0.5) * 40,
-              character.wingColors[character.currentWingColor].glow,
-              3 + Math.random() * 5,
-              (Math.random() - 0.5) * 4,
-              (Math.random() - 0.5) * 4,
-              80 + Math.random() * 40,
-            ),
-          )
+                // 重力
+                e.vy += GRAVITY;
+                e.x += e.vx;
+                e.y += e.vy;
+
+                // 地面
+                if (e.y + e.hp > H - 60) {
+                    e.y = H - 60 - (e.size || 40);
+                    e.vy = 0;
+                }
+
+                // 平台
+                platforms.forEach(p => {
+                    if (e.vy >= 0 &&
+                        e.x + (e.size || 40) > p.x && e.x < p.x + p.w &&
+                        e.y + (e.size || 40) > p.y && e.y + (e.size || 40) < p.y + p.h + 20) {
+                        e.y = p.y - (e.size || 40);
+                        e.vy = 0;
+                    }
+                });
+
+                // 伤害玩家
+                if (player.invincible <= 0 && collides(
+                    {x: player.x, y: player.y, w: player.w, h: player.h},
+                    {x: e.x, y: e.y, w: e.size || 40, h: e.size || 40}
+                )) {
+                    player.hp -= e.damage;
+                    player.invincible = 60;
+                    player.vx = -player.facing * 10;
+                    player.vy = -5;
+                }
+
+                // 死亡
+                if (e.hp <= 0) {
+                    gold += e.gold;
+                    levelKills++; // 增加击杀计数
+                    createDrop(e.x, e.y, 'gold');
+                    if (Math.random() < 0.25) createDrop(e.x, e.y, 'speed');
+                    if (Math.random() < 0.25) createDrop(e.x, e.y, 'damage');
+                    if (Math.random() < 0.3) createDrop(e.x, e.y, 'hp');
+
+                    for (let i = 0; i < 20; i++) {
+                        particles.push({
+                            x: e.x + (e.size || 40)/2,
+                            y: e.y + (e.size || 40)/2,
+                            vx: (Math.random() - 0.5) * 10,
+                            vy: (Math.random() - 0.5) * 10,
+                            color: e.color,
+                            size: Math.random() * 6 + 3,
+                            life: 40
+                        });
+                    }
+
+                    enemies.splice(idx, 1);
+                }
+            });
         }
-      })
 
-      canvas.addEventListener('mousemove', (e) => {
-        if (isTouching) {
-          touchTarget = getTouchPos(e)
+        // 更新子弹
+        function updateBullets() {
+            bullets.forEach((b, idx) => {
+                b.x += b.vx;
+                b.y += b.vy;
+                b.life--;
+
+                // 特效
+                if (b.name === '风暴') {
+                    for (let i = 0; i < 2; i++) {
+                        particles.push({
+                            x: b.x, y: b.y,
+                            vx: (Math.random() - 0.5) * 3,
+                            vy: (Math.random() - 0.5) * 3,
+                            color: b.bulletColor,
+                            size: Math.random() * 4 + 1,
+                            life: 15
+                        });
+                    }
+                }
+
+                // 击中敌人
+                enemies.forEach(e => {
+                    if (pointInRect(b.x, b.y, {x: e.x, y: e.y, w: e.size || 40, h: e.size || 40})) {
+                        e.hp -= b.damage;
+                        b.life = 0;
+
+                        // 雷电链式效果
+                        if (b.chain) {
+                            enemies.forEach(e2 => {
+                                if (e2 !== e && Math.abs(e2.x - e.x) < 150) {
+                                    e2.hp -= b.damage * 0.5;
+                                }
+                            });
+                        }
+
+                        // 冰霜减速
+                        if (b.freeze) {
+                            e.speed *= 0.5;
+                            setTimeout(() => e.speed /= 0.5, 2000);
+                        }
+                    }
+                });
+
+                if (b.life <= 0 || b.x < cameraX - 50 || b.x > cameraX + W + 50) {
+                    bullets.splice(idx, 1);
+                }
+            });
+
+            // 敌弹
+            enemyBullets.forEach((b, idx) => {
+                b.x += b.vx;
+                b.y += b.vy;
+                b.vy += 0.05;
+                b.life--;
+
+                if (player.invincible <= 0 && pointInRect(b.x, b.y, {x: player.x, y: player.y, w: player.w, h: player.h})) {
+                    player.hp -= b.damage;
+                    player.invincible = 60;
+                    b.life = 0;
+                }
+
+                if (b.life <= 0) {
+                    enemyBullets.splice(idx, 1);
+                }
+            });
         }
-      })
 
-      canvas.addEventListener('mouseup', () => {
-        isTouching = false
-      })
+        // 更新掉落
+        function updateDrops() {
+            drops.forEach((d, idx) => {
+                d.vy += 0.3;
+                d.y += d.vy;
+                d.life--;
 
-      // 动画循环
-      let lastTime = 0
-      function animate(currentTime) {
-        const deltaTime = currentTime - lastTime
-        lastTime = currentTime
+                if (d.y > H - 60) {
+                    d.y = H - 60;
+                    d.vy = 0;
+                }
 
-        // 清空画布
-        ctx.clearRect(0, 0, width, height)
+                // 收集
+                const dist = Math.hypot(player.x + player.w/2 - d.x, player.y + player.h/2 - d.y);
+                if (dist < 50 && !d.collected) {
+                    d.collected = true;
+
+                    switch(d.type) {
+                        case 'gold':
+                            gold += 10;
+                            break;
+                        case 'speed':
+                            player.attackSpeedBoost += 3; // 增加攻速
+                            player.boostTimer = 300; // 持续时间
+                            break;
+                        case 'damage':
+                            player.damageBoost += 0.3; // 增加30%伤害
+                            player.boostTimer = 300;
+                            break;
+                        case 'hp':
+                            player.hp = Math.min(player.maxHp, player.hp + 30);
+                            break;
+                    }
+
+                    drops.splice(idx, 1);
+                }
+
+                if (d.life <= 0) {
+                    drops.splice(idx, 1);
+                }
+            });
+        }
+
+        // 更新粒子
+        function updateParticles() {
+            particles.forEach((p, idx) => {
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vy += 0.1;
+                p.life--;
+                p.size *= 0.95;
+
+                if (p.life <= 0) {
+                    particles.splice(idx, 1);
+                }
+            });
+        }
+
+        // 更新相机
+        function updateCamera() {
+            const targetX = player.x - W * 0.3;
+            cameraX += (targetX - cameraX) * 0.1;
+            cameraX = Math.max(0, Math.min(levelWidth - W, cameraX));
+        }
 
         // 绘制背景
-        character.drawBackground()
+        function drawBackground() {
+            const config = LEVELS[currentLevel - 1];
 
-        // 更新和绘制
-        character.update(deltaTime)
-        character.drawParticles()
-        character.drawCharacter()
+            // 渐变背景
+            const grad = ctx.createLinearGradient(0, 0, 0, H);
+            grad.addColorStop(0, config.bgColor);
+            grad.addColorStop(1, '#0a0a15');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, W, H);
 
-        requestAnimationFrame(animate)
-      }
+            // 星星
+            for (let i = 0; i < 50; i++) {
+                const x = (i * 137) % W;
+                const y = (i * 73) % (H * 0.6);
+                const twinkle = Math.sin(Date.now() * 0.005 + i) * 0.5 + 0.5;
+                ctx.fillStyle = `rgba(255,255,255,${twinkle * 0.8})`;
+                ctx.beginPath();
+                ctx.arc(x, y, 1 + twinkle, 0, Math.PI * 2);
+                ctx.fill();
+            }
 
-      animate(0)
+            // 远山
+            ctx.fillStyle = 'rgba(50,50,80,0.5)';
+            ctx.beginPath();
+            ctx.moveTo(0, H - 100);
+            for (let x = 0; x <= W; x += 50) {
+                ctx.lineTo(x, H - 100 - Math.sin((x + cameraX * 0.1) * 0.01) * 50);
+            }
+            ctx.lineTo(W, H);
+            ctx.lineTo(0, H);
+            ctx.fill();
+        }
+
+        // 绘制地面
+        function drawGround() {
+            const config = LEVELS[currentLevel - 1];
+
+            // 主地面
+            ctx.fillStyle = config.groundColor;
+            ctx.fillRect(0, H - 60, W, 60);
+
+            // 草地/装饰
+            ctx.fillStyle = '#2d5a27';
+            for (let x = 0; x < W; x += 20) {
+                const worldX = x + cameraX;
+                const h = 5 + Math.sin(worldX * 0.1) * 3;
+                ctx.fillRect(x, H - 60 - h, 8, h);
+            }
+
+            // 地面纹理
+            ctx.fillStyle = 'rgba(0,0,0,0.2)';
+            for (let x = 0; x < W; x += TILE) {
+                ctx.fillRect(x, H - 30, TILE - 1, 30);
+            }
+        }
+
+        // 绘制终点
+        function drawGoal() {
+            const sx = goalX - cameraX;
+
+            // 传送门效果
+            ctx.save();
+
+            // 外圈光环
+            const gradient = ctx.createRadialGradient(sx, H - 100, 0, sx, H - 100, 60);
+            gradient.addColorStop(0, 'rgba(241, 196, 15, 0.8)');
+            gradient.addColorStop(0.5, 'rgba(243, 156, 18, 0.4)');
+            gradient.addColorStop(1, 'rgba(243, 156, 18, 0)');
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.arc(sx, H - 100, 60, 0, Math.PI * 2);
+            ctx.fill();
+
+            // 旋转光环
+            ctx.strokeStyle = '#f1c40f';
+            ctx.lineWidth = 3;
+            ctx.shadowBlur = 20;
+            ctx.shadowColor = '#f1c40f';
+            for (let i = 0; i < 3; i++) {
+                const angle = Date.now() * 0.003 + i * (Math.PI * 2 / 3);
+                ctx.beginPath();
+                ctx.arc(sx, H - 100, 40 + i * 5, angle, angle + Math.PI * 0.5);
+                ctx.stroke();
+            }
+
+            // 中心
+            ctx.fillStyle = '#fff';
+            ctx.beginPath();
+            ctx.arc(sx, H - 100, 15, 0, Math.PI * 2);
+            ctx.fill();
+
+            // 文字
+            ctx.fillStyle = '#f1c40f';
+            ctx.font = 'bold 16px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('终点', sx, H - 160);
+
+            // 箭头指示
+            const arrowBob = Math.sin(Date.now() * 0.005) * 10;
+            ctx.fillStyle = '#f1c40f';
+            ctx.beginPath();
+            ctx.moveTo(sx, H - 140 + arrowBob);
+            ctx.lineTo(sx - 15, H - 160 + arrowBob);
+            ctx.lineTo(sx + 15, H - 160 + arrowBob);
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.restore();
+        }
+
+        // 绘制增益UI
+        function drawBoostUI() {
+            if (player.boostTimer <= 0) return;
+
+            ctx.save();
+            ctx.fillStyle = 'rgba(0,0,0,0.7)';
+            ctx.fillRect(10, 150, 120, 60);
+            ctx.strokeStyle = '#f1c40f';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(10, 150, 120, 60);
+
+            if (player.attackSpeedBoost > 0) {
+                ctx.fillStyle = '#00d9ff';
+                ctx.font = '14px sans-serif';
+                ctx.fillText(`⚡ 攻速 +${player.attackSpeedBoost}`, 20, 175);
+            }
+            if (player.damageBoost > 0) {
+                ctx.fillStyle = '#ff4757';
+                ctx.font = '14px sans-serif';
+                ctx.fillText(`⚔ 伤害 +${Math.floor(player.damageBoost * 100)}%`, 20, 195);
+            }
+
+            // 倒计时条
+            const barWidth = 100 * (player.boostTimer / 300);
+            ctx.fillStyle = '#4CAF50';
+            ctx.fillRect(20, 200, barWidth, 5);
+
+            ctx.restore();
+        }
+
+        // 绘制平台
+        function drawPlatforms() {
+            platforms.forEach(p => {
+                const sx = p.x - cameraX;
+
+                // 平台主体
+                ctx.fillStyle = '#5d4e37';
+                ctx.fillRect(sx, p.y, p.w, p.h);
+
+                // 平台顶
+                ctx.fillStyle = '#7d6e57';
+                ctx.fillRect(sx, p.y, p.w, 5);
+
+                // 装饰
+                ctx.fillStyle = '#4d3e27';
+                ctx.fillRect(sx, p.y + p.h - 5, p.w, 5);
+            });
+        }
+
+        // 绘制玩家
+        function drawPlayer() {
+            const sx = player.x - cameraX;
+            const sy = player.y;
+
+            ctx.save();
+
+            // 无敌闪烁
+            if (player.invincible > 0 && Math.floor(player.invincible / 5) % 2 === 0) {
+                ctx.globalAlpha = 0.5;
+            }
+
+            // 身体
+            const h = player.crouching ? player.h * 0.6 : player.h;
+            const yOffset = player.crouching ? player.h * 0.4 : 0;
+
+            // 身体阴影
+            ctx.fillStyle = 'rgba(0,0,0,0.3)';
+            ctx.beginPath();
+            ctx.ellipse(sx + player.w/2, H - 60, player.w/2 + 5, 8, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // 古风服装
+            const dressGrad = ctx.createLinearGradient(sx, sy, sx, sy + h);
+            dressGrad.addColorStop(0, '#9b59b6');
+            dressGrad.addColorStop(1, '#8e44ad');
+            ctx.fillStyle = dressGrad;
+
+            // 长裙
+            ctx.beginPath();
+            ctx.moveTo(sx, sy + yOffset + 20);
+            ctx.lineTo(sx - 5, sy + h);
+            ctx.lineTo(sx + player.w + 5, sy + h);
+            ctx.lineTo(sx + player.w, sy + yOffset + 20);
+            ctx.closePath();
+            ctx.fill();
+
+            // 上身
+            ctx.fillStyle = '#faf0fa';
+            ctx.fillRect(sx + 5, sy + yOffset, player.w - 10, 25);
+
+            // 袖子飘动
+            const sleeveWave = Math.sin(player.animation) * 5;
+            ctx.fillStyle = '#f5e6f5';
+            ctx.beginPath();
+            ctx.moveTo(sx, sy + yOffset + 10);
+            ctx.quadraticCurveTo(sx - 15 + sleeveWave, sy + yOffset + 25, sx - 10, sy + yOffset + 40);
+            ctx.lineTo(sx + 5, sy + yOffset + 30);
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.moveTo(sx + player.w, sy + yOffset + 10);
+            ctx.quadraticCurveTo(sx + player.w + 15 - sleeveWave, sy + yOffset + 25, sx + player.w + 10, sy + yOffset + 40);
+            ctx.lineTo(sx + player.w - 5, sy + yOffset + 30);
+            ctx.closePath();
+            ctx.fill();
+
+            // 头部
+            ctx.fillStyle = '#fce4d6';
+            ctx.beginPath();
+            ctx.arc(sx + player.w/2, sy + yOffset - 5, 15, 0, Math.PI * 2);
+            ctx.fill();
+
+            // 头像
+            if (playerImgLoaded) {
+                ctx.save();
+                ctx.beginPath();
+                ctx.arc(sx + player.w/2, sy + yOffset - 5, 15, 0, Math.PI * 2);
+                ctx.clip();
+                ctx.drawImage(playerImg, sx + player.w/2 - 15, sy + yOffset - 20, 30, 30);
+                ctx.restore();
+            }
+
+            // 发髻
+            ctx.fillStyle = '#2c2c4a';
+            ctx.beginPath();
+            ctx.arc(sx + player.w/2, sy + yOffset - 15, 12, Math.PI, 0);
+            ctx.fill();
+
+            // 装饰
+            ctx.fillStyle = '#f1c40f';
+            ctx.beginPath();
+            ctx.arc(sx + player.w/2, sy + yOffset - 22, 3, 0, Math.PI * 2);
+            ctx.fill();
+
+            // 移动动画
+            if (Math.abs(player.vx) > 0 && player.grounded) {
+                const bobY = Math.sin(player.animation * 2) * 2;
+                ctx.translate(0, bobY);
+            }
+
+                // 翠翠名字标签
+                ctx.fillStyle = '#f1c40f';
+                ctx.font = 'bold 14px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.shadowBlur = 5;
+                ctx.shadowColor = '#000';
+                ctx.fillText('翠翠', sx + player.w/2, sy + yOffset - 30);
+                ctx.shadowBlur = 0;
+
+                ctx.restore();
+            }
+
+            // 绘制敌人
+        function drawEnemies() {
+            enemies.forEach(e => {
+                const sx = e.x - cameraX;
+                const size = e.size || 40;
+
+                ctx.save();
+
+                // 受伤闪烁
+                if (e.hp < e.maxHp) {
+                    ctx.globalAlpha = 0.8;
+                }
+
+                // 身体
+                ctx.fillStyle = e.color;
+
+                // 根据类型绘制不同形状
+                if (e.pattern === 'boss') {
+                    // Boss - 更大更威武
+                    ctx.beginPath();
+                    ctx.moveTo(sx, e.y + size * 0.3);
+                    ctx.lineTo(sx - size * 0.2, e.y + size);
+                    ctx.lineTo(sx + size + size * 0.2, e.y + size);
+                    ctx.lineTo(sx + size, e.y + size * 0.3);
+                    ctx.closePath();
+                    ctx.fill();
+
+                    // 皇冠
+                    ctx.fillStyle = '#f1c40f';
+                    ctx.beginPath();
+                    ctx.moveTo(sx + size/2, e.y - 10);
+                    ctx.lineTo(sx + size/2 - 8, e.y);
+                    ctx.lineTo(sx + size/2 + 8, e.y);
+                    ctx.closePath();
+                    ctx.fill();
+                } else {
+                    // 普通敌人
+                    ctx.beginPath();
+                    ctx.ellipse(sx + size/2, e.y + size/2, size/2, size/2 * 0.8, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                // 眼睛
+                ctx.fillStyle = '#fff';
+                ctx.beginPath();
+                ctx.arc(sx + size * 0.35, e.y + size * 0.35, size * 0.12, 0, Math.PI * 2);
+                ctx.arc(sx + size * 0.65, e.y + size * 0.35, size * 0.12, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = '#000';
+                ctx.beginPath();
+                ctx.arc(sx + size * 0.35 + e.facing * 2, e.y + size * 0.35, size * 0.06, 0, Math.PI * 2);
+                ctx.arc(sx + size * 0.65 + e.facing * 2, e.y + size * 0.35, size * 0.06, 0, Math.PI * 2);
+                ctx.fill();
+
+                // 名字
+                ctx.fillStyle = '#fff';
+                ctx.font = 'bold 12px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(e.type, sx + size/2, e.y - 10);
+
+                // 血条
+                ctx.fillStyle = '#333';
+                ctx.fillRect(sx, e.y - 25, size, 6);
+                ctx.fillStyle = '#e74c3c';
+                ctx.fillRect(sx, e.y - 25, size * (e.hp / e.maxHp), 6);
+
+                ctx.restore();
+            });
+        }
+
+        // 绘制子弹
+        function drawBullets() {
+            bullets.forEach(b => {
+                const sx = b.x - cameraX;
+
+                ctx.save();
+                ctx.shadowBlur = 20;
+                ctx.shadowColor = b.bulletColor;
+                ctx.fillStyle = b.bulletColor;
+
+                if (b.name === '火焰') {
+                    // 火焰子弹
+                    ctx.beginPath();
+                    ctx.arc(sx, b.y, b.size, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.fillStyle = '#fff';
+                    ctx.beginPath();
+                    ctx.arc(sx, b.y, b.size * 0.5, 0, Math.PI * 2);
+                    ctx.fill();
+                } else if (b.name === '风暴') {
+                    // 风暴螺旋
+                    ctx.strokeStyle = b.bulletColor;
+                    ctx.lineWidth = 3;
+                    ctx.beginPath();
+                    for (let i = 0; i < 20; i++) {
+                        const angle = i * 0.5 + Date.now() * 0.01;
+                        const r = b.size * (i / 20);
+                        const px = sx + Math.cos(angle) * r;
+                        const py = b.y + Math.sin(angle) * r;
+                        if (i === 0) ctx.moveTo(px, py);
+                        else ctx.lineTo(px, py);
+                    }
+                    ctx.stroke();
+                } else if (b.name === '雷电') {
+                    // 雷电
+                    ctx.strokeStyle = b.bulletColor;
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.moveTo(sx - 15, b.y - 10);
+                    ctx.lineTo(sx, b.y);
+                    ctx.lineTo(sx - 5, b.y);
+                    ctx.lineTo(sx + 15, b.y + 10);
+                    ctx.stroke();
+                } else if (b.name === '光剑') {
+                    // 光剑
+                    ctx.fillStyle = b.bulletColor;
+                    ctx.beginPath();
+                    ctx.moveTo(sx, b.y - b.range);
+                    ctx.lineTo(sx - 8, b.y);
+                    ctx.lineTo(sx + 8, b.y);
+                    ctx.closePath();
+                    ctx.fill();
+                } else if (b.name === '冰霜') {
+                    // 冰晶
+                    for (let i = 0; i < 6; i++) {
+                        const angle = i * Math.PI / 3 + Date.now() * 0.005;
+                        ctx.beginPath();
+                        ctx.moveTo(sx, b.y);
+                        ctx.lineTo(sx + Math.cos(angle) * b.size, b.y + Math.sin(angle) * b.size);
+                        ctx.strokeStyle = b.bulletColor;
+                        ctx.lineWidth = 2;
+                        ctx.stroke();
+                    }
+                } else {
+                    ctx.beginPath();
+                    ctx.arc(sx, b.y, b.size, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                ctx.restore();
+            });
+
+            // 敌弹
+            enemyBullets.forEach(b => {
+                const sx = b.x - cameraX;
+                ctx.fillStyle = b.color;
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = b.color;
+                ctx.beginPath();
+                ctx.arc(sx, b.y, b.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            });
+        }
+
+        // 绘制粒子
+        function drawParticles() {
+            particles.forEach(p => {
+                ctx.fillStyle = p.color;
+                ctx.globalAlpha = p.life / 40;
+                ctx.beginPath();
+                ctx.arc(p.x - cameraX, p.y, p.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.globalAlpha = 1;
+            });
+        }
+
+        // 绘制掉落
+        function drawDrops() {
+            drops.forEach(d => {
+                const sx = d.x - cameraX;
+                const bob = Math.sin(Date.now() * 0.01 + d.x) * 3;
+
+                ctx.save();
+                ctx.shadowBlur = 10;
+
+                if (d.type === 'gold') {
+                    ctx.fillStyle = '#f1c40f';
+                    ctx.shadowColor = '#f1c40f';
+                    ctx.beginPath();
+                    ctx.arc(sx, d.y + bob, 8, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.fillStyle = '#f39c12';
+                    ctx.font = 'bold 10px sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('$', sx, d.y + bob + 4);
+                } else if (d.type === 'speed') {
+                    // 攻速加成 - 闪电符号
+                    ctx.fillStyle = '#00d9ff';
+                    ctx.shadowColor = '#00d9ff';
+                    ctx.beginPath();
+                    ctx.arc(sx, d.y + bob, 10, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.fillStyle = '#fff';
+                    ctx.font = 'bold 12px sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('⚡', sx, d.y + bob + 4);
+                } else if (d.type === 'damage') {
+                    // 伤害加成 - 剑符号
+                    ctx.fillStyle = '#ff4757';
+                    ctx.shadowColor = '#ff4757';
+                    ctx.beginPath();
+                    ctx.arc(sx, d.y + bob, 10, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.fillStyle = '#fff';
+                    ctx.font = 'bold 12px sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('⚔', sx, d.y + bob + 4);
+                } else if (d.type === 'hp') {
+                    ctx.fillStyle = '#e74c3c';
+                    ctx.shadowColor = '#e74c3c';
+                    ctx.fillRect(sx - 8, d.y + bob - 12, 16, 24);
+                    ctx.fillStyle = '#fff';
+                    ctx.font = 'bold 12px sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('+', sx, d.y + bob + 4);
+                }
+
+                ctx.restore();
+            });
+        }
+
+        // UI更新
+        function updateUI() {
+            document.getElementById('hp').textContent = Math.max(0, Math.floor(player.hp));
+            document.getElementById('gold').textContent = gold;
+            document.getElementById('kills').textContent = levelKills;
+
+            // 更新进度条
+            const progress = Math.min(100, Math.max(0, (player.x / goalX) * 100));
+            const progressBar = document.getElementById('progressBar');
+            if (progressBar) {
+                progressBar.style.width = progress + '%';
+            }
+        }
+
+        // 主循环
+        let lastTime = 0;
+
+        function gameLoop(timestamp) {
+            if (gameState !== 'playing') {
+                requestAnimationFrame(gameLoop);
+                return;
+            }
+
+            const dt = timestamp - lastTime;
+            lastTime = timestamp;
+
+            // 更新增益效果
+            if (player.boostTimer > 0) {
+                player.boostTimer--;
+            }
+
+            // 更新
+            updatePlayer();
+            updateEnemies();
+            updateBullets();
+            updateDrops();
+            updateParticles();
+            updateCamera();
+            spawnEnemy();
+            updateUI();
+
+            // 关卡完成检测 - 到达终点即可过关
+            const config = LEVELS[currentLevel - 1];
+            if (player.x >= goalX) {
+                completeLevel();
+            }
+
+            // 死亡检测
+            if (player.hp <= 0) {
+                gameOver();
+            }
+
+            // 绘制
+            ctx.clearRect(0, 0, W, H);
+            drawBackground();
+            drawGround();
+            drawGoal(); // 绘制终点
+            drawPlatforms();
+            drawDrops();
+            drawBullets();
+            drawEnemies();
+            drawPlayer();
+            drawParticles();
+            drawBoostUI(); // 绘制增益状态
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        function completeLevel() {
+            gameState = 'levelComplete';
+            document.getElementById('levelGold').textContent = gold;
+            document.getElementById('levelComplete').style.display = 'flex';
+        }
+
+        function nextLevel() {
+            document.getElementById('levelComplete').style.display = 'none';
+            currentLevel++;
+            levelKills = 0;
+
+            if (currentLevel > 20) {
+                // 通关！
+                document.getElementById('levelComplete').querySelector('h1').textContent = '恭喜通关!';
+                document.getElementById('levelComplete').querySelector('p').innerHTML = '你已经完成了所有20关！';
+                document.getElementById('levelComplete').querySelector('.btn').textContent = '重新开始';
+                document.getElementById('levelComplete').querySelector('.btn').onclick = restartGame;
+                document.getElementById('levelComplete').style.display = 'flex';
+                gameState = 'complete';
+                return;
+            }
+
+            initLevel(currentLevel);
+            player.hp = Math.min(player.maxHp, player.hp + 20);
+            gameState = 'playing';
+        }
+
+        function gameOver() {
+            gameState = 'gameOver';
+            document.getElementById('finalLevel').textContent = currentLevel;
+            document.getElementById('gameOver').style.display = 'flex';
+        }
+
+        function restartGame() {
+            document.getElementById('gameOver').style.display = 'none';
+            document.getElementById('levelComplete').style.display = 'none';
+            currentLevel = 1;
+            gold = 0;
+            levelKills = 0;
+            player.hp = player.maxHp;
+            player.unlockedSkills = [true, true, true, true, true]; // 全部解锁
+            player.currentSkill = 0;
+            player.attackSpeedBoost = 0;
+            player.damageBoost = 0;
+            player.boostTimer = 0;
+            updateSkillUI();
+            initLevel(1);
+            gameState = 'playing';
+        }
+
+        // 启动
+        initLevel(1);
+        gameLoop(0);
     </script>
-  </body>
+</body>
 </html>
