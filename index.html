@@ -6,7 +6,7 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
     />
-    <title>翠手遮天-飞仙版</title>
+    <title>翠手遮天-变身版</title>
     <style>
       * {
         margin: 0;
@@ -264,7 +264,7 @@
         🎮 点击开始游戏
       </div>
       <div style="color: #fff; font-size: 14px; margin-bottom: 8px">
-        J攻击 | K技能 | L翻跟头 | F起飞
+        J攻击 | K技能 | L翻滚 | F起飞 | T变身
       </div>
       <div style="color: #888; font-size: 12px; margin-top: 10px">
         手机端使用底部按钮操作
@@ -1063,6 +1063,8 @@
       let goalX = levelWidth - 200 // 终点位置
       let levelKills = 0
       let totalKillsThisLevel = 0
+      let canTransform = true // 每关可以变身一次
+      let transformAvailable = true // 变身是否可用
 
       // 玩家
       const player = {
@@ -1092,6 +1094,9 @@
         trailParticles: [], // 残影粒子
         flying: false, // 起飞状态
         flyHeight: 0, // 飞行高度
+        demonForm: false, // 翠魔变身状态
+        demonTimer: 0, // 变身持续时间（600帧 = 10秒）
+        demonScale: 1.5, // 变身后大小
       }
 
       // 游戏对象
@@ -1104,6 +1109,7 @@
       let boss = null // 当前关卡Boss
       let bossSpawned = false // Boss是否已出现
       let bossDefeated = false // Boss是否被击败
+let transformAvailable = true // 每关可变身一次
 
       // 输入
       const keys = {}
@@ -1125,8 +1131,9 @@
                 <!-- 手柄左侧 - 移动区域 -->
                 <div style="display:flex;align-items:flex-end;gap:8px;pointer-events:auto;">
                     <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
-                        <!-- 起飞按钮 -->
+                        <!-- 起飞和变身按钮 -->
                         <button id="btnFly" class="touch-btn fly-btn-sm">✈</button>
+                        <button id="btnDemon" class="touch-btn demon-btn-sm">魔</button>
                         <!-- 左上按钮 -->
                         <button id="btnRoll" class="touch-btn roll-btn-sm">技</button>
                         <!-- 移动摇杆区域 -->
@@ -1228,6 +1235,15 @@
                     border:2px solid rgba(255,255,255,0.4) !important;
                 }
 
+                /* 变身按钮 - 暗黑紫红 */
+                .demon-btn-sm {
+                    width:45px !important;
+                    height:45px !important;
+                    background:linear-gradient(145deg,#8b0000,#4a0080) !important;
+                    font-size:18px !important;
+                    border:2px solid rgba(255,100,100,0.5) !important;
+                }
+
                 /* 技能按钮 - 紫色小按钮 */
                 .skill-btn-sm {
                     width:45px !important;
@@ -1247,6 +1263,7 @@
         const btnRoll = document.getElementById('btnRoll')
         const btnSkill = document.getElementById('btnSkill')
         const btnFly = document.getElementById('btnFly')
+        const btnDemon = document.getElementById('btnDemon')
 
         // 移动按钮
         btnLeft.addEventListener('touchstart', (e) => {
@@ -1369,6 +1386,22 @@
           keys['f'] = false
           btnFly.classList.remove('pressed')
         })
+
+        // 变身按钮
+        btnDemon.addEventListener('touchstart', (e) => {
+          e.preventDefault()
+          keys['t'] = true
+          btnDemon.classList.add('pressed')
+        })
+        btnDemon.addEventListener('touchend', (e) => {
+          e.preventDefault()
+          keys['t'] = false
+          btnDemon.classList.remove('pressed')
+        })
+        btnDemon.addEventListener('touchcancel', (e) => {
+          keys['t'] = false
+          btnDemon.classList.remove('pressed')
+        })
       }
       createTouchControls()
 
@@ -1404,6 +1437,7 @@
         boss = null
         bossSpawned = false
         bossDefeated = false
+        transformAvailable = true // 每关重置变身次数
         player.x = 100
         player.y = H - 120
         player.vx = 0
@@ -1514,33 +1548,19 @@
           rotation: 0,
         })
 
-        // 发射炫酷粒子特效
+        // 发射粒子特效 - 简化以减少卡顿
         const particleColor = getTextColor(effectLevel)
-        for (let i = 0; i < 6; i++) {
+        for (let i = 0; i < 3; i++) {
           const angle = (Math.random() - 0.5) * 1.5
-          const speed = Math.random() * 8 + 4
+          const speed = Math.random() * 6 + 3
           particles.push({
             x,
             y,
             vx: Math.cos(angle) * speed * dir,
             vy: Math.sin(angle) * speed - Math.random() * 3,
             color: particleColor,
-            size: Math.random() * 6 + 3,
-            life: 30 + Math.random() * 20,
-          })
-        }
-
-        // 额外特效 - 能量波纹
-        for (let i = 0; i < 4; i++) {
-          const angle = (i / 8) * Math.PI * 2
-          particles.push({
-            x: x + Math.cos(angle) * 20,
-            y: y + Math.sin(angle) * 20,
-            vx: Math.cos(angle) * 2,
-            vy: Math.sin(angle) * 2,
-            color: '#ffffff',
-            size: Math.random() * 3 + 1,
-            life: 15,
+            size: Math.random() * 4 + 2,
+            life: 20 + Math.random() * 10,
           })
         }
       }
@@ -1574,32 +1594,32 @@
           targeted: true, // 标记为追踪弹
         })
 
-        // 发射炫酷追踪粒子特效
+        // 发射追踪粒子特效 - 简化
         const particleColor = getTextColor(effectLevel)
-        for (let i = 0; i < 10; i++) {
+        for (let i = 0; i < 4; i++) {
           const angle = Math.random() * Math.PI * 2
-          const pSpeed = Math.random() * 10 + 5
+          const pSpeed = Math.random() * 6 + 3
           particles.push({
             x,
             y,
             vx: Math.cos(angle) * pSpeed,
             vy: Math.sin(angle) * pSpeed,
             color: particleColor,
-            size: Math.random() * 8 + 4,
-            life: 40 + Math.random() * 20,
+            size: Math.random() * 4 + 2,
+            life: 20 + Math.random() * 10,
           })
         }
 
-        // 追踪特效 - 箭头
-        for (let i = 0; i < 3; i++) {
+        // 追踪特效 - 箭头（简化）
+        for (let i = 0; i < 2; i++) {
           particles.push({
             x: x - dirX * (i + 1) * 15,
             y: y - dirY * (i + 1) * 15,
             vx: -dirX * 3,
             vy: -dirY * 3,
             color: '#ffffff',
-            size: 6 - i,
-            life: 20,
+            size: 4 - i,
+            life: 15,
           })
         }
       }
@@ -1758,12 +1778,42 @@
           player.flyHeight = 0
         }
 
-        // 攻击 - 自动追踪敌人
+        // 翠魔变身 - 按T键变身10秒
+        if (keys['t'] && transformAvailable && !player.demonForm) {
+          player.demonForm = true
+          player.demonTimer = 600 // 10秒（60帧 * 10）
+          transformAvailable = false
+          player.invincible = 600 // 变身期间无敌
+          // 变身特效
+          for (let i = 0; i < 15; i++) {
+            const angle = (i / 15) * Math.PI * 2
+            particles.push({
+              x: player.x + player.w / 2 + Math.cos(angle) * 50,
+              y: player.y + player.h / 2 + Math.sin(angle) * 50,
+              vx: Math.cos(angle) * -5,
+              vy: Math.sin(angle) * -5,
+              color: '#8b0000',
+              size: 8,
+              life: 30,
+            })
+          }
+        }
+
+        // 变身状态处理
+        if (player.demonForm) {
+          player.demonTimer--
+          if (player.demonTimer <= 0) {
+            player.demonForm = false
+          }
+        }
+
+        // 攻击 - 自动追踪敌人（有节流限制）
         const speedBoost =
           player.attackSpeedBoost > 0
             ? Math.max(5, 15 - player.attackSpeedBoost)
             : 15
-        if (keys['j'] && player.attackCooldown <= 0) {
+        const maxBullets = 20 // 最多20发子弹
+        if (keys['j'] && player.attackCooldown <= 0 && bullets.length < maxBullets) {
           // 起飞时自动追踪最近的敌人
           if (player.flying && enemies.length > 0) {
             let nearestEnemy = null
@@ -1792,8 +1842,8 @@
           player.attackCooldown = speedBoost
         }
 
-        // 技能攻击 - 发射多发文字子弹
-        if (keys['k'] && player.skillCooldown <= 0) {
+        // 技能攻击 - 发射多发文字子弹（有节流限制）
+        if (keys['k'] && player.skillCooldown <= 0 && bullets.length < maxBullets - 3) {
           const effectLevel = getTextEffectLevel()
           const damageBoost =
             player.damageBoost > 0 ? 1 + player.damageBoost : 1
@@ -1956,59 +2006,29 @@
             player.vy = -5
           }
 
-          // 死亡 - 炫酷爆炸特效
+          // 死亡 - 简化爆炸特效
           if (e.hp <= 0) {
             gold += e.gold
-            levelKills++ // 增加击杀计数
+            levelKills++
             createDrop(e.x, e.y, 'gold')
-            if (Math.random() < 0.25) createDrop(e.x, e.y, 'speed')
-            if (Math.random() < 0.25) createDrop(e.x, e.y, 'damage')
-            if (Math.random() < 0.3) createDrop(e.x, e.y, 'hp')
+            if (Math.random() < 0.2) createDrop(e.x, e.y, 'speed')
+            if (Math.random() < 0.2) createDrop(e.x, e.y, 'damage')
 
             const centerX = e.x + e.size / 2
             const centerY = e.y + e.size / 2
 
-            // 大爆炸粒子
-            for (let i = 0; i < 10; i++) {
+            // 爆炸粒子 - 简化
+            for (let i = 0; i < 6; i++) {
               const angle = Math.random() * Math.PI * 2
-              const speed = Math.random() * 15 + 8
+              const speed = Math.random() * 8 + 5
               particles.push({
                 x: centerX,
                 y: centerY,
                 vx: Math.cos(angle) * speed,
                 vy: Math.sin(angle) * speed - 3,
                 color: e.color,
-                size: Math.random() * 10 + 5,
-                life: 50 + Math.random() * 30,
-              })
-            }
-
-            // 白色闪光粒子
-            for (let i = 0; i < 5; i++) {
-              const angle = Math.random() * Math.PI * 2
-              const speed = Math.random() * 8 + 3
-              particles.push({
-                x: centerX,
-                y: centerY,
-                vx: Math.cos(angle) * speed,
-                vy: Math.sin(angle) * speed,
-                color: '#ffffff',
                 size: Math.random() * 6 + 3,
-                life: 25,
-              })
-            }
-
-            // 冲击波
-            for (let i = 0; i < 6; i++) {
-              const angle = (i / 6) * Math.PI * 2
-              particles.push({
-                x: centerX + Math.cos(angle) * 20,
-                y: centerY + Math.sin(angle) * 20,
-                vx: Math.cos(angle) * 6,
-                vy: Math.sin(angle) * 6,
-                color: e.color,
-                size: Math.random() * 8 + 4,
-                life: 30,
+                life: 30 + Math.random() * 15,
               })
             }
 
@@ -2208,74 +2228,27 @@
               e.hp -= b.damage
               b.life = 0
 
-              // 击中炫酷特效
-              for (let i = 0; i < 8; i++) {
+              // 击中特效 - 简化
+              for (let i = 0; i < 4; i++) {
                 const angle = Math.random() * Math.PI * 2
-                const speed = Math.random() * 10 + 5
+                const speed = Math.random() * 6 + 3
                 particles.push({
                   x: b.x,
                   y: b.y,
                   vx: Math.cos(angle) * speed,
                   vy: Math.sin(angle) * speed,
                   color: b.color,
-                  size: Math.random() * 8 + 4,
-                  life: 40 + Math.random() * 20,
-                })
-              }
-
-              // 冲击波特效
-              for (let i = 0; i < 4; i++) {
-                const angle = (i / 4) * Math.PI * 2
-                particles.push({
-                  x: b.x + Math.cos(angle) * 10,
-                  y: b.y + Math.sin(angle) * 10,
-                  vx: Math.cos(angle) * 8,
-                  vy: Math.sin(angle) * 8,
-                  color: '#ffffff',
                   size: Math.random() * 4 + 2,
-                  life: 20,
+                  life: 20 + Math.random() * 10,
                 })
-              }
-
-              // 雷电链式效果
-              if (b.chain) {
-                enemies.forEach((e2) => {
-                  if (e2 !== e && Math.abs(e2.x - e.x) < 150) {
-                    e2.hp -= b.damage * 0.5
-                    // 链式闪电特效
-                    for (let i = 0; i < 4; i++) {
-                      particles.push({
-                        x: (e.x + e2.x) / 2,
-                        y: (e.y + e2.y) / 2,
-                        vx: (Math.random() - 0.5) * 10,
-                        vy: (Math.random() - 0.5) * 10,
-                        color: '#ffff00',
-                        size: Math.random() * 5 + 2,
-                        life: 15,
-                      })
-                    }
-                  }
-                })
-              }
-
-              // 冰霜减速特效
-              if (b.freeze) {
-                e.speed *= 0.5
-                for (let i = 0; i < 5; i++) {
-                  particles.push({
-                    x: e.x + e.size / 2,
-                    y: e.y + e.size / 2,
-                    vx: (Math.random() - 0.5) * 5,
-                    vy: -Math.random() * 5,
-                    color: '#00ffff',
-                    size: Math.random() * 6 + 2,
-                    life: 40,
-                  })
-                }
-                setTimeout(() => (e.speed /= 0.5), 2000)
               }
             }
           })
+
+          // 限制最大粒子数防止卡顿
+          if (particles.length > 100) {
+            particles = particles.slice(-100)
+          }
 
           if (b.life <= 0 || b.x < cameraX - 50 || b.x > cameraX + W + 50) {
             bullets.splice(idx, 1)
@@ -2703,6 +2676,25 @@
 
       // 绘制增益UI
       function drawBoostUI() {
+        // 翠魔变身状态指示器
+        ctx.save()
+        ctx.fillStyle = 'rgba(0,0,0,0.7)'
+        ctx.fillRect(W - 90, 10, 80, 35)
+        ctx.strokeStyle = transformAvailable ? '#8b0000' : '#444'
+        ctx.lineWidth = 2
+        ctx.strokeRect(W - 90, 10, 80, 35)
+        ctx.fillStyle = transformAvailable ? '#ff0000' : '#666'
+        ctx.font = 'bold 12px sans-serif'
+        ctx.textAlign = 'center'
+        if (player.demonForm) {
+          ctx.fillStyle = '#ff0000'
+          ctx.fillText(`魔 ${Math.ceil(player.demonTimer / 60)}s`, W - 50, 32)
+        } else {
+          ctx.fillStyle = transformAvailable ? '#ff6666' : '#666'
+          ctx.fillText('魔 ' + (transformAvailable ? '就绪' : '已用'), W - 50, 32)
+        }
+        ctx.restore()
+
         // 翻跟头冷却指示器
         if (player.rollCooldown > 0) {
           const rollReady = player.rollCooldown <= 0
@@ -2939,76 +2931,123 @@
 
         ctx.restore()
 
+        // 翠魔变身特效
+        const demonScale = player.demonForm ? 1.5 : 1
+        const demonOffsetX = player.demonForm ? -player.w * 0.25 : 0
+        const demonOffsetY = player.demonForm ? -player.h * 0.25 : 0
+
+        // 变身时添加额外特效
+        if (player.demonForm) {
+          ctx.save()
+          // 暗黑光环
+          ctx.globalAlpha = 0.3 + Math.sin(gameTime * 0.02) * 0.1
+          const demonGlow = ctx.createRadialGradient(
+            centerX, centerY, 0,
+            centerX, centerY, 100
+          )
+          demonGlow.addColorStop(0, '#8b0000')
+          demonGlow.addColorStop(0.5, '#4a0080')
+          demonGlow.addColorStop(1, 'transparent')
+          ctx.fillStyle = demonGlow
+          ctx.beginPath()
+          ctx.arc(centerX, centerY, 100, 0, Math.PI * 2)
+          ctx.fill()
+          ctx.restore()
+
+          // 恶魔角特效
+          ctx.save()
+          ctx.fillStyle = '#4a0000'
+          ctx.shadowBlur = 15
+          ctx.shadowColor = '#ff0000'
+          // 左角
+          ctx.beginPath()
+          ctx.moveTo(centerX - 15, sy + yOffset - 10)
+          ctx.lineTo(centerX - 25, sy + yOffset - 35)
+          ctx.lineTo(centerX - 5, sy + yOffset - 15)
+          ctx.closePath()
+          ctx.fill()
+          // 右角
+          ctx.beginPath()
+          ctx.moveTo(centerX + 15, sy + yOffset - 10)
+          ctx.lineTo(centerX + 25, sy + yOffset - 35)
+          ctx.lineTo(centerX + 5, sy + yOffset - 15)
+          ctx.closePath()
+          ctx.fill()
+          ctx.restore()
+        }
+
         // 身体阴影
         ctx.fillStyle = 'rgba(0,0,0,0.3)'
         ctx.beginPath()
         ctx.ellipse(centerX, H - 60, player.w / 2 + 5, 8, 0, 0, Math.PI * 2)
         ctx.fill()
 
-        // 古风服装 - 正面视图
+        // 古风服装 - 正面视图（变身时变黑紫色）
+        const dressColor1 = player.demonForm ? '#2a0040' : '#9b59b6'
+        const dressColor2 = player.demonForm ? '#1a002a' : '#8e44ad'
         const dressGrad = ctx.createLinearGradient(sx, sy, sx, sy + h)
-        dressGrad.addColorStop(0, '#9b59b6')
-        dressGrad.addColorStop(1, '#8e44ad')
+        dressGrad.addColorStop(0, dressColor1)
+        dressGrad.addColorStop(1, dressColor2)
         ctx.fillStyle = dressGrad
 
-        // 长裙 - 正面向
+        // 长裙 - 正面向（使用变身后的大小）
         ctx.beginPath()
-        ctx.moveTo(sx + 5, sy + yOffset + 20)
-        ctx.lineTo(sx - 5, sy + h)
-        ctx.lineTo(sx + player.w + 5, sy + h)
-        ctx.lineTo(sx + player.w - 5, sy + yOffset + 20)
+        ctx.moveTo(sx + demonOffsetX + 5, sy + demonOffsetY + yOffset + 20)
+        ctx.lineTo(sx + demonOffsetX - 5, sy + demonOffsetY + h)
+        ctx.lineTo(sx + demonOffsetX + player.w + 5, sy + demonOffsetY + h)
+        ctx.lineTo(sx + demonOffsetX + player.w - 5, sy + demonOffsetY + yOffset + 20)
         ctx.closePath()
         ctx.fill()
 
-        // 裙子装饰线条
-        ctx.strokeStyle = '#f1c40f'
+        // 裙子装饰线条（变身时变红色）
+        ctx.strokeStyle = player.demonForm ? '#ff0000' : '#f1c40f'
         ctx.lineWidth = 2
         ctx.beginPath()
-        ctx.moveTo(centerX, sy + yOffset + 25)
-        ctx.lineTo(centerX, sy + h - 5)
+        ctx.moveTo(centerX, sy + demonOffsetY + yOffset + 25)
+        ctx.lineTo(centerX, sy + demonOffsetY + h - 5)
         ctx.stroke()
 
-        // 腰带
-        ctx.fillStyle = '#f1c40f'
-        ctx.fillRect(sx + 3, sy + yOffset + 20, player.w - 6, 8)
+        // 腰带（变身时变红色）
+        ctx.fillStyle = player.demonForm ? '#ff0000' : '#f1c40f'
+        ctx.fillRect(sx + demonOffsetX + 3, sy + demonOffsetY + yOffset + 20, player.w - 6, 8)
 
-        // 上身 - 正面
-        ctx.fillStyle = '#faf0fa'
-        ctx.fillRect(sx + 5, sy + yOffset, player.w - 10, 25)
+        // 上身 - 正面（变身时变暗色）
+        ctx.fillStyle = player.demonForm ? '#3a0030' : '#faf0fa'
+        ctx.fillRect(sx + demonOffsetX + 5, sy + demonOffsetY + yOffset, player.w - 10, 25)
 
-        // 袖子 - 正面展开
+        // 袖子 - 正面展开（变身时变暗色）
         const sleeveWave = Math.sin(player.animation) * 3
-        ctx.fillStyle = '#f5e6f5'
+        ctx.fillStyle = player.demonForm ? '#2a0020' : '#f5e6f5'
 
         // 左袖子
         ctx.beginPath()
-        ctx.moveTo(sx + 5, sy + yOffset + 5)
-        ctx.lineTo(sx - 10, sy + yOffset + 15 + sleeveWave)
-        ctx.lineTo(sx - 5, sy + yOffset + 35)
-        ctx.lineTo(sx + 5, sy + yOffset + 25)
+        ctx.moveTo(sx + demonOffsetX + 5, sy + demonOffsetY + yOffset + 5)
+        ctx.lineTo(sx + demonOffsetX - 10, sy + demonOffsetY + yOffset + 15 + sleeveWave)
+        ctx.lineTo(sx + demonOffsetX - 5, sy + demonOffsetY + yOffset + 35)
+        ctx.lineTo(sx + demonOffsetX + 5, sy + demonOffsetY + yOffset + 25)
         ctx.closePath()
         ctx.fill()
 
         // 右袖子
         ctx.beginPath()
-        ctx.moveTo(sx + player.w - 5, sy + yOffset + 5)
-        ctx.lineTo(sx + player.w + 10, sy + yOffset + 15 + sleeveWave)
-        ctx.lineTo(sx + player.w + 5, sy + yOffset + 35)
-        ctx.lineTo(sx + player.w - 5, sy + yOffset + 25)
+        ctx.moveTo(sx + demonOffsetX + player.w - 5, sy + demonOffsetY + yOffset + 5)
+        ctx.lineTo(sx + demonOffsetX + player.w + 10, sy + demonOffsetY + yOffset + 15 + sleeveWave)
+        ctx.lineTo(sx + demonOffsetX + player.w + 5, sy + demonOffsetY + yOffset + 35)
+        ctx.lineTo(sx + demonOffsetX + player.w - 5, sy + demonOffsetY + yOffset + 25)
         ctx.closePath()
         ctx.fill()
 
-        // 头部 - 正面
-        ctx.fillStyle = '#fce4d6'
+        // 头部 - 正面（变身时变暗色）
+        ctx.fillStyle = player.demonForm ? '#3a2040' : '#fce4d6'
         ctx.beginPath()
-        ctx.arc(centerX, sy + yOffset - 5, 15, 0, Math.PI * 2)
+        ctx.arc(centerX, sy + demonOffsetY + yOffset - 5, 15, 0, Math.PI * 2)
         ctx.fill()
 
         // 头像
         if (playerImgLoaded) {
           ctx.save()
           ctx.beginPath()
-          ctx.arc(centerX, sy + yOffset - 5, 15, 0, Math.PI * 2)
+          ctx.arc(centerX, sy + demonOffsetY + yOffset - 5, 15, 0, Math.PI * 2)
           ctx.clip()
           ctx.drawImage(playerImg, centerX - 15, sy + yOffset - 20, 30, 30)
           ctx.restore()
@@ -3033,13 +3072,38 @@
 
         // 中间头发
         ctx.beginPath()
-        ctx.ellipse(centerX, sy + yOffset - 18, 6, 8, 0, 0, Math.PI * 2)
+        ctx.ellipse(centerX, sy + demonOffsetY + yOffset - 18, 6, 8, 0, 0, Math.PI * 2)
         ctx.fill()
 
-        // 装饰发簪
-        ctx.fillStyle = '#f1c40f'
+        // 变身时添加恶魔眼睛
+        if (player.demonForm) {
+          ctx.save()
+          ctx.shadowBlur = 10
+          ctx.shadowColor = '#ff0000'
+          ctx.fillStyle = '#ff0000'
+          // 左眼
+          ctx.beginPath()
+          ctx.ellipse(centerX - 6, sy + demonOffsetY + yOffset - 3, 4, 3, 0, 0, Math.PI * 2)
+          ctx.fill()
+          // 右眼
+          ctx.beginPath()
+          ctx.ellipse(centerX + 6, sy + demonOffsetY + yOffset - 3, 4, 3, 0, 0, Math.PI * 2)
+          ctx.fill()
+          // 眼睛高光
+          ctx.fillStyle = '#ffff00'
+          ctx.beginPath()
+          ctx.arc(centerX - 5, sy + demonOffsetY + yOffset - 4, 1.5, 0, Math.PI * 2)
+          ctx.fill()
+          ctx.beginPath()
+          ctx.arc(centerX + 7, sy + demonOffsetY + yOffset - 4, 1.5, 0, Math.PI * 2)
+          ctx.fill()
+          ctx.restore()
+        }
+
+        // 装饰发簪（变身时变红色）
+        ctx.fillStyle = player.demonForm ? '#ff0000' : '#f1c40f'
         ctx.beginPath()
-        ctx.arc(centerX, sy + yOffset - 25, 3, 0, Math.PI * 2)
+        ctx.arc(centerX, sy + demonOffsetY + yOffset - 25, 3, 0, Math.PI * 2)
         ctx.fill()
 
         // 移动动画
@@ -3048,32 +3112,32 @@
           ctx.translate(0, bobY)
         }
 
-        // 翠翠名字标签
-        ctx.fillStyle = '#f1c40f'
+        // 翠翠/翠魔名字标签
+        ctx.fillStyle = player.demonForm ? '#ff0000' : '#f1c40f'
         ctx.font = 'bold 14px sans-serif'
         ctx.textAlign = 'center'
         ctx.shadowBlur = 5
         ctx.shadowColor = '#000'
-        ctx.fillText('翠翠', centerX, sy + yOffset - 35)
+        ctx.fillText(player.demonForm ? '翠魔' : '翠翠', centerX, sy + yOffset - 35)
         ctx.shadowBlur = 0
 
         ctx.restore()
 
-        // 翅膀高级特效 - 随等级增加
-        if (wingLevel >= 3) {
+        // 翅膀高级特效 - 随等级增加（简化）
+        if (wingLevel >= 4) {
           ctx.save()
-          ctx.globalAlpha = 0.3
+          ctx.globalAlpha = 0.2
           ctx.strokeStyle = wingColor
-          ctx.lineWidth = 2
-          ctx.shadowBlur = 15
+          ctx.lineWidth = 1.5
+          ctx.shadowBlur = 10
           ctx.shadowColor = wingGlow
           // 左翅膀光环
           ctx.beginPath()
           ctx.ellipse(
-            centerX - 60 * wingScale,
-            centerY + wingTipY * 0.5,
-            30 + wingLevel * 5,
-            20,
+            centerX - 50 * wingScale,
+            centerY,
+            25 + wingLevel * 3,
+            15,
             0,
             0,
             Math.PI * 2,
@@ -3082,10 +3146,10 @@
           // 右翅膀光环
           ctx.beginPath()
           ctx.ellipse(
-            centerX + 60 * wingScale,
-            centerY + wingTipY * 0.5,
-            30 + wingLevel * 5,
-            20,
+            centerX + 50 * wingScale,
+            centerY,
+            25 + wingLevel * 3,
+            15,
             0,
             0,
             Math.PI * 2,
@@ -3094,24 +3158,21 @@
           ctx.restore()
         }
 
-        // 终极特效 - 等级5以上
+        // 终极特效 - 等级5以上（简化粒子）
         if (wingLevel >= 5) {
-          for (let i = 0; i < 3; i++) {
+          for (let i = 0; i < 2; i++) {
             const particleAngle =
-              (gameTime * 0.008 + i * ((Math.PI * 2) / 3)) % (Math.PI * 2)
-            const particleR = 70 + Math.sin(gameTime * 0.01 + i) * 15
+              (gameTime * 0.008 + i * ((Math.PI * 2) / 2)) % (Math.PI * 2)
+            const particleR = 60 + Math.sin(gameTime * 0.01 + i) * 10
             const px = centerX + Math.cos(particleAngle) * particleR
-            const py =
-              centerY +
-              Math.sin(particleAngle) * particleR * 0.6 +
-              wingTipY * 0.3
+            const py = centerY + Math.sin(particleAngle) * particleR * 0.5
             ctx.save()
-            ctx.globalAlpha = 0.5
+            ctx.globalAlpha = 0.4
             ctx.fillStyle = wingColor
-            ctx.shadowBlur = 8
+            ctx.shadowBlur = 5
             ctx.shadowColor = wingGlow
             ctx.beginPath()
-            ctx.arc(px, py, 4, 0, Math.PI * 2)
+            ctx.arc(px, py, 3, 0, Math.PI * 2)
             ctx.fill()
             ctx.restore()
           }
