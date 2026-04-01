@@ -6,7 +6,7 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
     />
-    <title>翠手遮天-变身版</title>
+    <title>翠手遮天-飞仙版</title>
     <style>
       * {
         margin: 0;
@@ -34,8 +34,8 @@
         left: 0px !important;
         width: 100% !important;
         height: calc(100% - 160px) !important;
-        z-index: 0 !important;
-        background-color: #87ceeb !important;
+        z-index: 1 !important;
+        background-color: transparent !important;
       }
       .ui-overlay {
         position: fixed;
@@ -251,6 +251,8 @@
         text-align: center;
         width: 90%;
         max-width: 320px;
+        cursor: pointer;
+        pointer-events: auto;
       "
     >
       <div
@@ -1109,7 +1111,6 @@
       let boss = null // 当前关卡Boss
       let bossSpawned = false // Boss是否已出现
       let bossDefeated = false // Boss是否被击败
-let transformAvailable = true // 每关可变身一次
 
       // 输入
       const keys = {}
