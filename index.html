@@ -992,7 +992,9 @@
           bgColor: `hsl(${(i * 18) % 360}, 30%, ${25 - Math.min(i, 10)}%)`,
           groundColor: `hsl(${(i * 18 + 60) % 360}, 50%, ${35 - Math.min(i, 15)}%)`,
           enemyCount:
-            Math.min(5 + Math.floor(i * 1.5), 15) * 10 * Math.max(difficultyMultiplier, 1),
+            Math.min(5 + Math.floor(i * 1.5), 15) *
+            10 *
+            Math.max(difficultyMultiplier, 1),
           enemyTypes:
             i < 5
               ? ['嘉姐']
@@ -1001,8 +1003,33 @@
                 : i < 12
                   ? ['嘉姐', '万总', '二叔', '幽灵', '骷髅', '狼人']
                   : i < 16
-                    ? ['嘉姐', '万总', '二叔', '二婶', '幽灵', '僵尸', '骷髅', '恶魔', '巫师']
-                    : ['嘉姐', '万总', '二叔', '二婶', '幽灵', '僵尸', '骷髅', '恶魔', '巫师', '狼人', '吸血鬼', '巨魔', '食人魔', '女巫'],
+                    ? [
+                        '嘉姐',
+                        '万总',
+                        '二叔',
+                        '二婶',
+                        '幽灵',
+                        '僵尸',
+                        '骷髅',
+                        '恶魔',
+                        '巫师',
+                      ]
+                    : [
+                        '嘉姐',
+                        '万总',
+                        '二叔',
+                        '二婶',
+                        '幽灵',
+                        '僵尸',
+                        '骷髅',
+                        '恶魔',
+                        '巫师',
+                        '狼人',
+                        '吸血鬼',
+                        '巨魔',
+                        '食人魔',
+                        '女巫',
+                      ],
           spawnRate:
             Math.max(800 - i * 30, 200) / Math.max(difficultyMultiplier, 1),
           difficultyMultiplier: difficultyMultiplier,
@@ -1031,19 +1058,41 @@
       function generateEnemies(level) {
         const levelEnemies = []
         const allTypes = [
-          '嘉姐', '万总', '二叔', '二婶',
-          '幽灵', '僵尸', '骷髅', '恶魔', '巫师', '狼人',
-          '吸血鬼', '巨魔', '食人魔', '女巫'
+          '嘉姐',
+          '万总',
+          '二叔',
+          '二婶',
+          '幽灵',
+          '僵尸',
+          '骷髅',
+          '恶魔',
+          '巫师',
+          '狼人',
+          '吸血鬼',
+          '巨魔',
+          '食人魔',
+          '女巫',
         ]
-        const types = level < 5
-          ? ['嘉姐']
-          : level < 8
-            ? ['嘉姐', '万总', '幽灵']
-            : level < 12
-              ? ['嘉姐', '万总', '二叔', '幽灵', '骷髅', '狼人']
-              : level < 16
-                ? ['嘉姐', '万总', '二叔', '二婶', '幽灵', '僵尸', '骷髅', '恶魔', '巫师']
-                : allTypes
+        const types =
+          level < 5
+            ? ['嘉姐']
+            : level < 8
+              ? ['嘉姐', '万总', '幽灵']
+              : level < 12
+                ? ['嘉姐', '万总', '二叔', '幽灵', '骷髅', '狼人']
+                : level < 16
+                  ? [
+                      '嘉姐',
+                      '万总',
+                      '二叔',
+                      '二婶',
+                      '幽灵',
+                      '僵尸',
+                      '骷髅',
+                      '恶魔',
+                      '巫师',
+                    ]
+                  : allTypes
         const count = Math.min(4 + level, 12) * 10 // 敌人数量增加10倍
 
         for (let i = 0; i < count; i++) {
@@ -1899,7 +1948,11 @@
             ? Math.max(5, 15 - player.attackSpeedBoost)
             : 15
         const maxBullets = 20 // 最多20发子弹
-        if (keys['j'] && player.attackCooldown <= 0 && bullets.length < maxBullets) {
+        if (
+          keys['j'] &&
+          player.attackCooldown <= 0 &&
+          bullets.length < maxBullets
+        ) {
           // 起飞时自动追踪最近的敌人
           if (player.flying && enemies.length > 0) {
             let nearestEnemy = null
@@ -1929,7 +1982,11 @@
         }
 
         // 技能攻击 - 发射多发文字子弹（有节流限制）
-        if (keys['k'] && player.skillCooldown <= 0 && bullets.length < maxBullets - 3) {
+        if (
+          keys['k'] &&
+          player.skillCooldown <= 0 &&
+          bullets.length < maxBullets - 3
+        ) {
           const effectLevel = getTextEffectLevel()
           const damageBoost =
             player.damageBoost > 0 ? 1 + player.damageBoost : 1
@@ -2020,83 +2077,136 @@
       // 必杀技系统
       // =============================================
 
-      // 翠雨梨花针 - 漫天毒针落下
+      // 翠雨梨花针 - 烟花绽放效果
       function activateSkill1() {
         skill1Available = false
         skill1Active = true
-        skill1Timer = 120 // 2秒动画
+        skill1Timer = 200 // 3秒多动画
         earthquakeTimer = 180 // 3秒地震
 
-        // 生成五颜六色的毒针
-        for (let i = 0; i < 100; i++) {
-          const colors = ['#ff0066', '#00ff66', '#ffff00', '#ff6600', '#00ffff', '#ff00ff', '#6600ff', '#66ff00']
-          skillNeedles.push({
-            x: cameraX + Math.random() * W,
-            y: -50 - Math.random() * 200,
-            vx: (Math.random() - 0.5) * 3,
-            vy: 15 + Math.random() * 10,
-            color: colors[Math.floor(Math.random() * colors.length)],
-            size: 3 + Math.random() * 4,
-            rotation: Math.random() * Math.PI * 2,
-            rotationSpeed: (Math.random() - 0.5) * 0.3,
-            deadly: true
-          })
-        }
+        // 从屏幕多个位置烟花绽放
+        const burstPoints = [
+          { x: cameraX + W * 0.2, y: H * 0.3 },
+          { x: cameraX + W * 0.5, y: H * 0.2 },
+          { x: cameraX + W * 0.8, y: H * 0.3 },
+          { x: cameraX + W * 0.35, y: H * 0.4 },
+          { x: cameraX + W * 0.65, y: H * 0.4 },
+        ]
 
-        // 特效粒子
-        for (let i = 0; i < 80; i++) {
+        burstPoints.forEach((point, burstIndex) => {
+          // 每个爆发点射出50根针，像烟花一样向外扩散后落下
+          for (let i = 0; i < 60; i++) {
+            const colors = [
+              '#ff0066',
+              '#00ff66',
+              '#ffff00',
+              '#ff6600',
+              '#00ffff',
+              '#ff00ff',
+              '#6600ff',
+              '#66ff00',
+            ]
+            const angle = (i / 60) * Math.PI * 2 + burstIndex * 0.5
+            const speed = 10 + Math.random() * 8
+            skillNeedles.push({
+              x: point.x + (Math.random() - 0.5) * 50,
+              y: point.y + (Math.random() - 0.5) * 50,
+              vx: Math.cos(angle) * speed,
+              vy: Math.sin(angle) * speed - 5,
+              color: colors[Math.floor(Math.random() * colors.length)],
+              size: 4 + Math.random() * 4,
+              rotation: angle,
+              rotationSpeed: (Math.random() - 0.5) * 0.5,
+              deadly: true,
+              phase: 'burst',
+            })
+          }
+        })
+
+        // 中心大爆发特效
+        for (let i = 0; i < 200; i++) {
+          const colors = [
+            '#ff0066',
+            '#00ff66',
+            '#ffff00',
+            '#ff6600',
+            '#00ffff',
+            '#ff00ff',
+          ]
           particles.push({
-            x: cameraX + Math.random() * W,
-            y: Math.random() * H,
-            vx: (Math.random() - 0.5) * 10,
-            vy: (Math.random() - 0.5) * 10,
-            color: ['#ff0066', '#00ff66', '#ffff00', '#ff6600'][Math.floor(Math.random() * 4)],
-            size: Math.random() * 8 + 4,
-            life: 60
+            x: cameraX + W / 2,
+            y: H / 3,
+            vx: (Math.random() - 0.5) * 35,
+            vy: (Math.random() - 0.5) * 35 - 10,
+            color: colors[Math.floor(Math.random() * colors.length)],
+            size: Math.random() * 15 + 8,
+            life: 100,
           })
         }
       }
 
       function updateSkill1() {
         skill1Timer--
-        skillNeedles.forEach((needle, idx) => {
+
+        skillNeedles.forEach((needle) => {
+          // 根据阶段更新速度
+          if (needle.phase === 'burst') {
+            needle.vx *= 0.96
+            needle.vy += 0.4
+            if (needle.vy > 3) {
+              needle.phase = 'rain'
+            }
+          } else {
+            needle.vy += 0.6
+            needle.vx *= 0.98
+          }
+
           needle.x += needle.vx
           needle.y += needle.vy
           needle.rotation += needle.rotationSpeed
 
-          // 针落地后消失
-          if (needle.y > H - 60) {
-            needle.deadly = false
-            // 落地特效
-            for (let i = 0; i < 5; i++) {
-              particles.push({
-                x: needle.x,
-                y: H - 60,
-                vx: (Math.random() - 0.5) * 8,
-                vy: -Math.random() * 8,
-                color: needle.color,
-                size: Math.random() * 4 + 2,
-                life: 20
-              })
+          // 针落地
+          if (
+            needle.y > H - 60 ||
+            needle.x < cameraX - 100 ||
+            needle.x > cameraX + W + 100
+          ) {
+            if (needle.deadly) {
+              for (let i = 0; i < 8; i++) {
+                particles.push({
+                  x: Math.max(cameraX, Math.min(cameraX + W, needle.x)),
+                  y: H - 60,
+                  vx: (Math.random() - 0.5) * 12,
+                  vy: -Math.random() * 12,
+                  color: needle.color,
+                  size: Math.random() * 7 + 4,
+                  life: 30,
+                })
+              }
             }
+            needle.deadly = false
           }
 
-          // 检测毒针是否击中敌人
+          // 检测击中敌人
           if (needle.deadly) {
-            enemies.forEach(e => {
-              if (Math.hypot(needle.x - (e.x + e.size/2), needle.y - (e.y + e.size/2)) < e.size/2 + needle.size) {
-                e.hp -= 50
+            enemies.forEach((e) => {
+              const ex = e.x + (e.size || 40) / 2
+              const ey = e.y + (e.size || 40) / 2
+              if (
+                Math.hypot(needle.x - ex, needle.y - ey) <
+                (e.size || 40) / 2 + needle.size
+              ) {
+                e.hp -= 60
                 needle.deadly = false
-                // 击中特效
-                for (let i = 0; i < 3; i++) {
+                for (let i = 0; i < 10; i++) {
                   particles.push({
                     x: needle.x,
                     y: needle.y,
-                    vx: (Math.random() - 0.5) * 6,
-                    vy: (Math.random() - 0.5) * 6,
+                    vx: (Math.random() - 0.5) * 12,
+                    vy: (Math.random() - 0.5) * 12,
                     color: needle.color,
-                    size: Math.random() * 5 + 2,
-                    life: 15
+                    size: Math.random() * 7 + 4,
+                    life: 25,
                   })
                 }
               }
@@ -2104,38 +2214,43 @@
           }
         })
 
-        // 清理无效毒针
-        skillNeedles = skillNeedles.filter(n => n.y < H + 50 && n.deadly)
+        skillNeedles = skillNeedles.filter((n) => n.y < H + 150 && n.deadly)
 
         if (skill1Timer <= 0) {
           skill1Active = false
+          skillNeedles = []
         }
       }
 
-      // 亢翠有悔 - 巨龙横扫
+      // 亢翠有悔 - 长龙盘旋
       function activateSkill2() {
         skill2Available = false
         skill2Active = true
-        skill2Timer = 120 // 2秒
+        skill2Timer = 200 // 3秒多
         earthquakeTimer = 180
 
         skillDragon = {
-          x: cameraX - 200,
+          x: cameraX - 300,
           y: H / 2,
           frame: 0,
-          speed: 15
+          baseY: H / 2,
+          angle: 0, // 旋转角度
+          radius: 150, // 盘旋半径
+          coilCount: 3, // 盘旋圈数
         }
 
-        // 特效
-        for (let i = 0; i < 100; i++) {
+        // 龙出现特效
+        for (let i = 0; i < 150; i++) {
           particles.push({
             x: cameraX + Math.random() * W,
-            y: H - 60,
-            vx: Math.random() * 5 + 2,
-            vy: -Math.random() * 15 - 5,
-            color: ['#ffd700', '#ff6600', '#ff0000'][Math.floor(Math.random() * 3)],
-            size: Math.random() * 10 + 5,
-            life: 80
+            y: H - 60 + (Math.random() - 0.5) * 30,
+            vx: Math.random() * 8 + 3,
+            vy: -Math.random() * 20 - 8,
+            color: ['#ffd700', '#ff6600', '#ff0000', '#ffaa00'][
+              Math.floor(Math.random() * 4)
+            ],
+            size: Math.random() * 15 + 8,
+            life: 100,
           })
         }
       }
@@ -2143,75 +2258,107 @@
       function updateSkill2() {
         skill2Timer--
         skillDragon.frame++
+        skillDragon.angle += 0.08
 
-        // 巨龙移动
-        skillDragon.x += skillDragon.speed
-        skillDragon.y = H / 2 + Math.sin(skillDragon.frame * 0.1) * 50
+        // 螺旋移动轨迹 - 长龙盘旋
+        skillDragon.x += 12
+        skillDragon.y =
+          skillDragon.baseY + Math.sin(skillDragon.angle) * skillDragon.radius
 
-        // 巨龙经过之处敌人全部死亡
-        enemies.forEach(e => {
-          const dragonWidth = 300
-          if (e.x + e.size > skillDragon.x - 100 && e.x < skillDragon.x + dragonWidth) {
-            e.hp -= 200 // 秒杀
-            // 特效
-            for (let i = 0; i < 10; i++) {
-              particles.push({
-                x: e.x + e.size/2,
-                y: e.y + e.size/2,
-                vx: (Math.random() - 0.5) * 15,
-                vy: (Math.random() - 0.5) * 15,
-                color: ['#ffd700', '#ff6600', '#ff0000'][Math.floor(Math.random() * 3)],
-                size: Math.random() * 12 + 6,
-                life: 40
-              })
-            }
+        // 盘旋伤害 - 螺旋路径上所有敌人受伤
+        enemies.forEach((e) => {
+          // 计算螺旋路径上的点
+          const dragonPath = []
+          for (let t = 0; t < 6.28; t += 0.3) {
+            const px = skillDragon.x - t * 60 // 沿X轴后退
+            const py =
+              skillDragon.baseY +
+              Math.sin(skillDragon.angle - t) * skillDragon.radius
+            dragonPath.push({ x: px, y: py })
           }
+
+          // 检查敌人是否在螺旋路径附近
+          dragonPath.forEach((dp) => {
+            const dist = Math.hypot(
+              e.x + e.size / 2 - dp.x,
+              e.y + e.size / 2 - dp.y,
+            )
+            if (dist < 120) {
+              if (!e.dragonHit) {
+                e.hp -= 150
+                e.dragonHit = true
+                setTimeout(() => {
+                  if (e) e.dragonHit = false
+                }, 500)
+                for (let i = 0; i < 12; i++) {
+                  particles.push({
+                    x: e.x + e.size / 2,
+                    y: e.y + e.size / 2,
+                    vx: (Math.random() - 0.5) * 20,
+                    vy: (Math.random() - 0.5) * 20,
+                    color: ['#ffd700', '#ff6600', '#ff0000'][
+                      Math.floor(Math.random() * 3)
+                    ],
+                    size: Math.random() * 15 + 8,
+                    life: 50,
+                  })
+                }
+              }
+            }
+          })
         })
 
-        // 留下轨迹粒子
-        if (skillDragon.frame % 3 === 0) {
-          particles.push({
-            x: skillDragon.x + Math.random() * 100,
-            y: skillDragon.y + (Math.random() - 0.5) * 100,
-            vx: -5,
-            vy: (Math.random() - 0.5) * 3,
-            color: '#ffd700',
-            size: Math.random() * 15 + 8,
-            life: 30
-          })
+        // 留下火焰轨迹
+        if (skillDragon.frame % 2 === 0) {
+          for (let i = 0; i < 3; i++) {
+            particles.push({
+              x: skillDragon.x - Math.random() * 300,
+              y: skillDragon.y + (Math.random() - 0.5) * 80,
+              vx: -8,
+              vy: (Math.random() - 0.5) * 4,
+              color: ['#ffd700', '#ff6600', '#ff3300'][
+                Math.floor(Math.random() * 3)
+              ],
+              size: Math.random() * 20 + 12,
+              life: 40,
+            })
+          }
         }
 
-        if (skill2Timer <= 0 || skillDragon.x > cameraX + W + 300) {
+        if (skill2Timer <= 0 || skillDragon.x > cameraX + W + 400) {
           skill2Active = false
         }
       }
 
-      // 五毒拍翠掌 - 天降掌法
+      // 五毒拍翠掌 - 金色手掌毒气
       function activateSkill3() {
         skill3Available = false
         skill3Active = true
-        skill3Timer = 150 // 2.5秒
+        skill3Timer = 180 // 3秒
         earthquakeTimer = 180
 
         skillPalm = {
           x: cameraX + W / 2,
-          y: -300,
-          targetY: H / 2 - 100,
+          y: -400,
+          targetY: H / 2 - 50,
           frame: 0,
-          width: 400,
-          height: 500
+          width: 500,
+          height: 600,
+          impactFrame: 0,
         }
 
-        // 特效
-        for (let i = 0; i < 150; i++) {
+        // 天空裂开特效
+        for (let i = 0; i < 200; i++) {
           particles.push({
             x: cameraX + Math.random() * W,
-            y: Math.random() * H,
-            vx: (Math.random() - 0.5) * 20,
-            vy: (Math.random() - 0.5) * 20,
-            color: ['#00ff00', '#ff00ff', '#ffff00', '#00ffff', '#ff6600'][Math.floor(Math.random() * 5)],
-            size: Math.random() * 10 + 5,
-            life: 60
+            y: Math.random() * H * 0.5,
+            vx: (Math.random() - 0.5) * 25,
+            vy: (Math.random() - 0.5) * 25,
+            color: ['#00ff00', '#ff00ff', '#ffff00', '#ff6600', '#00ffff'][
+              Math.floor(Math.random() * 5)
+            ],
+            size: Math.random() * 15 + 8,
+            life: 80,
           })
         }
       }
@@ -2222,48 +2369,76 @@
 
         // 掌法下落
         if (skillPalm.y < skillPalm.targetY) {
-          skillPalm.y += 20
+          skillPalm.y += 25
         } else {
-          // 掌法停留并震动
-          skillPalm.y = skillPalm.targetY + Math.sin(skillPalm.frame * 0.5) * 5
+          skillPalm.impactFrame++
+          // 掌法停留震动
+          skillPalm.y = skillPalm.targetY + Math.sin(skillPalm.frame * 0.8) * 8
+        }
+
+        // 金色冲击波
+        if (skillPalm.impactFrame < 10 && skillPalm.impactFrame % 3 === 0) {
+          for (let i = 0; i < 20; i++) {
+            const angle = (i / 20) * Math.PI * 2
+            particles.push({
+              x: skillPalm.x + (Math.cos(angle) * skillPalm.width) / 2,
+              y: skillPalm.y + (Math.sin(angle) * skillPalm.height) / 3,
+              vx: Math.cos(angle) * 15,
+              vy: Math.sin(angle) * 12,
+              color: '#ffd700',
+              size: Math.random() * 20 + 10,
+              life: 40,
+            })
+          }
         }
 
         // 掌法覆盖范围内敌人死亡
-        enemies.forEach(e => {
-          const palmLeft = skillPalm.x - skillPalm.width/2
-          const palmRight = skillPalm.x + skillPalm.width/2
-          const palmTop = skillPalm.y - skillPalm.height/2
-          const palmBottom = skillPalm.y + skillPalm.height/2
+        enemies.forEach((e) => {
+          const palmLeft = skillPalm.x - skillPalm.width / 2
+          const palmRight = skillPalm.x + skillPalm.width / 2
+          const palmTop = skillPalm.y - skillPalm.height / 2
+          const palmBottom = skillPalm.y + skillPalm.height / 2
 
-          if (e.x + e.size > palmLeft && e.x < palmRight &&
-              e.y + e.size > palmTop && e.y < palmBottom) {
-            e.hp -= 200
-            // 中毒特效
-            for (let i = 0; i < 15; i++) {
-              particles.push({
-                x: e.x + e.size/2,
-                y: e.y + e.size/2,
-                vx: (Math.random() - 0.5) * 12,
-                vy: (Math.random() - 0.5) * 12 - 3,
-                color: ['#00ff00', '#ff00ff', '#ff6600'][Math.floor(Math.random() * 3)],
-                size: Math.random() * 10 + 5,
-                life: 50
-              })
+          if (
+            e.x + e.size > palmLeft &&
+            e.x < palmRight &&
+            e.y + e.size > palmTop &&
+            e.y < palmBottom
+          ) {
+            if (!e.palmHit) {
+              e.hp -= 200
+              e.palmHit = true
+              // 中毒特效
+              for (let i = 0; i < 20; i++) {
+                particles.push({
+                  x: e.x + e.size / 2,
+                  y: e.y + e.size / 2,
+                  vx: (Math.random() - 0.5) * 15,
+                  vy: (Math.random() - 0.5) * 15 - 5,
+                  color: ['#00ff00', '#7fff00', '#adff2f', '#ff6600'][
+                    Math.floor(Math.random() * 4)
+                  ],
+                  size: Math.random() * 15 + 8,
+                  life: 60,
+                })
+              }
             }
           }
         })
 
-        // 毒气特效
-        if (skillPalm.frame % 5 === 0) {
-          for (let i = 0; i < 10; i++) {
+        // 持续毒气特效
+        if (skillPalm.impactFrame > 0 && skillPalm.frame % 4 === 0) {
+          for (let i = 0; i < 15; i++) {
             particles.push({
               x: skillPalm.x + (Math.random() - 0.5) * skillPalm.width,
               y: skillPalm.y + (Math.random() - 0.5) * skillPalm.height,
-              vx: (Math.random() - 0.5) * 8,
-              vy: -Math.random() * 5,
-              color: ['#00ff00', '#ff00ff'][Math.floor(Math.random() * 2)],
-              size: Math.random() * 20 + 10,
-              life: 40
+              vx: (Math.random() - 0.5) * 10,
+              vy: -Math.random() * 8 - 2,
+              color: ['#00ff00', '#7fff00', '#ff00ff'][
+                Math.floor(Math.random() * 3)
+              ],
+              size: Math.random() * 25 + 15,
+              life: 50,
             })
           }
         }
@@ -2278,166 +2453,204 @@
         // 地震效果
         if (earthquakeTimer > 0) {
           ctx.save()
-          const intensity = earthquakeTimer > 120 ? 8 : (earthquakeTimer > 60 ? 5 : 3)
+          const intensity =
+            earthquakeTimer > 120 ? 12 : earthquakeTimer > 60 ? 8 : 4
           ctx.translate(
             (Math.random() - 0.5) * intensity,
-            (Math.random() - 0.5) * intensity
+            (Math.random() - 0.5) * intensity,
           )
         }
 
-        // 翠雨梨花针
+        // 翠雨梨花针 - 烟花特效
         if (skill1Active) {
           ctx.save()
-          skillNeedles.forEach(needle => {
+          skillNeedles.forEach((needle) => {
             ctx.save()
             ctx.translate(needle.x, needle.y)
             ctx.rotate(needle.rotation)
 
-            // 针的光芒
-            ctx.shadowBlur = 15
+            // 针的光芒和拖尾
+            ctx.shadowBlur = 25
             ctx.shadowColor = needle.color
 
-            // 绘制毒针
-            ctx.fillStyle = needle.color
+            // 绘制发光毒针
+            const needleGrad = ctx.createLinearGradient(0, -needle.size * 3, 0, needle.size * 4)
+            needleGrad.addColorStop(0, needle.color)
+            needleGrad.addColorStop(0.5, needle.color)
+            needleGrad.addColorStop(1, 'rgba(255,255,255,0.3)')
+
+            ctx.fillStyle = needleGrad
             ctx.beginPath()
-            ctx.moveTo(0, -needle.size * 2)
-            ctx.lineTo(-needle.size/2, needle.size)
-            ctx.lineTo(needle.size/2, needle.size)
+            ctx.moveTo(0, -needle.size * 3)
+            ctx.lineTo(-needle.size, needle.size)
+            ctx.lineTo(needle.size, needle.size)
             ctx.closePath()
             ctx.fill()
 
-            // 针的尾迹
-            ctx.globalAlpha = 0.5
-            ctx.fillStyle = needle.color
-            ctx.fillRect(-needle.size/4, needle.size, needle.size/2, needle.size * 3)
+            // 尾迹效果
+            ctx.globalAlpha = 0.6
+            for (let t = 0; t < 4; t++) {
+              ctx.globalAlpha = 0.4 - t * 0.1
+              ctx.fillStyle = needle.color
+              ctx.fillRect(-needle.size/3 + t * 2, needle.size + t * 3, needle.size * 0.6, needle.size * 2)
+            }
+            ctx.globalAlpha = 1
 
             ctx.restore()
           })
-          ctx.restore()
 
-          // 屏幕文字
+          // 屏幕大文字标题
           ctx.save()
-          ctx.fillStyle = 'rgba(255, 255, 255, 0.9)'
-          ctx.font = 'bold 48px sans-serif'
+          const titleAlpha = Math.min(1, skill1Timer / 30)
+          ctx.globalAlpha = titleAlpha
+
+          ctx.fillStyle = 'rgba(0,0,0,0.6)'
+          ctx.fillRect(W/2 - 160, 70, 320, 55)
+
+          const titleGrad = ctx.createLinearGradient(W/2 - 120, 0, W/2 + 120, 0)
+          titleGrad.addColorStop(0, '#ff0066')
+          titleGrad.addColorStop(0.3, '#ff6600')
+          titleGrad.addColorStop(0.5, '#ffff00')
+          titleGrad.addColorStop(0.7, '#00ff66')
+          titleGrad.addColorStop(1, '#00ffff')
+
+          ctx.fillStyle = titleGrad
+          ctx.font = 'bold 40px sans-serif'
           ctx.textAlign = 'center'
-          ctx.shadowBlur = 20
+          ctx.shadowBlur = 35
           ctx.shadowColor = '#00ff66'
-          ctx.fillText('翠雨梨花针', W/2, 100)
+          ctx.fillText('✨ 翠雨梨花针 ✨', W/2, 108)
+          ctx.restore()
           ctx.restore()
         }
 
-        // 亢翠有悔
+        // 亢翠有悔 - 盘旋巨龙
         if (skill2Active) {
           ctx.save()
           const dx = skillDragon.x - cameraX
           const dy = skillDragon.y
 
-          // 巨龙主体
-          ctx.shadowBlur = 50
+          // 绘制盘旋的龙身（螺旋）
+          for (let i = 0; i < 15; i++) {
+            const t = i / 15 * Math.PI * 2.5
+            const segX = dx - i * 55
+            const segY = dy + Math.sin(skillDragon.angle + t) * skillDragon.radius
+            const segSize = 55 - i * 3
+
+            ctx.shadowBlur = 60
+            ctx.shadowColor = '#ffd700'
+
+            const segGrad = ctx.createRadialGradient(segX, segY, 0, segX, segY, segSize)
+            segGrad.addColorStop(0, '#ffff00')
+            segGrad.addColorStop(0.4, '#ff6600')
+            segGrad.addColorStop(0.8, '#ff0000')
+            segGrad.addColorStop(1, 'transparent')
+
+            ctx.fillStyle = segGrad
+            ctx.beginPath()
+            ctx.arc(segX, segY, segSize, 0, Math.PI * 2)
+            ctx.fill()
+          }
+
+          // 龙头 - 超大发光
+          ctx.shadowBlur = 120
           ctx.shadowColor = '#ffd700'
 
-          // 龙头
-          const dragonGrad = ctx.createRadialGradient(dx, dy, 0, dx, dy, 80)
-          dragonGrad.addColorStop(0, '#ffff00')
-          dragonGrad.addColorStop(0.3, '#ff6600')
-          dragonGrad.addColorStop(0.7, '#ff0000')
+          const dragonGrad = ctx.createRadialGradient(dx, dy, 0, dx, dy, 110)
+          dragonGrad.addColorStop(0, '#ffffff')
+          dragonGrad.addColorStop(0.2, '#ffff00')
+          dragonGrad.addColorStop(0.5, '#ff6600')
           dragonGrad.addColorStop(1, 'transparent')
           ctx.fillStyle = dragonGrad
           ctx.beginPath()
-          ctx.ellipse(dx, dy, 80, 50, 0, 0, Math.PI * 2)
+          ctx.arc(dx, dy, 110, 0, Math.PI * 2)
           ctx.fill()
 
-          // 龙角
-          ctx.fillStyle = '#ffd700'
-          ctx.beginPath()
-          ctx.moveTo(dx - 30, dy - 30)
-          ctx.lineTo(dx - 60, dy - 80)
-          ctx.lineTo(dx - 10, dy - 40)
-          ctx.closePath()
-          ctx.fill()
-          ctx.beginPath()
-          ctx.moveTo(dx + 30, dy - 30)
-          ctx.lineTo(dx + 60, dy - 80)
-          ctx.lineTo(dx + 10, dy - 40)
-          ctx.closePath()
-          ctx.fill()
-
-          // 龙眼
+          // 龙眼 - 巨大发光
+          ctx.shadowBlur = 40
           ctx.fillStyle = '#ff0000'
           ctx.beginPath()
-          ctx.ellipse(dx - 25, dy - 10, 15, 10, 0, 0, Math.PI * 2)
+          ctx.ellipse(dx - 35, dy - 20, 25, 18, 0, 0, Math.PI * 2)
           ctx.fill()
           ctx.beginPath()
-          ctx.ellipse(dx + 25, dy - 10, 15, 10, 0, 0, Math.PI * 2)
+          ctx.ellipse(dx + 35, dy - 20, 25, 18, 0, 0, Math.PI * 2)
           ctx.fill()
           ctx.fillStyle = '#ffff00'
           ctx.beginPath()
-          ctx.arc(dx - 25, dy - 10, 5, 0, Math.PI * 2)
+          ctx.arc(dx - 35, dy - 20, 10, 0, Math.PI * 2)
           ctx.fill()
           ctx.beginPath()
-          ctx.arc(dx + 25, dy - 10, 5, 0, Math.PI * 2)
+          ctx.arc(dx + 35, dy - 20, 10, 0, Math.PI * 2)
           ctx.fill()
 
-          // 龙须
+          // 龙角 - 更大
+          ctx.fillStyle = '#ffd700'
+          ctx.beginPath()
+          ctx.moveTo(dx - 45, dy - 50)
+          ctx.lineTo(dx - 100, dy - 140)
+          ctx.lineTo(dx - 15, dy - 60)
+          ctx.closePath()
+          ctx.fill()
+          ctx.beginPath()
+          ctx.moveTo(dx + 45, dy - 50)
+          ctx.lineTo(dx + 100, dy - 140)
+          ctx.lineTo(dx + 15, dy - 60)
+          ctx.closePath()
+          ctx.fill()
+
+          // 龙须飘动
           ctx.strokeStyle = '#ffd700'
-          ctx.lineWidth = 4
-          ctx.beginPath()
-          ctx.moveTo(dx - 50, dy + 10)
-          ctx.quadraticCurveTo(dx - 120, dy + 30, dx - 150, dy + 50)
-          ctx.stroke()
-          ctx.beginPath()
-          ctx.moveTo(dx + 50, dy + 10)
-          ctx.quadraticCurveTo(dx + 120, dy + 30, dx + 150, dy + 50)
-          ctx.stroke()
-
-          // 龙身
+          ctx.lineWidth = 8
+          ctx.lineCap = 'round'
           ctx.shadowBlur = 30
-          for (let i = 0; i < 5; i++) {
-            const segmentX = dx - 100 - i * 60
-            const segmentY = dy + Math.sin(skillDragon.frame * 0.2 + i) * 20
-            const segGrad = ctx.createRadialGradient(segmentX, segmentY, 0, segmentX, segmentY, 40 - i * 5)
-            segGrad.addColorStop(0, '#ff6600')
-            segGrad.addColorStop(1, 'transparent')
-            ctx.fillStyle = segGrad
-            ctx.beginPath()
-            ctx.ellipse(segmentX, segmentY, 40 - i * 5, 30 - i * 3, 0, 0, Math.PI * 2)
-            ctx.fill()
-          }
-
-          // 龙尾
-          const tailX = dx - 400
-          const tailY = dy + Math.sin(skillDragon.frame * 0.2 + 5) * 30
           ctx.beginPath()
-          ctx.moveTo(tailX + 30, tailY)
-          ctx.quadraticCurveTo(tailX, tailY - 20, tailX - 50, tailY)
-          ctx.quadraticCurveTo(tailX, tailY + 20, tailX + 30, tailY)
-          ctx.fillStyle = '#ff3300'
-          ctx.fill()
+          ctx.moveTo(dx - 70, dy + 15)
+          ctx.quadraticCurveTo(dx - 180, dy + 60 + Math.sin(skillDragon.frame * 0.25) * 40, dx - 250, dy + 100)
+          ctx.stroke()
+          ctx.beginPath()
+          ctx.moveTo(dx + 70, dy + 15)
+          ctx.quadraticCurveTo(dx + 180, dy + 60 + Math.cos(skillDragon.frame * 0.25) * 40, dx + 250, dy + 100)
+          ctx.stroke()
 
-          // 火焰效果
-          ctx.fillStyle = 'rgba(255, 100, 0, 0.5)'
-          for (let i = 0; i < 20; i++) {
-            const flameX = dx + 60 + Math.random() * 30
-            const flameY = dy + (Math.random() - 0.5) * 60
+          // 火焰从口中喷出
+          for (let i = 0; i < 25; i++) {
+            const flameX = dx + 110 + Math.random() * 80
+            const flameY = dy + (Math.random() - 0.5) * 100
+            const flameGrad = ctx.createRadialGradient(flameX, flameY, 0, flameX, flameY, 30)
+            flameGrad.addColorStop(0, '#ffff00')
+            flameGrad.addColorStop(0.5, '#ff6600')
+            flameGrad.addColorStop(1, 'transparent')
+            ctx.fillStyle = flameGrad
             ctx.beginPath()
-            ctx.arc(flameX, flameY, Math.random() * 15 + 5, 0, Math.PI * 2)
+            ctx.arc(flameX, flameY, 25 + Math.random() * 20, 0, Math.PI * 2)
             ctx.fill()
           }
 
           ctx.restore()
 
-          // 屏幕文字
+          // 屏幕大文字标题
           ctx.save()
-          ctx.fillStyle = 'rgba(255, 215, 0, 0.9)'
-          ctx.font = 'bold 48px sans-serif'
+          const titleAlpha = Math.min(1, skill2Timer / 30)
+          ctx.globalAlpha = titleAlpha
+
+          ctx.fillStyle = 'rgba(0,0,0,0.6)'
+          ctx.fillRect(W/2 - 160, 70, 320, 55)
+
+          const titleGrad = ctx.createLinearGradient(W/2 - 120, 0, W/2 + 120, 0)
+          titleGrad.addColorStop(0, '#ffd700')
+          titleGrad.addColorStop(0.5, '#ff6600')
+          titleGrad.addColorStop(1, '#ff0000')
+
+          ctx.fillStyle = titleGrad
+          ctx.font = 'bold 40px sans-serif'
           ctx.textAlign = 'center'
-          ctx.shadowBlur = 30
-          ctx.shadowColor = '#ff6600'
-          ctx.fillText('亢翠有悔', W/2, 100)
+          ctx.shadowBlur = 35
+          ctx.shadowColor = '#ffd700'
+          ctx.fillText('🐉 亢翠有悔 🐉', W/2, 108)
           ctx.restore()
         }
 
-        // 五毒拍翠掌
+        // 五毒拍翠掌 - 金色手掌毒气
         if (skill3Active) {
           ctx.save()
 
@@ -2446,69 +2659,113 @@
           const palmW = skillPalm.width
           const palmH = skillPalm.height
 
-          // 毒气云
-          ctx.globalAlpha = 0.3
-          const gasGrad = ctx.createRadialGradient(palmX, palmY, 0, palmX, palmY, palmW/2)
-          gasGrad.addColorStop(0, '#00ff00')
-          gasGrad.addColorStop(0.5, '#ff00ff')
-          gasGrad.addColorStop(1, 'transparent')
-          ctx.fillStyle = gasGrad
+          // 巨大毒气云背景
+          ctx.globalAlpha = 0.5
+          const bigGasGrad = ctx.createRadialGradient(palmX, palmY, 0, palmX, palmY, palmW/2 + 80)
+          bigGasGrad.addColorStop(0, '#00ff00')
+          bigGasGrad.addColorStop(0.3, '#7fff00')
+          bigGasGrad.addColorStop(0.6, '#ff00ff')
+          bigGasGrad.addColorStop(1, 'transparent')
+          ctx.fillStyle = bigGasGrad
           ctx.beginPath()
-          ctx.ellipse(palmX, palmY, palmW/2, palmH/2, 0, 0, Math.PI * 2)
+          ctx.ellipse(palmX, palmY, palmW/2 + 80, palmH/2 + 50, 0, 0, Math.PI * 2)
           ctx.fill()
           ctx.globalAlpha = 1
 
-          // 掌印
-          ctx.shadowBlur = 60
-          ctx.shadowColor = '#00ff00'
+          // 金色巨大掌印
+          ctx.shadowBlur = 120
+          ctx.shadowColor = '#ffd700'
 
-          const palmGrad = ctx.createRadialGradient(palmX, palmY, 0, palmX, palmY, palmW/3)
-          palmGrad.addColorStop(0, '#ffff00')
-          palmGrad.addColorStop(0.3, '#00ff00')
-          palmGrad.addColorStop(0.6, '#ff00ff')
-          palmGrad.addColorStop(1, 'rgba(0,0,0,0.5)')
+          // 掌印渐变 - 金色到绿色
+          const palmGrad = ctx.createRadialGradient(palmX, palmY, 0, palmX, palmY, palmW/2)
+          palmGrad.addColorStop(0, '#ffffff')
+          palmGrad.addColorStop(0.15, '#ffd700')
+          palmGrad.addColorStop(0.35, '#ffaa00')
+          palmGrad.addColorStop(0.55, '#00ff00')
+          palmGrad.addColorStop(0.75, '#006600')
+          palmGrad.addColorStop(1, 'rgba(0,80,0,0.4)')
 
-          ctx.fillStyle = palmGrad
           // 掌心
+          ctx.fillStyle = palmGrad
           ctx.beginPath()
-          ctx.ellipse(palmX, palmY, palmW/4, palmH/3, 0, 0, Math.PI * 2)
+          ctx.ellipse(palmX, palmY, palmW/2.5, palmH/2, 0, 0, Math.PI * 2)
           ctx.fill()
 
-          // 五指
-          ctx.fillStyle = '#00ff00'
+          // 五指 - 金色发光粗大
+          ctx.shadowBlur = 80
           for (let i = 0; i < 5; i++) {
-            const fingerAngle = -Math.PI/2 + (i - 2) * 0.3
-            const fingerLength = palmH/2 + 30
-            const fingerX = palmX + Math.cos(fingerAngle) * (palmW/4)
-            const fingerY = palmY + Math.sin(fingerAngle) * (palmH/3)
+            const fingerAngle = -Math.PI/2 + (i - 2) * 0.28
+            const fingerLength = palmH/2 + 60
+            const fBaseX = palmX + Math.cos(fingerAngle) * (palmW/3)
+            const fBaseY = palmY + Math.sin(fingerAngle) * (palmH/2.5)
+            const fEndX = fBaseX + Math.cos(fingerAngle) * fingerLength
+            const fEndY = fBaseY + Math.sin(fingerAngle) * fingerLength
 
+            const fingGrad = ctx.createLinearGradient(fBaseX, fBaseY, fEndX, fEndY)
+            fingGrad.addColorStop(0, '#ffd700')
+            fingGrad.addColorStop(0.5, '#00ff00')
+            fingGrad.addColorStop(1, '#004400')
+
+            ctx.strokeStyle = fingGrad
+            ctx.lineWidth = 40
+            ctx.lineCap = 'round'
             ctx.beginPath()
-            ctx.ellipse(
-              fingerX + Math.cos(fingerAngle) * fingerLength/2,
-              fingerY + Math.sin(fingerAngle) * fingerLength/2,
-              20, fingerLength/2, fingerAngle, 0, Math.PI * 2
-            )
+            ctx.moveTo(fBaseX, fBaseY)
+            ctx.lineTo(fEndX, fEndY)
+            ctx.stroke()
+
+            // 手指尖大发光
+            ctx.fillStyle = '#00ff00'
+            ctx.shadowBlur = 40
+            ctx.beginPath()
+            ctx.arc(fEndX, fEndY, 22, 0, Math.PI * 2)
             ctx.fill()
           }
 
-          // 毒文字
-          ctx.fillStyle = '#ffff00'
-          ctx.font = 'bold 36px sans-serif'
+          // 掌中符文
+          ctx.shadowBlur = 50
+          ctx.fillStyle = '#ffd700'
+          ctx.font = 'bold 56px sans-serif'
           ctx.textAlign = 'center'
-          ctx.shadowBlur = 20
-          ctx.shadowColor = '#00ff00'
-          ctx.fillText('五毒神掌', palmX, palmY + palmH/4 + 50)
+          ctx.fillText('毒', palmX, palmY + 18)
+
+          // 绿色毒气粒子围绕旋转
+          ctx.shadowBlur = 25
+          for (let i = 0; i < 25; i++) {
+            const gasAngle = skillPalm.frame * 0.06 + i * 0.25
+            const gasR = palmW/3 + Math.sin(gasAngle * 3) * 60
+            const gasX = palmX + Math.cos(gasAngle) * gasR
+            const gasY = palmY + Math.sin(gasAngle) * gasR * 0.75
+
+            ctx.fillStyle = ['#00ff00', '#7fff00', '#adff2f', '#ff00ff'][i % 4]
+            ctx.globalAlpha = 0.8
+            ctx.beginPath()
+            ctx.arc(gasX, gasY, 18 + Math.sin(skillPalm.frame * 0.25 + i) * 10, 0, Math.PI * 2)
+            ctx.fill()
+          }
+          ctx.globalAlpha = 1
 
           ctx.restore()
 
-          // 屏幕文字
+          // 屏幕大文字标题
           ctx.save()
-          ctx.fillStyle = 'rgba(0, 255, 0, 0.9)'
-          ctx.font = 'bold 48px sans-serif'
+          const titleAlpha = Math.min(1, skill3Timer / 30)
+          ctx.globalAlpha = titleAlpha
+
+          ctx.fillStyle = 'rgba(0,0,0,0.6)'
+          ctx.fillRect(W/2 - 170, 70, 340, 55)
+
+          const titleGrad = ctx.createLinearGradient(W/2 - 130, 0, W/2 + 130, 0)
+          titleGrad.addColorStop(0, '#ffd700')
+          titleGrad.addColorStop(0.5, '#00ff00')
+          titleGrad.addColorStop(1, '#ff00ff')
+
+          ctx.fillStyle = titleGrad
+          ctx.font = 'bold 40px sans-serif'
           ctx.textAlign = 'center'
-          ctx.shadowBlur = 30
+          ctx.shadowBlur = 35
           ctx.shadowColor = '#00ff00'
-          ctx.fillText('五毒拍翠掌', W/2, 100)
+          ctx.fillText('🖐 五毒拍翠掌 🖐', W/2, 108)
           ctx.restore()
         }
 
@@ -3283,7 +3540,11 @@
           ctx.fillText(`魔 ${Math.ceil(player.demonTimer / 60)}s`, W - 50, 32)
         } else {
           ctx.fillStyle = transformAvailable ? '#ff6666' : '#666'
-          ctx.fillText('魔 ' + (transformAvailable ? '就绪' : '已用'), W - 50, 32)
+          ctx.fillText(
+            '魔 ' + (transformAvailable ? '就绪' : '已用'),
+            W - 50,
+            32,
+          )
         }
         ctx.restore()
 
@@ -3294,47 +3555,65 @@
 
         // 技能1 - 翠雨梨花针
         ctx.save()
-        ctx.fillStyle = skill1Available ? 'rgba(255,0,102,0.8)' : 'rgba(100,100,100,0.8)'
+        ctx.fillStyle = skill1Available
+          ? 'rgba(255,0,102,0.8)'
+          : 'rgba(100,100,100,0.8)'
         ctx.strokeStyle = skill1Available ? '#ff0066' : '#444'
         ctx.lineWidth = 2
         ctx.beginPath()
-        ctx.arc(10 + skillSize/2, skillY, skillSize/2, 0, Math.PI * 2)
+        ctx.arc(10 + skillSize / 2, skillY, skillSize / 2, 0, Math.PI * 2)
         ctx.fill()
         ctx.stroke()
         ctx.fillStyle = '#fff'
         ctx.font = 'bold 14px sans-serif'
         ctx.textAlign = 'center'
-        ctx.fillText('1', 10 + skillSize/2, skillY + 5)
+        ctx.fillText('1', 10 + skillSize / 2, skillY + 5)
         ctx.restore()
 
         // 技能2 - 亢翠有悔
         ctx.save()
-        ctx.fillStyle = skill2Available ? 'rgba(255,215,0,0.8)' : 'rgba(100,100,100,0.8)'
+        ctx.fillStyle = skill2Available
+          ? 'rgba(255,215,0,0.8)'
+          : 'rgba(100,100,100,0.8)'
         ctx.strokeStyle = skill2Available ? '#ffd700' : '#444'
         ctx.lineWidth = 2
         ctx.beginPath()
-        ctx.arc(10 + skillSize/2, skillY + skillGap, skillSize/2, 0, Math.PI * 2)
+        ctx.arc(
+          10 + skillSize / 2,
+          skillY + skillGap,
+          skillSize / 2,
+          0,
+          Math.PI * 2,
+        )
         ctx.fill()
         ctx.stroke()
         ctx.fillStyle = '#fff'
         ctx.font = 'bold 14px sans-serif'
         ctx.textAlign = 'center'
-        ctx.fillText('2', 10 + skillSize/2, skillY + skillGap + 5)
+        ctx.fillText('2', 10 + skillSize / 2, skillY + skillGap + 5)
         ctx.restore()
 
         // 技能3 - 五毒拍翠掌
         ctx.save()
-        ctx.fillStyle = skill3Available ? 'rgba(0,255,0,0.8)' : 'rgba(100,100,100,0.8)'
+        ctx.fillStyle = skill3Available
+          ? 'rgba(0,255,0,0.8)'
+          : 'rgba(100,100,100,0.8)'
         ctx.strokeStyle = skill3Available ? '#00ff00' : '#444'
         ctx.lineWidth = 2
         ctx.beginPath()
-        ctx.arc(10 + skillSize/2, skillY + skillGap * 2, skillSize/2, 0, Math.PI * 2)
+        ctx.arc(
+          10 + skillSize / 2,
+          skillY + skillGap * 2,
+          skillSize / 2,
+          0,
+          Math.PI * 2,
+        )
         ctx.fill()
         ctx.stroke()
         ctx.fillStyle = '#fff'
         ctx.font = 'bold 14px sans-serif'
         ctx.textAlign = 'center'
-        ctx.fillText('3', 10 + skillSize/2, skillY + skillGap * 2 + 5)
+        ctx.fillText('3', 10 + skillSize / 2, skillY + skillGap * 2 + 5)
         ctx.restore()
 
         // 翻跟头冷却指示器
@@ -3584,8 +3863,12 @@
           // 暗黑光环
           ctx.globalAlpha = 0.3 + Math.sin(gameTime * 0.02) * 0.1
           const demonGlow = ctx.createRadialGradient(
-            centerX, centerY, 0,
-            centerX, centerY, 100
+            centerX,
+            centerY,
+            0,
+            centerX,
+            centerY,
+            100,
           )
           demonGlow.addColorStop(0, '#8b0000')
           demonGlow.addColorStop(0.5, '#4a0080')
@@ -3637,7 +3920,10 @@
         ctx.moveTo(sx + demonOffsetX + 5, sy + demonOffsetY + yOffset + 20)
         ctx.lineTo(sx + demonOffsetX - 5, sy + demonOffsetY + h)
         ctx.lineTo(sx + demonOffsetX + player.w + 5, sy + demonOffsetY + h)
-        ctx.lineTo(sx + demonOffsetX + player.w - 5, sy + demonOffsetY + yOffset + 20)
+        ctx.lineTo(
+          sx + demonOffsetX + player.w - 5,
+          sy + demonOffsetY + yOffset + 20,
+        )
         ctx.closePath()
         ctx.fill()
 
@@ -3651,11 +3937,21 @@
 
         // 腰带（变身时变红色）
         ctx.fillStyle = player.demonForm ? '#ff0000' : '#f1c40f'
-        ctx.fillRect(sx + demonOffsetX + 3, sy + demonOffsetY + yOffset + 20, player.w - 6, 8)
+        ctx.fillRect(
+          sx + demonOffsetX + 3,
+          sy + demonOffsetY + yOffset + 20,
+          player.w - 6,
+          8,
+        )
 
         // 上身 - 正面（变身时变暗色）
         ctx.fillStyle = player.demonForm ? '#3a0030' : '#faf0fa'
-        ctx.fillRect(sx + demonOffsetX + 5, sy + demonOffsetY + yOffset, player.w - 10, 25)
+        ctx.fillRect(
+          sx + demonOffsetX + 5,
+          sy + demonOffsetY + yOffset,
+          player.w - 10,
+          25,
+        )
 
         // 袖子 - 正面展开（变身时变暗色）
         const sleeveWave = Math.sin(player.animation) * 3
@@ -3664,7 +3960,10 @@
         // 左袖子
         ctx.beginPath()
         ctx.moveTo(sx + demonOffsetX + 5, sy + demonOffsetY + yOffset + 5)
-        ctx.lineTo(sx + demonOffsetX - 10, sy + demonOffsetY + yOffset + 15 + sleeveWave)
+        ctx.lineTo(
+          sx + demonOffsetX - 10,
+          sy + demonOffsetY + yOffset + 15 + sleeveWave,
+        )
         ctx.lineTo(sx + demonOffsetX - 5, sy + demonOffsetY + yOffset + 35)
         ctx.lineTo(sx + demonOffsetX + 5, sy + demonOffsetY + yOffset + 25)
         ctx.closePath()
@@ -3672,10 +3971,22 @@
 
         // 右袖子
         ctx.beginPath()
-        ctx.moveTo(sx + demonOffsetX + player.w - 5, sy + demonOffsetY + yOffset + 5)
-        ctx.lineTo(sx + demonOffsetX + player.w + 10, sy + demonOffsetY + yOffset + 15 + sleeveWave)
-        ctx.lineTo(sx + demonOffsetX + player.w + 5, sy + demonOffsetY + yOffset + 35)
-        ctx.lineTo(sx + demonOffsetX + player.w - 5, sy + demonOffsetY + yOffset + 25)
+        ctx.moveTo(
+          sx + demonOffsetX + player.w - 5,
+          sy + demonOffsetY + yOffset + 5,
+        )
+        ctx.lineTo(
+          sx + demonOffsetX + player.w + 10,
+          sy + demonOffsetY + yOffset + 15 + sleeveWave,
+        )
+        ctx.lineTo(
+          sx + demonOffsetX + player.w + 5,
+          sy + demonOffsetY + yOffset + 35,
+        )
+        ctx.lineTo(
+          sx + demonOffsetX + player.w - 5,
+          sy + demonOffsetY + yOffset + 25,
+        )
         ctx.closePath()
         ctx.fill()
 
@@ -3714,7 +4025,15 @@
 
         // 中间头发
         ctx.beginPath()
-        ctx.ellipse(centerX, sy + demonOffsetY + yOffset - 18, 6, 8, 0, 0, Math.PI * 2)
+        ctx.ellipse(
+          centerX,
+          sy + demonOffsetY + yOffset - 18,
+          6,
+          8,
+          0,
+          0,
+          Math.PI * 2,
+        )
         ctx.fill()
 
         // 变身时添加恶魔眼睛
@@ -3725,19 +4044,47 @@
           ctx.fillStyle = '#ff0000'
           // 左眼
           ctx.beginPath()
-          ctx.ellipse(centerX - 6, sy + demonOffsetY + yOffset - 3, 4, 3, 0, 0, Math.PI * 2)
+          ctx.ellipse(
+            centerX - 6,
+            sy + demonOffsetY + yOffset - 3,
+            4,
+            3,
+            0,
+            0,
+            Math.PI * 2,
+          )
           ctx.fill()
           // 右眼
           ctx.beginPath()
-          ctx.ellipse(centerX + 6, sy + demonOffsetY + yOffset - 3, 4, 3, 0, 0, Math.PI * 2)
+          ctx.ellipse(
+            centerX + 6,
+            sy + demonOffsetY + yOffset - 3,
+            4,
+            3,
+            0,
+            0,
+            Math.PI * 2,
+          )
           ctx.fill()
           // 眼睛高光
           ctx.fillStyle = '#ffff00'
           ctx.beginPath()
-          ctx.arc(centerX - 5, sy + demonOffsetY + yOffset - 4, 1.5, 0, Math.PI * 2)
+          ctx.arc(
+            centerX - 5,
+            sy + demonOffsetY + yOffset - 4,
+            1.5,
+            0,
+            Math.PI * 2,
+          )
           ctx.fill()
           ctx.beginPath()
-          ctx.arc(centerX + 7, sy + demonOffsetY + yOffset - 4, 1.5, 0, Math.PI * 2)
+          ctx.arc(
+            centerX + 7,
+            sy + demonOffsetY + yOffset - 4,
+            1.5,
+            0,
+            Math.PI * 2,
+          )
           ctx.fill()
           ctx.restore()
         }
@@ -3760,7 +4107,11 @@
         ctx.textAlign = 'center'
         ctx.shadowBlur = 5
         ctx.shadowColor = '#000'
-        ctx.fillText(player.demonForm ? '翠魔' : '翠翠', centerX, sy + yOffset - 35)
+        ctx.fillText(
+          player.demonForm ? '翠魔' : '翠翠',
+          centerX,
+          sy + yOffset - 35,
+        )
         ctx.shadowBlur = 0
 
         ctx.restore()
@@ -4381,7 +4732,8 @@
       // 绘制粒子
       function drawParticles() {
         particles.forEach((p) => {
-          if (!p || !isFinite(p.x) || !isFinite(p.y) || !isFinite(p.size)) return
+          if (!p || !isFinite(p.x) || !isFinite(p.y) || !isFinite(p.size))
+            return
           const alpha = p.life / 40
           ctx.save()
 
