@@ -30,10 +30,10 @@
       canvas#game {
         display: block !important;
         position: fixed !important;
-        top: 0px !important;
+        top: 50px !important;
         left: 0px !important;
         width: 100% !important;
-        height: 100% !important;
+        height: calc(100% - 160px) !important;
         z-index: 0 !important;
         background-color: #87ceeb !important;
       }
@@ -45,36 +45,36 @@
         display: flex;
         justify-content: space-between;
         align-items: flex-start;
-        padding: 10px;
+        padding: 5px;
         pointer-events: none;
         z-index: 50;
       }
       .stats {
         background: rgba(0, 0, 0, 0.8);
-        padding: 10px 15px;
+        padding: 8px 10px;
         border-radius: 10px;
         color: #fff;
         font-family: 'SimHei', sans-serif;
-        font-size: 14px;
+        font-size: 12px;
         border: 2px solid #f1c40f;
         z-index: 50;
       }
       .stats div {
-        margin: 5px 0;
+        margin: 3px 0;
       }
       .progress-container {
         background: rgba(0, 0, 0, 0.7);
-        padding: 8px 12px;
-        border-radius: 10px;
+        padding: 6px 10px;
+        border-radius: 8px;
         border: 2px solid #f1c40f;
-        min-width: 150px;
+        min-width: 100px;
       }
       .kills-container {
         background: rgba(0, 0, 0, 0.7);
-        padding: 8px 12px;
+        padding: 6px 10px;
         border-radius: 8px;
         border: 2px solid #9b59b6;
-        font-size: 12px;
+        font-size: 11px;
         color: #fff;
       }
       .level-title {
@@ -83,10 +83,10 @@
         left: 50%;
         transform: translate(-50%, -50%);
         font-family: 'SimHei', sans-serif;
-        font-size: 48px;
+        font-size: 36px;
         color: #f1c40f;
         text-shadow:
-          0 0 20px #f39c12,
+          0 0 15px #f39c12,
           0 0 40px #e74c3c;
         opacity: 0;
         transition: opacity 0.5s;
@@ -117,68 +117,71 @@
         justify-content: center;
         align-items: center;
         z-index: 100;
+        padding: 15px;
       }
       .game-over h1 {
-        font-size: 60px;
+        font-size: 36px;
         color: #e74c3c;
-        text-shadow: 0 0 30px #c0392b;
-        margin-bottom: 30px;
+        text-shadow: 0 0 20px #c0392b;
+        margin-bottom: 20px;
       }
       .level-complete h1 {
-        font-size: 48px;
+        font-size: 32px;
         color: #f1c40f;
-        text-shadow: 0 0 30px #f39c12;
-        margin-bottom: 30px;
+        text-shadow: 0 0 20px #f39c12;
+        margin-bottom: 20px;
       }
       .btn {
-        padding: 15px 40px;
-        font-size: 20px;
+        padding: 12px 24px;
+        font-size: 16px;
         background: linear-gradient(135deg, #9b59b6, #8e44ad);
         color: #fff;
         border: none;
-        border-radius: 25px;
+        border-radius: 20px;
         cursor: pointer;
-        margin: 10px;
+        margin: 8px;
         font-family: 'SimHei', sans-serif;
-        transition:
-          transform 0.2s,
-          box-shadow 0.2s;
+        transition: transform 0.2s, box-shadow 0.2s;
+        min-width: 120px;
+        min-height: 44px;
+        touch-action: manipulation;
       }
       .btn:hover {
-        transform: scale(1.1);
-        box-shadow: 0 0 20px #9b59b6;
+        transform: scale(1.05);
+        box-shadow: 0 0 15px #9b59b6;
       }
-      .skill-bar {
-        position: fixed;
-        top: 80px;
-        right: 10px;
-        display: flex;
-        gap: 6px;
-        pointer-events: auto;
-        z-index: 50;
+      .btn:active {
+        transform: scale(0.95);
       }
-      .skill-btn {
-        width: 45px;
-        height: 45px;
-        border-radius: 10px;
-        border: 2px solid #fff;
-        background: rgba(0, 0, 0, 0.7);
-        color: #fff;
-        font-size: 20px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        cursor: pointer;
-        transition: all 0.2s;
-      }
-      .skill-btn.active {
-        border-color: #f1c40f;
-        box-shadow: 0 0 12px #f1c40f;
-        background: rgba(241, 196, 15, 0.3);
-      }
-      .skill-btn.locked {
-        opacity: 0.4;
-        border-color: #666;
+      /* 移动端适配 */
+      @media (max-width: 600px) {
+        .ui-overlay {
+          padding: 3px;
+        }
+        .stats {
+          padding: 5px 8px;
+          font-size: 10px;
+        }
+        .stats div {
+          margin: 2px 0;
+        }
+        .progress-container {
+          min-width: 80px;
+          padding: 4px 6px;
+        }
+        .kills-container {
+          font-size: 10px;
+          padding: 4px 6px;
+        }
+        .level-title {
+          font-size: 28px;
+        }
+        .game-over h1 {
+          font-size: 28px;
+        }
+        .level-complete h1 {
+          font-size: 24px;
+        }
       }
     </style>
   </head>
@@ -230,10 +233,7 @@
 
     <div class="level-title" id="levelTitle"></div>
 
-    <!-- 技能栏移到顶部中间 -->
-    <div class="skill-bar" id="skillBar"></div>
-
-    <!-- 开始提示 -->
+    <!-- 开始提示 - 移动端优化 -->
     <div
       id="startHint"
       style="
@@ -242,27 +242,29 @@
         left: 50%;
         transform: translate(-50%, -50%);
         background: rgba(0, 0, 0, 0.9);
-        padding: 25px 50px;
-        border-radius: 20px;
-        border: 4px solid #f1c40f;
+        padding: 20px 30px;
+        border-radius: 15px;
+        border: 3px solid #f1c40f;
         z-index: 300;
         text-align: center;
+        width: 90%;
+        max-width: 320px;
       "
     >
       <div
         style="
           color: #f1c40f;
-          font-size: 28px;
+          font-size: 22px;
           font-weight: bold;
-          margin-bottom: 15px;
+          margin-bottom: 12px;
         "
       >
         🎮 点击开始游戏
       </div>
-      <div style="color: #fff; font-size: 16px; margin-bottom: 10px">
-        按 J 攻击 | 按 K 技能 | 按 L 翻跟头
+      <div style="color: #fff; font-size: 14px; margin-bottom: 8px">
+        J攻击 | K技能 | L翻跟头
       </div>
-      <div style="color: #888; font-size: 14px; margin-top: 15px">
+      <div style="color: #888; font-size: 12px; margin-top: 10px">
         手机端使用底部按钮操作
       </div>
     </div>
@@ -289,7 +291,7 @@
       </button>
     </div>
 
-    <!-- 奖励图片弹窗 -->
+    <!-- 奖励图片弹窗 - 移动端优化 -->
     <div
       id="rewardModal"
       style="
@@ -304,42 +306,43 @@
         flex-direction: column;
         justify-content: center;
         align-items: center;
+        padding: 10px;
       "
     >
       <div
         style="
           background: linear-gradient(135deg, #1a1a2e, #16213e);
-          padding: 15px;
-          border-radius: 15px;
+          padding: 12px;
+          border-radius: 12px;
           border: 2px solid #f1c40f;
           text-align: center;
-          width: 85%;
-          max-width: 350px;
+          width: 95%;
+          max-width: 300px;
         "
       >
-        <h2 style="color: #f1c40f; margin-bottom: 10px; font-size: 20px">
+        <h2 style="color: #f1c40f; margin-bottom: 8px; font-size: 18px">
           🎉 通关奖励 🎉
         </h2>
-        <p style="color: #fff; margin-bottom: 10px; font-size: 14px">
+        <p style="color: #fff; margin-bottom: 8px; font-size: 12px">
           第 <span id="rewardLevel">1</span> 关奖励
         </p>
         <div
           style="
             max-width: 100%;
-            max-height: 50vh;
+            max-height: 45vh;
             overflow: hidden;
             border-radius: 8px;
             border: 2px solid #fff;
-            box-shadow: 0 0 20px rgba(241, 196, 15, 0.5);
+            box-shadow: 0 0 15px rgba(241, 196, 15, 0.5);
           "
         >
           <img
             id="rewardImage"
             src=""
-            style="max-width: 100%; max-height: 50vh; display: block"
+            style="max-width: 100%; max-height: 45vh; display: block"
           />
         </div>
-        <p style="color: #aaa; margin: 10px 0; font-size: 11px">
+        <p style="color: #aaa; margin: 8px 0; font-size: 10px">
           长按或右键保存图片
         </p>
         <div
@@ -356,8 +359,9 @@
             onclick="saveRewardImage()"
             style="
               background: linear-gradient(135deg, #27ae60, #2ecc71);
-              padding: 10px 20px;
-              font-size: 14px;
+              padding: 10px 18px;
+              font-size: 13px;
+              min-width: 70px;
             "
           >
             💾 保存
@@ -365,7 +369,7 @@
           <button
             class="btn"
             onclick="closeRewardModal()"
-            style="padding: 10px 20px; font-size: 14px"
+            style="padding: 10px 18px; font-size: 13px; min-width: 70px"
           >
             继续 ▶
           </button>
@@ -373,7 +377,7 @@
       </div>
     </div>
 
-    <!-- 全家福弹窗 - 通关后展示所有图片 -->
+    <!-- 全家福弹窗 - 移动端优化 -->
     <div
       id="galleryModal"
       style="
@@ -389,38 +393,40 @@
         justify-content: center;
         align-items: center;
         overflow-y: auto;
+        padding: 10px;
       "
     >
       <div
         style="
           background: linear-gradient(135deg, #1a1a2e, #16213e);
-          padding: 20px;
-          border-radius: 20px;
+          padding: 15px;
+          border-radius: 15px;
           border: 3px solid #f1c40f;
           max-width: 95%;
           max-height: 95%;
           text-align: center;
+          width: 95%;
         "
       >
-        <h2 style="color: #f1c40f; margin-bottom: 10px; font-size: 28px">
+        <h2 style="color: #f1c40f; margin-bottom: 8px; font-size: 22px">
           🎊 通关全家福 🎊
         </h2>
-        <p style="color: #fff; margin-bottom: 15px; font-size: 16px">
+        <p style="color: #fff; margin-bottom: 10px; font-size: 14px">
           恭喜你完成了全部20关！
         </p>
-        <p style="color: #f1c40f; margin-bottom: 20px; font-size: 14px">
+        <p style="color: #f1c40f; margin-bottom: 15px; font-size: 12px">
           以下是您收集的所有奖励照片
         </p>
         <div
           id="galleryContainer"
           style="
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 10px;
             max-width: 100%;
             overflow-y: auto;
-            max-height: 60vh;
-            padding: 10px;
+            max-height: 55vh;
+            padding: 8px;
           "
         >
           <!-- 图片将由JS生成 -->
@@ -428,10 +434,10 @@
         <div
           style="
             display: flex;
-            gap: 15px;
+            gap: 10px;
             justify-content: center;
             flex-wrap: wrap;
-            margin-top: 20px;
+            margin-top: 15px;
           "
         >
           <button
@@ -439,16 +445,17 @@
             onclick="saveAllImages()"
             style="
               background: linear-gradient(135deg, #27ae60, #2ecc71);
-              padding: 12px 30px;
-              font-size: 16px;
+              padding: 10px 20px;
+              font-size: 13px;
+              min-width: 100px;
             "
           >
-            💾 保存全部图片
+            💾 保存全部
           </button>
           <button
             class="btn"
             onclick="closeGalleryModal()"
-            style="padding: 12px 30px; font-size: 16px"
+            style="padding: 10px 20px; font-size: 13px; min-width: 100px"
           >
             🏠 返回主页
           </button>
@@ -634,6 +641,7 @@
           this.isLeft = isLeft
           this.phase = Math.random() * Math.PI * 2
           this.waveAmplitude = 0.15 + Math.random() * 0.1
+          this.scale = 1
         }
 
         update(time, breathOffset) {
@@ -647,6 +655,7 @@
           ctx.save()
           ctx.translate(this.baseX, this.baseY)
           ctx.rotate(this.currentAngle)
+          ctx.scale(this.scale, this.scale)
 
           // 羽毛渐变
           const gradient = ctx.createLinearGradient(0, 0, this.length, 0)
@@ -655,7 +664,7 @@
           gradient.addColorStop(1, 'rgba(255, 255, 255, 0.5)')
 
           ctx.fillStyle = gradient
-          ctx.shadowBlur = 15
+          ctx.shadowBlur = 15 * this.scale
           ctx.shadowColor = this.color
 
           ctx.beginPath()
@@ -710,58 +719,52 @@
       // 游戏时间
       let gameTime = 0
 
-      // 技能配置
-      const SKILLS = [
-        {
-          name: '火焰',
-          icon: '🔥',
-          color: '#e74c3c',
-          bulletColor: '#f39c12',
-          speed: 12,
-          damage: 20,
-          size: 15,
-        },
-        {
-          name: '风暴',
-          icon: '🌀',
-          color: '#3498db',
-          bulletColor: '#85c1e9',
-          speed: 15,
-          damage: 15,
-          size: 20,
-          pierce: true,
-        },
-        {
-          name: '雷电',
-          icon: '⚡',
-          color: '#f1c40f',
-          bulletColor: '#fff',
-          speed: 20,
-          damage: 35,
-          size: 12,
-          chain: true,
-        },
-        {
-          name: '光剑',
-          icon: '⚔️',
-          color: '#9b59b6',
-          bulletColor: '#e8daef',
-          speed: 18,
-          damage: 50,
-          size: 10,
-          range: 100,
-        },
-        {
-          name: '冰霜',
-          icon: '❄️',
-          color: '#00cec9',
-          bulletColor: '#81ecec',
-          speed: 10,
-          damage: 12,
-          size: 18,
-          freeze: true,
-        },
-      ]
+      // 文字子弹配置 - 轮训输出
+      const BULLET_TEXTS = ['嘉姐cnm', '万总cnm', '二婶不孝顺奶奶', '二叔最坏']
+      let bulletTextIndex = 0
+      let bulletTextTimer = 0
+      const BULLET_TEXT_INTERVAL = 60 // 每60帧切换文字
+
+      // 获取当前子弹文字
+      function getCurrentBulletText() {
+        return BULLET_TEXTS[bulletTextIndex % BULLET_TEXTS.length]
+      }
+
+      // 根据增益计算文字特效等级
+      function getTextEffectLevel() {
+        const boost =
+          player.damageBoost > 0 ? Math.floor(player.damageBoost * 10) : 0
+        return Math.min(boost, 5) // 最高5级特效
+      }
+
+      // 文字特效颜色配置 - 鲜艳醒目
+      function getTextColor(level) {
+        const colors = [
+          '#ff3333', // 0级: 鲜红色
+          '#ff9900', // 1级: 橙色
+          '#ffcc00', // 2级: 金黄色
+          '#33ff66', // 3级: 亮绿色
+          '#00ccff', // 4级: 天蓝色
+          '#ff33ff', // 5级: 粉紫色
+        ]
+        return colors[level] || '#ff3333'
+      }
+
+      // 文字子弹伤害
+      function getBulletDamage() {
+        const base = 15
+        const boost =
+          player.damageBoost > 0 ? Math.floor(player.damageBoost * 15) : 0
+        return base + boost
+      }
+
+      // 文字子弹速度 - 初始较慢让人看清文字
+      function getBulletSpeed() {
+        const base = 6
+        const boost =
+          player.damageBoost > 0 ? Math.floor(player.damageBoost * 2) : 0
+        return base + boost
+      }
 
       // 恐怖Boss配置 - 超大型Boss
       const BOSSES = {
@@ -975,8 +978,6 @@
         invincible: 0,
         attackCooldown: 0,
         skillCooldown: 0,
-        currentSkill: 0,
-        unlockedSkills: [true, true, true, true, true], // 全部解锁
         animation: 0,
         attackSpeedBoost: 0, // 攻速加成
         damageBoost: 0, // 伤害加成
@@ -1002,26 +1003,18 @@
       const keys = {}
       document.addEventListener('keydown', (e) => {
         keys[e.key.toLowerCase()] = true
-        if (
-          e.key >= '1' &&
-          e.key <= '5' &&
-          player.unlockedSkills[parseInt(e.key) - 1]
-        ) {
-          player.currentSkill = parseInt(e.key) - 1
-          updateSkillUI()
-        }
       })
       document.addEventListener(
         'keyup',
         (e) => (keys[e.key.toLowerCase()] = false),
       )
 
-      // 触控按钮 - 手柄风格布局
+      // 触控按钮 - 手柄风格布局，固定在屏幕最底部
       function createTouchControls() {
         const controls = document.createElement('div')
         controls.id = 'touchControls'
         controls.style.cssText =
-          'position:fixed;bottom:160px;left:0;right:0;display:flex;justify-content:space-between;align-items:flex-end;padding:0 15px;pointer-events:none;z-index:100;'
+          'position:fixed;bottom:0px;left:0;right:0;display:flex;justify-content:space-between;align-items:flex-end;padding:0 15px 10px 15px;pointer-events:none;z-index:100;'
         controls.innerHTML = `
                 <!-- 手柄左侧 - 移动区域 -->
                 <div style="display:flex;align-items:flex-end;gap:8px;pointer-events:auto;">
@@ -1261,34 +1254,6 @@
         })
       }
 
-      // 技能UI
-      function createSkillUI() {
-        const bar = document.getElementById('skillBar')
-        SKILLS.forEach((skill, i) => {
-          const btn = document.createElement('div')
-          btn.className =
-            'skill-btn' + (player.unlockedSkills[i] ? '' : ' locked')
-          btn.innerHTML = skill.icon
-          btn.title = skill.name
-          btn.onclick = () => {
-            if (player.unlockedSkills[i]) {
-              player.currentSkill = i
-              updateSkillUI()
-            }
-          }
-          bar.appendChild(btn)
-        })
-      }
-      createSkillUI()
-
-      function updateSkillUI() {
-        const btns = document.querySelectorAll('.skill-btn')
-        btns.forEach((btn, i) => {
-          btn.classList.toggle('active', i === player.currentSkill)
-        })
-      }
-      updateSkillUI()
-
       // 初始化关卡
       function initLevel(level) {
         const config = LEVELS[level - 1]
@@ -1395,26 +1360,28 @@
         }
       }
 
-      // 创建子弹
-      function createBullet(x, y, dir, skill) {
-        if (skill == null || skill < 0 || skill >= SKILLS.length) return
-        const s = SKILLS[skill]
-        if (!s) return
-
-        const damageBoost = player.damageBoost > 0 ? 1 + player.damageBoost : 1
+      // 创建文字子弹
+      function createBullet(x, y, dir) {
+        const text = getCurrentBulletText()
+        const effectLevel = getTextEffectLevel()
 
         bullets.push({
           x,
           y,
-          vx: dir * s.speed,
+          vx: dir * getBulletSpeed(),
           vy: 0,
-          ...s,
-          damage: s.damage * damageBoost,
+          text: text,
+          effectLevel: effectLevel,
+          color: getTextColor(effectLevel),
+          damage: getBulletDamage(),
+          size: 15, // 碰撞大小
           life: 100,
           fromPlayer: true,
+          rotation: 0,
         })
 
         // 发射炫酷粒子特效
+        const particleColor = getTextColor(effectLevel)
         for (let i = 0; i < 6; i++) {
           const angle = (Math.random() - 0.5) * 1.5
           const speed = Math.random() * 8 + 4
@@ -1423,7 +1390,7 @@
             y,
             vx: Math.cos(angle) * speed * dir,
             vy: Math.sin(angle) * speed - Math.random() * 3,
-            color: s.bulletColor,
+            color: particleColor,
             size: Math.random() * 6 + 3,
             life: 30 + Math.random() * 20,
           })
@@ -1597,32 +1564,39 @@
             player.x + player.w / 2 + player.facing * 30,
             player.y + player.h / 2 - 10,
             player.facing,
-            player.currentSkill,
           )
           player.attackCooldown = speedBoost
         }
 
-        // 技能攻击
+        // 技能攻击 - 发射多发文字子弹
         if (keys['k'] && player.skillCooldown <= 0) {
-          const skillIndex = Math.min(player.currentSkill, SKILLS.length - 1)
-          const s = SKILLS[skillIndex]
-          if (s) {
-            const damageBoost =
-              player.damageBoost > 0 ? 1 + player.damageBoost : 1
-            // 发射多发子弹
-            for (let i = -1; i <= 1; i++) {
-              bullets.push({
-                x: player.x + player.w / 2,
-                y: player.y + player.h / 2 - 10,
-                vx: player.facing * s.speed * 0.8,
-                vy: i * 3,
-                ...s,
-                damage: s.damage * damageBoost,
-                life: 80,
-              })
-            }
-            player.skillCooldown = Math.max(30, 60 - player.attackSpeedBoost)
+          const effectLevel = getTextEffectLevel()
+          const damageBoost =
+            player.damageBoost > 0 ? 1 + player.damageBoost : 1
+          // 发射3发子弹
+          for (let i = -1; i <= 1; i++) {
+            const text = getCurrentBulletText()
+            bullets.push({
+              x: player.x + player.w / 2,
+              y: player.y + player.h / 2 - 10,
+              vx: player.facing * getBulletSpeed() * 0.8,
+              vy: i * 3,
+              text: text,
+              effectLevel: effectLevel,
+              color: getTextColor(effectLevel),
+              damage: getBulletDamage() * damageBoost,
+              size: 15, // 碰撞大小
+              life: 80,
+            })
           }
+          player.skillCooldown = Math.max(30, 60 - player.attackSpeedBoost)
+        }
+
+        // 子弹文字轮训计时
+        bulletTextTimer++
+        if (bulletTextTimer >= BULLET_TEXT_INTERVAL) {
+          bulletTextTimer = 0
+          bulletTextIndex++
         }
 
         // 冷却
@@ -2011,7 +1985,7 @@
                   y: b.y,
                   vx: Math.cos(angle) * speed,
                   vy: Math.sin(angle) * speed,
-                  color: b.bulletColor,
+                  color: b.color,
                   size: Math.random() * 8 + 4,
                   life: 40 + Math.random() * 20,
                 })
@@ -2722,55 +2696,189 @@
 
         ctx.restore()
 
-        // 绘制翅膀 - 在玩家背后
+        // 绘制翅膀 - 在玩家背后，随增益变帅，Z轴煽动效果
+        const wingLevel = Math.min(Math.floor(player.damageBoost * 5) + 1, 6)
         const wingGlow = WING_COLORS[currentWingColor].glow
         const wingColor = WING_COLORS[currentWingColor].primary
         const breathOffset = Math.sin(gameTime * 0.003) * 3
+        const flapSpeed = 0.008 + wingLevel * 0.002
+        const flapAmplitude = 0.15 + wingLevel * 0.05 // Z轴缩放幅度
+        const wingScale = 1 + wingLevel * 0.15
 
-        // 更新翅膀位置和角度
-        const wingCenterX = sx + player.w / 2
+        // Z轴煽动：使用缩放模拟前后煽动
+        const flapZScale = 1 + Math.sin(gameTime * flapSpeed) * flapAmplitude
+
+        // 更新翅膀位置和角度 - 随玩家朝向
+        const wingCenterX = sx + player.w / 2 + player.facing * 5
         const wingCenterY = sy + player.h / 2 - 10
 
-        leftWings.forEach((wing, i) => {
-          wing.baseX = wingCenterX - 15
-          wing.baseY = wingCenterY + breathOffset
-          wing.update(gameTime, breathOffset)
-          wing.angle =
-            -Math.PI * 0.65 -
-            i * 0.12 -
-            Math.sin(gameTime * 0.006 + i * 0.3) * 0.15
-          wing.draw(ctx)
-        })
-
-        rightWings.forEach((wing, i) => {
-          wing.baseX = wingCenterX + 15
-          wing.baseY = wingCenterY + breathOffset
-          wing.update(gameTime, breathOffset)
-          wing.angle =
-            -Math.PI * 0.35 +
-            i * 0.12 +
-            Math.sin(gameTime * 0.006 + i * 0.3) * 0.15
-          wing.draw(ctx)
-        })
-
-        // 翅膀光晕
+        // 绘制翅膀 - 使用Z轴缩放模拟煽动
         ctx.save()
-        ctx.globalAlpha = 0.3
+        ctx.translate(wingCenterX, wingCenterY)
+
+        // 左翅膀 - 沿Z轴煽动
+        leftWings.forEach((wing, i) => {
+          const wingZScale = flapZScale * (1 - i * 0.05) // 根部Z缩放更大
+          const angleOffset = -Math.PI * 0.6 - i * 0.08 + player.facing * 0.2
+
+          ctx.save()
+          ctx.scale(wingZScale, wingZScale) // Z轴缩放
+          ctx.translate(-20 * wingScale, breathOffset)
+
+          const gradient = ctx.createLinearGradient(0, 0, 50 * wingScale, 0)
+          gradient.addColorStop(0, wingColor)
+          gradient.addColorStop(0.5, wingColor)
+          gradient.addColorStop(1, 'rgba(255, 255, 255, 0.5)')
+
+          ctx.fillStyle = gradient
+          ctx.shadowBlur = 15 * wingZScale
+          ctx.shadowColor = wingColor
+
+          ctx.beginPath()
+          ctx.moveTo(0, 0)
+          ctx.quadraticCurveTo(
+            25 * wingScale,
+            -10 * wingScale - i * 3,
+            50 * wingScale,
+            Math.sin(gameTime * flapSpeed + i) * 5 * wingScale,
+          )
+          ctx.quadraticCurveTo(25 * wingScale, 10 * wingScale + i * 3, 0, 0)
+          ctx.fill()
+          ctx.restore()
+        })
+
+        // 右翅膀 - 沿Z轴煽动
+        rightWings.forEach((wing, i) => {
+          const wingZScale = flapZScale * (1 - i * 0.05)
+          const angleOffset = -Math.PI * 0.4 + i * 0.08 + player.facing * 0.2
+
+          ctx.save()
+          ctx.scale(wingZScale, wingZScale) // Z轴缩放
+          ctx.translate(20 * wingScale, breathOffset)
+
+          const gradient = ctx.createLinearGradient(0, 0, 50 * wingScale, 0)
+          gradient.addColorStop(0, wingColor)
+          gradient.addColorStop(0.5, wingColor)
+          gradient.addColorStop(1, 'rgba(255, 255, 255, 0.5)')
+
+          ctx.fillStyle = gradient
+          ctx.shadowBlur = 15 * wingZScale
+          ctx.shadowColor = wingColor
+
+          ctx.beginPath()
+          ctx.moveTo(0, 0)
+          ctx.quadraticCurveTo(
+            25 * wingScale,
+            -10 * wingScale - i * 3,
+            50 * wingScale,
+            Math.sin(gameTime * flapSpeed + i) * 5 * wingScale,
+          )
+          ctx.quadraticCurveTo(25 * wingScale, 10 * wingScale + i * 3, 0, 0)
+          ctx.fill()
+          ctx.restore()
+        })
+
+        ctx.restore()
+
+        // 翅膀光晕 - 等级越高越亮越大
+        ctx.save()
+        ctx.globalAlpha = 0.2 + wingLevel * 0.05
+        const glowSize = 60 + wingLevel * 20
         const glowGrad = ctx.createRadialGradient(
           wingCenterX,
           wingCenterY,
           0,
           wingCenterX,
           wingCenterY,
-          60,
+          glowSize,
         )
-        glowGrad.addColorStop(0, wingGlow + '66')
+        glowGrad.addColorStop(0, wingGlow + '88')
         glowGrad.addColorStop(1, 'transparent')
         ctx.fillStyle = glowGrad
         ctx.beginPath()
-        ctx.arc(wingCenterX, wingCenterY, 60, 0, Math.PI * 2)
+        ctx.arc(wingCenterX, wingCenterY, glowSize, 0, Math.PI * 2)
         ctx.fill()
         ctx.restore()
+
+        // 高级翅膀特效 - 等级3以上有光环
+        if (wingLevel >= 3) {
+          ctx.save()
+          ctx.globalAlpha = 0.4
+          ctx.strokeStyle = wingColor
+          ctx.lineWidth = 2
+          ctx.shadowBlur = 20
+          ctx.shadowColor = wingColor
+          ctx.beginPath()
+          ctx.arc(
+            wingCenterX,
+            wingCenterY,
+            40 + wingLevel * 5 + Math.sin(gameTime * 0.01) * 5,
+            0,
+            Math.PI * 2,
+          )
+          ctx.stroke()
+          ctx.restore()
+        }
+
+        // 终极翅膀特效 - 等级5以上有粒子
+        if (wingLevel >= 5) {
+          for (let i = 0; i < wingLevel; i++) {
+            const particleAngle =
+              (gameTime * 0.005 + i * ((Math.PI * 2) / wingLevel)) %
+              (Math.PI * 2)
+            const particleR = 50 + Math.sin(gameTime * 0.01 + i) * 10
+            const px = wingCenterX + Math.cos(particleAngle) * particleR
+            const py = wingCenterY + Math.sin(particleAngle) * particleR
+            ctx.save()
+            ctx.globalAlpha = 0.6
+            ctx.fillStyle = wingColor
+            ctx.shadowBlur = 10
+            ctx.shadowColor = wingColor
+            ctx.beginPath()
+            ctx.arc(px, py, 4, 0, Math.PI * 2)
+            ctx.fill()
+            ctx.restore()
+          }
+        }
+
+        // 超终极特效 - 等级6雷电翅膀
+        if (wingLevel >= 6) {
+          ctx.save()
+          ctx.strokeStyle = '#ffffff'
+          ctx.lineWidth = 1
+          ctx.shadowBlur = 15
+          ctx.shadowColor = '#ffff00'
+          ctx.globalAlpha = 0.7 + Math.sin(gameTime * 0.02) * 0.3
+          // 左翅膀雷电
+          for (let i = 0; i < 3; i++) {
+            ctx.beginPath()
+            ctx.moveTo(wingCenterX - 20, wingCenterY)
+            ctx.lineTo(
+              wingCenterX - 40 - i * 15,
+              wingCenterY - 20 + Math.random() * 10,
+            )
+            ctx.lineTo(
+              wingCenterX - 60 - i * 15,
+              wingCenterY + Math.random() * 20 - 10,
+            )
+            ctx.stroke()
+          }
+          // 右翅膀雷电
+          for (let i = 0; i < 3; i++) {
+            ctx.beginPath()
+            ctx.moveTo(wingCenterX + 20, wingCenterY)
+            ctx.lineTo(
+              wingCenterX + 40 + i * 15,
+              wingCenterY - 20 + Math.random() * 10,
+            )
+            ctx.lineTo(
+              wingCenterX + 60 + i * 15,
+              wingCenterY + Math.random() * 20 - 10,
+            )
+            ctx.stroke()
+          }
+          ctx.restore()
+        }
       }
 
       // 绘制敌人
@@ -3135,205 +3243,111 @@
         }
       }
 
-      // 绘制子弹 - 炫酷特效
+      // 绘制文字子弹 - 特效随增益变帅
       function drawBullets() {
         bullets.forEach((b) => {
           const sx = b.x - cameraX
 
           ctx.save()
 
-          if (b.name === '火焰') {
-            // 火焰子弹 - 炽热球体带尾焰
-            // 外焰
-            const fireGrad = ctx.createRadialGradient(
-              sx,
-              b.y,
-              0,
-              sx,
-              b.y,
-              b.size * 2,
+          // 文字旋转效果
+          b.rotation = (b.rotation || 0) + 0.05
+          const wobble = Math.sin(b.rotation) * 0.1
+
+          // 根据特效等级绘制不同效果
+          const level = b.effectLevel || 0
+
+          // 外发光效果
+          if (level >= 1) {
+            ctx.shadowBlur = 15 + level * 5
+            ctx.shadowColor = b.color
+          }
+
+          // 文字背景特效
+          if (level >= 2) {
+            // 描边效果
+            ctx.font = `bold ${20 + level * 2}px 'SimHei', sans-serif`
+            ctx.strokeStyle = b.color
+            ctx.lineWidth = 2 + level
+            ctx.strokeText(
+              b.text,
+              sx - ctx.measureText(b.text).width / 2,
+              b.y + 7,
             )
-            fireGrad.addColorStop(0, '#fff')
-            fireGrad.addColorStop(0.2, '#ffff00')
-            fireGrad.addColorStop(0.5, '#ff6600')
-            fireGrad.addColorStop(1, 'rgba(255,50,0,0)')
-            ctx.fillStyle = fireGrad
-            ctx.shadowBlur = 30
-            ctx.shadowColor = '#ff4500'
-            ctx.beginPath()
-            ctx.arc(sx, b.y, b.size * 2, 0, Math.PI * 2)
-            ctx.fill()
+          }
 
-            // 核心
-            ctx.fillStyle = '#fff'
+          if (level >= 3) {
+            // 外发光圆环
             ctx.beginPath()
-            ctx.arc(sx, b.y, b.size * 0.4, 0, Math.PI * 2)
-            ctx.fill()
+            ctx.arc(sx, b.y, 25 + level * 3, 0, Math.PI * 2)
+            ctx.strokeStyle = b.color
+            ctx.globalAlpha = 0.5
+            ctx.lineWidth = 2
+            ctx.stroke()
+            ctx.globalAlpha = 1
+          }
 
-            // 火焰尾迹
-            for (let i = 0; i < 5; i++) {
-              const trailX = sx - b.vx * i * 2
-              const trailSize = b.size * (1 - i * 0.2)
-              const alpha = 1 - i * 0.2
-              ctx.fillStyle = `rgba(255, ${150 - i * 30}, 0, ${alpha})`
+          if (level >= 4) {
+            // 旋转光环
+            ctx.save()
+            ctx.translate(sx, b.y)
+            ctx.rotate(b.rotation)
+            for (let i = 0; i < 4; i++) {
+              const angle = (i * Math.PI) / 2
               ctx.beginPath()
-              ctx.arc(trailX, b.y, trailSize, 0, Math.PI * 2)
+              ctx.arc(
+                Math.cos(angle) * 30,
+                Math.sin(angle) * 30,
+                5,
+                0,
+                Math.PI * 2,
+              )
+              ctx.fillStyle = b.color
+              ctx.globalAlpha = 0.7
               ctx.fill()
             }
-          } else if (b.name === '风暴') {
-            // 风暴 - 龙卷风螺旋
-            ctx.shadowBlur = 25
-            ctx.shadowColor = '#00bfff'
+            ctx.restore()
+            ctx.globalAlpha = 1
+          }
 
-            // 多层螺旋
-            for (let layer = 0; layer < 3; layer++) {
-              ctx.strokeStyle = b.bulletColor
-              ctx.lineWidth = 4 - layer
-              ctx.globalAlpha = 1 - layer * 0.3
+          if (level >= 5) {
+            // 终极特效 - 火焰翅膀
+            for (let i = 0; i < 3; i++) {
+              const wingX = sx - b.vx * (i + 1) * 3
+              const wingY = b.y + Math.sin(b.rotation + i) * 10
               ctx.beginPath()
-              for (let i = 0; i < 30; i++) {
-                const angle = i * 0.4 + Date.now() * 0.02 + layer
-                const r = b.size * (1 - i / 40) + layer * 3
-                const px = sx + Math.cos(angle) * r
-                const py = b.y + Math.sin(angle) * r
-                if (i === 0) ctx.moveTo(px, py)
-                else ctx.lineTo(px, py)
-              }
-              ctx.stroke()
+              ctx.arc(wingX, wingY, 8 - i * 2, 0, Math.PI * 2)
+              ctx.fillStyle = b.color
+              ctx.globalAlpha = 0.6 - i * 0.15
+              ctx.fill()
             }
             ctx.globalAlpha = 1
 
-            // 中心光点
-            ctx.fillStyle = '#fff'
-            ctx.beginPath()
-            ctx.arc(sx, b.y, b.size * 0.3, 0, Math.PI * 2)
-            ctx.fill()
-          } else if (b.name === '雷电') {
-            // 雷电 - 闪电链
-            ctx.shadowBlur = 30
-            ctx.shadowColor = '#ffff00'
-
-            // 主体闪电
-            ctx.strokeStyle = '#ffff00'
-            ctx.lineWidth = 4
-            ctx.beginPath()
-            ctx.moveTo(sx - 25, b.y - 15)
-            for (let i = 0; i < 6; i++) {
-              const px = sx - 25 + i * 10 + (Math.random() - 0.5) * 10
-              const py = b.y - 15 + i * 6 + (Math.random() - 0.5) * 5
-              ctx.lineTo(px, py)
-            }
-            ctx.stroke()
-
-            // 分支闪电
-            ctx.lineWidth = 2
-            ctx.strokeStyle = '#87ceeb'
-            for (let i = 0; i < 3; i++) {
-              ctx.beginPath()
-              const startX = sx - 10 + i * 15
-              ctx.moveTo(startX, b.y - 5 + i * 3)
-              ctx.lineTo(startX + (Math.random() - 0.5) * 20, b.y + 10 + i * 5)
-              ctx.stroke()
-            }
-
-            // 电弧光环
-            ctx.strokeStyle = '#fff'
+            // 雷电效果
+            ctx.strokeStyle = '#ffffff'
             ctx.lineWidth = 1
             ctx.beginPath()
-            ctx.arc(
-              sx,
-              b.y,
-              b.size + 5 + Math.sin(Date.now() * 0.02) * 3,
-              0,
-              Math.PI * 2,
-            )
+            ctx.moveTo(sx - 20, b.y - 20)
+            ctx.lineTo(sx, b.y)
+            ctx.lineTo(sx + 20, b.y - 10)
             ctx.stroke()
-          } else if (b.name === '光剑') {
-            // 光剑 - 剑气
-            ctx.shadowBlur = 40
-            ctx.shadowColor = '#da70d6'
-
-            // 剑身
-            const swordGrad = ctx.createLinearGradient(
-              sx,
-              b.y - b.range,
-              sx,
-              b.y + 20,
-            )
-            swordGrad.addColorStop(0, 'rgba(255,255,255,0)')
-            swordGrad.addColorStop(0.3, b.bulletColor)
-            swordGrad.addColorStop(0.5, '#fff')
-            swordGrad.addColorStop(0.7, b.bulletColor)
-            swordGrad.addColorStop(1, 'rgba(255,255,255,0)')
-
-            ctx.fillStyle = swordGrad
-            ctx.beginPath()
-            ctx.moveTo(sx, b.y - b.range)
-            ctx.lineTo(sx - 12, b.y)
-            ctx.lineTo(sx, b.y + 20)
-            ctx.lineTo(sx + 12, b.y)
-            ctx.closePath()
-            ctx.fill()
-
-            // 剑柄
-            ctx.fillStyle = '#ffd700'
-            ctx.fillRect(sx - 3, b.y + 15, 6, 15)
-
-            // 剑气波纹
-            ctx.strokeStyle = b.bulletColor
-            ctx.lineWidth = 2
-            ctx.globalAlpha = 0.5 + Math.sin(Date.now() * 0.01) * 0.3
-            ctx.beginPath()
-            ctx.ellipse(sx, b.y, b.size * 3, b.size, 0, 0, Math.PI * 2)
-            ctx.stroke()
-            ctx.globalAlpha = 1
-          } else if (b.name === '冰霜') {
-            // 冰霜 - 六角雪花
-            ctx.shadowBlur = 20
-            ctx.shadowColor = '#00ffff'
-
-            // 旋转的雪花
-            const rotation = Date.now() * 0.005
-            for (let i = 0; i < 6; i++) {
-              const angle = (i * Math.PI) / 3 + rotation
-              ctx.strokeStyle = b.bulletColor
-              ctx.lineWidth = 3
-              ctx.beginPath()
-              ctx.moveTo(sx, b.y)
-              const px = sx + Math.cos(angle) * b.size
-              const py = b.y + Math.sin(angle) * b.size
-              ctx.lineTo(px, py)
-
-              // 分支
-              ctx.moveTo(px, py)
-              ctx.lineTo(
-                px + Math.cos(angle + 0.5) * 5,
-                py + Math.sin(angle + 0.5) * 5,
-              )
-              ctx.moveTo(px, py)
-              ctx.lineTo(
-                px + Math.cos(angle - 0.5) * 5,
-                py + Math.sin(angle - 0.5) * 5,
-              )
-              ctx.stroke()
-            }
-
-            // 中心
-            ctx.fillStyle = '#fff'
-            ctx.beginPath()
-            ctx.arc(sx, b.y, b.size * 0.3, 0, Math.PI * 2)
-            ctx.fill()
-
-            // 冰晶尾迹
-            for (let i = 0; i < 4; i++) {
-              const trailX = sx - b.vx * i * 3
-              ctx.strokeStyle = `rgba(0, 255, 255, ${0.5 - i * 0.1})`
-              ctx.lineWidth = 2
-              ctx.beginPath()
-              ctx.arc(trailX, b.y, b.size * 0.5 * (1 - i * 0.2), 0, Math.PI * 2)
-              ctx.stroke()
-            }
           }
+
+          // 绘制主文字
+          ctx.font = `bold ${20 + level * 2}px 'SimHei', sans-serif`
+          ctx.fillStyle = b.color
+          ctx.textAlign = 'center'
+          ctx.textBaseline = 'middle'
+
+          // 文字阴影
+          ctx.shadowBlur = 10 + level * 5
+          ctx.shadowColor = b.color
+          ctx.fillText(b.text, sx, b.y + wobble * 5)
+
+          // 文字高光
+          ctx.shadowBlur = 0
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.8)'
+          ctx.fillText(b.text, sx, b.y + wobble * 5)
 
           ctx.restore()
         })
@@ -3665,15 +3679,14 @@
         gold = 0
         levelKills = 0
         player.hp = player.maxHp
-        player.unlockedSkills = [true, true, true, true, true] // 全部解锁
-        player.currentSkill = 0
         player.attackSpeedBoost = 0
         player.damageBoost = 0
         player.boostTimer = 0
         player.rolling = false
         player.rollCooldown = 0
         player.trailParticles = []
-        updateSkillUI()
+        bulletTextIndex = 0
+        bulletTextTimer = 0
         initLevel(1)
         gameState = 'playing'
       }
