@@ -141,7 +141,9 @@
         cursor: pointer;
         margin: 8px;
         font-family: 'SimHei', sans-serif;
-        transition: transform 0.2s, box-shadow 0.2s;
+        transition:
+          transform 0.2s,
+          box-shadow 0.2s;
         min-width: 120px;
         min-height: 44px;
         touch-action: manipulation;
@@ -2545,6 +2547,8 @@
       function drawPlayer() {
         const sx = player.x - cameraX
         const sy = player.y
+        const centerX = sx + player.w / 2
+        const centerY = sy + player.h / 2
 
         // 绘制残影
         player.trailParticles.forEach((t) => {
@@ -2585,98 +2589,227 @@
         const h = player.crouching ? player.h * 0.6 : player.h
         const yOffset = player.crouching ? player.h * 0.4 : 0
 
-        // 身体阴影
-        ctx.fillStyle = 'rgba(0,0,0,0.3)'
+        // 翅膀参数 - Z轴煽动效果（面向玩家视角）
+        const wingLevel = Math.min(Math.floor(player.damageBoost * 5) + 1, 6)
+        const wingColor = WING_COLORS[currentWingColor].primary
+        const wingGlow = WING_COLORS[currentWingColor].glow
+        const flapSpeed = 0.01 + wingLevel * 0.003
+        const flapAmplitude = 10 + wingLevel * 3 // 翅膀上下煽动幅度
+        const wingScale = 1 + wingLevel * 0.15
+
+        // Z轴煽动：翅膀垂直上下煽动（面向玩家的视角）
+        const flapPhase = Math.sin(gameTime * flapSpeed)
+        const wingTipY = flapPhase * flapAmplitude // 翅膀尖端Y偏移
+
+        // 绘制翅膀 - 在角色两侧，垂直上下煽动
+        ctx.save()
+
+        // 左翅膀 - 左侧
+        for (let i = 0; i < 4; i++) {
+          const featherLength = (50 + i * 8) * wingScale
+          const featherYOffset = i * 8 * wingScale // 每片羽毛稍微靠下
+          const tipY = wingTipY * (1 - i * 0.15) // 根部偏移小，尖端偏移大
+
+          const gradient = ctx.createLinearGradient(
+            centerX - 20,
+            centerY - featherYOffset,
+            centerX - 20 - featherLength,
+            centerY - featherYOffset + tipY,
+          )
+          gradient.addColorStop(0, wingColor)
+          gradient.addColorStop(0.6, wingColor)
+          gradient.addColorStop(1, 'rgba(255, 255, 255, 0.3)')
+
+          ctx.fillStyle = gradient
+          ctx.shadowBlur = 10 * wingScale
+          ctx.shadowColor = wingGlow
+
+          ctx.beginPath()
+          // 羽毛形状 - 从身体向外延伸
+          ctx.moveTo(centerX - 10, centerY - 10 - featherYOffset)
+          ctx.quadraticCurveTo(
+            centerX - 20 - featherLength * 0.5,
+            centerY - 15 - featherYOffset + tipY * 0.5,
+            centerX - 20 - featherLength,
+            centerY - 10 - featherYOffset + tipY,
+          )
+          ctx.quadraticCurveTo(
+            centerX - 20 - featherLength * 0.5,
+            centerY - 5 - featherYOffset + tipY * 0.5,
+            centerX - 10,
+            centerY - 5 - featherYOffset,
+          )
+          ctx.closePath()
+          ctx.fill()
+        }
+
+        // 右翅膀 - 右侧（镜像）
+        for (let i = 0; i < 4; i++) {
+          const featherLength = (50 + i * 8) * wingScale
+          const featherYOffset = i * 8 * wingScale
+          const tipY = wingTipY * (1 - i * 0.15)
+
+          const gradient = ctx.createLinearGradient(
+            centerX + 20,
+            centerY - featherYOffset,
+            centerX + 20 + featherLength,
+            centerY - featherYOffset + tipY,
+          )
+          gradient.addColorStop(0, wingColor)
+          gradient.addColorStop(0.6, wingColor)
+          gradient.addColorStop(1, 'rgba(255, 255, 255, 0.3)')
+
+          ctx.fillStyle = gradient
+          ctx.shadowBlur = 10 * wingScale
+          ctx.shadowColor = wingGlow
+
+          ctx.beginPath()
+          ctx.moveTo(centerX + 10, centerY - 10 - featherYOffset)
+          ctx.quadraticCurveTo(
+            centerX + 20 + featherLength * 0.5,
+            centerY - 15 - featherYOffset + tipY * 0.5,
+            centerX + 20 + featherLength,
+            centerY - 10 - featherYOffset + tipY,
+          )
+          ctx.quadraticCurveTo(
+            centerX + 20 + featherLength * 0.5,
+            centerY - 5 - featherYOffset + tipY * 0.5,
+            centerX + 10,
+            centerY - 5 - featherYOffset,
+          )
+          ctx.closePath()
+          ctx.fill()
+        }
+
+        // 翅膀光晕 - 在翅膀后面
+        ctx.globalAlpha = 0.15 + wingLevel * 0.03
+        const glowGrad = ctx.createRadialGradient(
+          centerX,
+          centerY,
+          0,
+          centerX,
+          centerY,
+          80 * wingScale,
+        )
+        glowGrad.addColorStop(0, wingGlow)
+        glowGrad.addColorStop(1, 'transparent')
+        ctx.fillStyle = glowGrad
         ctx.beginPath()
         ctx.ellipse(
-          sx + player.w / 2,
-          H - 60,
-          player.w / 2 + 5,
-          8,
+          centerX,
+          centerY,
+          90 * wingScale,
+          60 * wingScale,
           0,
           0,
           Math.PI * 2,
         )
         ctx.fill()
+        ctx.globalAlpha = 1
 
-        // 古风服装
+        ctx.restore()
+
+        // 身体阴影
+        ctx.fillStyle = 'rgba(0,0,0,0.3)'
+        ctx.beginPath()
+        ctx.ellipse(centerX, H - 60, player.w / 2 + 5, 8, 0, 0, Math.PI * 2)
+        ctx.fill()
+
+        // 古风服装 - 正面视图
         const dressGrad = ctx.createLinearGradient(sx, sy, sx, sy + h)
         dressGrad.addColorStop(0, '#9b59b6')
         dressGrad.addColorStop(1, '#8e44ad')
         ctx.fillStyle = dressGrad
 
-        // 长裙
+        // 长裙 - 正面向
         ctx.beginPath()
-        ctx.moveTo(sx, sy + yOffset + 20)
+        ctx.moveTo(sx + 5, sy + yOffset + 20)
         ctx.lineTo(sx - 5, sy + h)
         ctx.lineTo(sx + player.w + 5, sy + h)
-        ctx.lineTo(sx + player.w, sy + yOffset + 20)
+        ctx.lineTo(sx + player.w - 5, sy + yOffset + 20)
         ctx.closePath()
         ctx.fill()
 
-        // 上身
+        // 裙子装饰线条
+        ctx.strokeStyle = '#f1c40f'
+        ctx.lineWidth = 2
+        ctx.beginPath()
+        ctx.moveTo(centerX, sy + yOffset + 25)
+        ctx.lineTo(centerX, sy + h - 5)
+        ctx.stroke()
+
+        // 腰带
+        ctx.fillStyle = '#f1c40f'
+        ctx.fillRect(sx + 3, sy + yOffset + 20, player.w - 6, 8)
+
+        // 上身 - 正面
         ctx.fillStyle = '#faf0fa'
         ctx.fillRect(sx + 5, sy + yOffset, player.w - 10, 25)
 
-        // 袖子飘动
-        const sleeveWave = Math.sin(player.animation) * 5
+        // 袖子 - 正面展开
+        const sleeveWave = Math.sin(player.animation) * 3
         ctx.fillStyle = '#f5e6f5'
+
+        // 左袖子
         ctx.beginPath()
-        ctx.moveTo(sx, sy + yOffset + 10)
-        ctx.quadraticCurveTo(
-          sx - 15 + sleeveWave,
-          sy + yOffset + 25,
-          sx - 10,
-          sy + yOffset + 40,
-        )
-        ctx.lineTo(sx + 5, sy + yOffset + 30)
+        ctx.moveTo(sx + 5, sy + yOffset + 5)
+        ctx.lineTo(sx - 10, sy + yOffset + 15 + sleeveWave)
+        ctx.lineTo(sx - 5, sy + yOffset + 35)
+        ctx.lineTo(sx + 5, sy + yOffset + 25)
         ctx.closePath()
         ctx.fill()
 
+        // 右袖子
         ctx.beginPath()
-        ctx.moveTo(sx + player.w, sy + yOffset + 10)
-        ctx.quadraticCurveTo(
-          sx + player.w + 15 - sleeveWave,
-          sy + yOffset + 25,
-          sx + player.w + 10,
-          sy + yOffset + 40,
-        )
-        ctx.lineTo(sx + player.w - 5, sy + yOffset + 30)
+        ctx.moveTo(sx + player.w - 5, sy + yOffset + 5)
+        ctx.lineTo(sx + player.w + 10, sy + yOffset + 15 + sleeveWave)
+        ctx.lineTo(sx + player.w + 5, sy + yOffset + 35)
+        ctx.lineTo(sx + player.w - 5, sy + yOffset + 25)
         ctx.closePath()
         ctx.fill()
 
-        // 头部
+        // 头部 - 正面
         ctx.fillStyle = '#fce4d6'
         ctx.beginPath()
-        ctx.arc(sx + player.w / 2, sy + yOffset - 5, 15, 0, Math.PI * 2)
+        ctx.arc(centerX, sy + yOffset - 5, 15, 0, Math.PI * 2)
         ctx.fill()
 
         // 头像
         if (playerImgLoaded) {
           ctx.save()
           ctx.beginPath()
-          ctx.arc(sx + player.w / 2, sy + yOffset - 5, 15, 0, Math.PI * 2)
+          ctx.arc(centerX, sy + yOffset - 5, 15, 0, Math.PI * 2)
           ctx.clip()
-          ctx.drawImage(
-            playerImg,
-            sx + player.w / 2 - 15,
-            sy + yOffset - 20,
-            30,
-            30,
-          )
+          ctx.drawImage(playerImg, centerX - 15, sy + yOffset - 20, 30, 30)
           ctx.restore()
         }
 
-        // 发髻
+        // 发髻 - 正面两个发髻
         ctx.fillStyle = '#2c2c4a'
         ctx.beginPath()
-        ctx.arc(sx + player.w / 2, sy + yOffset - 15, 12, Math.PI, 0)
+        ctx.ellipse(
+          centerX - 12,
+          sy + yOffset - 18,
+          8,
+          10,
+          -0.3,
+          0,
+          Math.PI * 2,
+        )
+        ctx.fill()
+        ctx.beginPath()
+        ctx.ellipse(centerX + 12, sy + yOffset - 18, 8, 10, 0.3, 0, Math.PI * 2)
         ctx.fill()
 
-        // 装饰
+        // 中间头发
+        ctx.beginPath()
+        ctx.ellipse(centerX, sy + yOffset - 18, 6, 8, 0, 0, Math.PI * 2)
+        ctx.fill()
+
+        // 装饰发簪
         ctx.fillStyle = '#f1c40f'
         ctx.beginPath()
-        ctx.arc(sx + player.w / 2, sy + yOffset - 22, 3, 0, Math.PI * 2)
+        ctx.arc(centerX, sy + yOffset - 25, 3, 0, Math.PI * 2)
         ctx.fill()
 
         // 移动动画
@@ -2691,128 +2824,39 @@
         ctx.textAlign = 'center'
         ctx.shadowBlur = 5
         ctx.shadowColor = '#000'
-        ctx.fillText('翠翠', sx + player.w / 2, sy + yOffset - 30)
+        ctx.fillText('翠翠', centerX, sy + yOffset - 35)
         ctx.shadowBlur = 0
 
         ctx.restore()
 
-        // 绘制翅膀 - 在玩家背后，随增益变帅，Z轴煽动效果
-        const wingLevel = Math.min(Math.floor(player.damageBoost * 5) + 1, 6)
-        const wingGlow = WING_COLORS[currentWingColor].glow
-        const wingColor = WING_COLORS[currentWingColor].primary
-        const breathOffset = Math.sin(gameTime * 0.003) * 3
-        const flapSpeed = 0.008 + wingLevel * 0.002
-        const flapAmplitude = 0.15 + wingLevel * 0.05 // Z轴缩放幅度
-        const wingScale = 1 + wingLevel * 0.15
-
-        // Z轴煽动：使用缩放模拟前后煽动
-        const flapZScale = 1 + Math.sin(gameTime * flapSpeed) * flapAmplitude
-
-        // 更新翅膀位置和角度 - 随玩家朝向
-        const wingCenterX = sx + player.w / 2 + player.facing * 5
-        const wingCenterY = sy + player.h / 2 - 10
-
-        // 绘制翅膀 - 使用Z轴缩放模拟煽动
-        ctx.save()
-        ctx.translate(wingCenterX, wingCenterY)
-
-        // 左翅膀 - 沿Z轴煽动
-        leftWings.forEach((wing, i) => {
-          const wingZScale = flapZScale * (1 - i * 0.05) // 根部Z缩放更大
-          const angleOffset = -Math.PI * 0.6 - i * 0.08 + player.facing * 0.2
-
-          ctx.save()
-          ctx.scale(wingZScale, wingZScale) // Z轴缩放
-          ctx.translate(-20 * wingScale, breathOffset)
-
-          const gradient = ctx.createLinearGradient(0, 0, 50 * wingScale, 0)
-          gradient.addColorStop(0, wingColor)
-          gradient.addColorStop(0.5, wingColor)
-          gradient.addColorStop(1, 'rgba(255, 255, 255, 0.5)')
-
-          ctx.fillStyle = gradient
-          ctx.shadowBlur = 15 * wingZScale
-          ctx.shadowColor = wingColor
-
-          ctx.beginPath()
-          ctx.moveTo(0, 0)
-          ctx.quadraticCurveTo(
-            25 * wingScale,
-            -10 * wingScale - i * 3,
-            50 * wingScale,
-            Math.sin(gameTime * flapSpeed + i) * 5 * wingScale,
-          )
-          ctx.quadraticCurveTo(25 * wingScale, 10 * wingScale + i * 3, 0, 0)
-          ctx.fill()
-          ctx.restore()
-        })
-
-        // 右翅膀 - 沿Z轴煽动
-        rightWings.forEach((wing, i) => {
-          const wingZScale = flapZScale * (1 - i * 0.05)
-          const angleOffset = -Math.PI * 0.4 + i * 0.08 + player.facing * 0.2
-
-          ctx.save()
-          ctx.scale(wingZScale, wingZScale) // Z轴缩放
-          ctx.translate(20 * wingScale, breathOffset)
-
-          const gradient = ctx.createLinearGradient(0, 0, 50 * wingScale, 0)
-          gradient.addColorStop(0, wingColor)
-          gradient.addColorStop(0.5, wingColor)
-          gradient.addColorStop(1, 'rgba(255, 255, 255, 0.5)')
-
-          ctx.fillStyle = gradient
-          ctx.shadowBlur = 15 * wingZScale
-          ctx.shadowColor = wingColor
-
-          ctx.beginPath()
-          ctx.moveTo(0, 0)
-          ctx.quadraticCurveTo(
-            25 * wingScale,
-            -10 * wingScale - i * 3,
-            50 * wingScale,
-            Math.sin(gameTime * flapSpeed + i) * 5 * wingScale,
-          )
-          ctx.quadraticCurveTo(25 * wingScale, 10 * wingScale + i * 3, 0, 0)
-          ctx.fill()
-          ctx.restore()
-        })
-
-        ctx.restore()
-
-        // 翅膀光晕 - 等级越高越亮越大
-        ctx.save()
-        ctx.globalAlpha = 0.2 + wingLevel * 0.05
-        const glowSize = 60 + wingLevel * 20
-        const glowGrad = ctx.createRadialGradient(
-          wingCenterX,
-          wingCenterY,
-          0,
-          wingCenterX,
-          wingCenterY,
-          glowSize,
-        )
-        glowGrad.addColorStop(0, wingGlow + '88')
-        glowGrad.addColorStop(1, 'transparent')
-        ctx.fillStyle = glowGrad
-        ctx.beginPath()
-        ctx.arc(wingCenterX, wingCenterY, glowSize, 0, Math.PI * 2)
-        ctx.fill()
-        ctx.restore()
-
-        // 高级翅膀特效 - 等级3以上有光环
+        // 翅膀高级特效 - 随等级增加
         if (wingLevel >= 3) {
           ctx.save()
-          ctx.globalAlpha = 0.4
+          ctx.globalAlpha = 0.3
           ctx.strokeStyle = wingColor
           ctx.lineWidth = 2
-          ctx.shadowBlur = 20
-          ctx.shadowColor = wingColor
+          ctx.shadowBlur = 15
+          ctx.shadowColor = wingGlow
+          // 左翅膀光环
           ctx.beginPath()
-          ctx.arc(
-            wingCenterX,
-            wingCenterY,
-            40 + wingLevel * 5 + Math.sin(gameTime * 0.01) * 5,
+          ctx.ellipse(
+            centerX - 60 * wingScale,
+            centerY + wingTipY * 0.5,
+            30 + wingLevel * 5,
+            20,
+            0,
+            0,
+            Math.PI * 2,
+          )
+          ctx.stroke()
+          // 右翅膀光环
+          ctx.beginPath()
+          ctx.ellipse(
+            centerX + 60 * wingScale,
+            centerY + wingTipY * 0.5,
+            30 + wingLevel * 5,
+            20,
+            0,
             0,
             Math.PI * 2,
           )
@@ -2820,64 +2864,27 @@
           ctx.restore()
         }
 
-        // 终极翅膀特效 - 等级5以上有粒子
+        // 终极特效 - 等级5以上
         if (wingLevel >= 5) {
-          for (let i = 0; i < wingLevel; i++) {
+          for (let i = 0; i < 3; i++) {
             const particleAngle =
-              (gameTime * 0.005 + i * ((Math.PI * 2) / wingLevel)) %
-              (Math.PI * 2)
-            const particleR = 50 + Math.sin(gameTime * 0.01 + i) * 10
-            const px = wingCenterX + Math.cos(particleAngle) * particleR
-            const py = wingCenterY + Math.sin(particleAngle) * particleR
+              (gameTime * 0.008 + i * ((Math.PI * 2) / 3)) % (Math.PI * 2)
+            const particleR = 70 + Math.sin(gameTime * 0.01 + i) * 15
+            const px = centerX + Math.cos(particleAngle) * particleR
+            const py =
+              centerY +
+              Math.sin(particleAngle) * particleR * 0.6 +
+              wingTipY * 0.3
             ctx.save()
-            ctx.globalAlpha = 0.6
+            ctx.globalAlpha = 0.5
             ctx.fillStyle = wingColor
-            ctx.shadowBlur = 10
-            ctx.shadowColor = wingColor
+            ctx.shadowBlur = 8
+            ctx.shadowColor = wingGlow
             ctx.beginPath()
             ctx.arc(px, py, 4, 0, Math.PI * 2)
             ctx.fill()
             ctx.restore()
           }
-        }
-
-        // 超终极特效 - 等级6雷电翅膀
-        if (wingLevel >= 6) {
-          ctx.save()
-          ctx.strokeStyle = '#ffffff'
-          ctx.lineWidth = 1
-          ctx.shadowBlur = 15
-          ctx.shadowColor = '#ffff00'
-          ctx.globalAlpha = 0.7 + Math.sin(gameTime * 0.02) * 0.3
-          // 左翅膀雷电
-          for (let i = 0; i < 3; i++) {
-            ctx.beginPath()
-            ctx.moveTo(wingCenterX - 20, wingCenterY)
-            ctx.lineTo(
-              wingCenterX - 40 - i * 15,
-              wingCenterY - 20 + Math.random() * 10,
-            )
-            ctx.lineTo(
-              wingCenterX - 60 - i * 15,
-              wingCenterY + Math.random() * 20 - 10,
-            )
-            ctx.stroke()
-          }
-          // 右翅膀雷电
-          for (let i = 0; i < 3; i++) {
-            ctx.beginPath()
-            ctx.moveTo(wingCenterX + 20, wingCenterY)
-            ctx.lineTo(
-              wingCenterX + 40 + i * 15,
-              wingCenterY - 20 + Math.random() * 10,
-            )
-            ctx.lineTo(
-              wingCenterX + 60 + i * 15,
-              wingCenterY + Math.random() * 20 - 10,
-            )
-            ctx.stroke()
-          }
-          ctx.restore()
         }
       }
 
