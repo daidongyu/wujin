@@ -6,7 +6,7 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
     />
-    <title>翠在江湖-终极版</title>
+    <title>翠手遮天-飞仙版</title>
     <style>
       * {
         margin: 0;
@@ -1021,13 +1021,13 @@
         const controls = document.createElement('div')
         controls.id = 'touchControls'
         controls.style.cssText =
-          'position:fixed;bottom:5px;left:0;right:0;display:flex;justify-content:space-between;align-items:flex-end;padding:0 15px;pointer-events:none;z-index:100;'
+          'position:fixed;bottom:80px;left:0;right:0;display:flex;justify-content:space-between;align-items:flex-end;padding:0 15px;pointer-events:none;z-index:100;'
         controls.innerHTML = `
                 <!-- 手柄左侧 - 移动区域 -->
                 <div style="display:flex;align-items:flex-end;gap:8px;pointer-events:auto;">
                     <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
                         <!-- 左上按钮 -->
-                        <button id="btnRoll" class="touch-btn roll-btn-sm">K</button>
+                        <button id="btnRoll" class="touch-btn roll-btn-sm">技</button>
                         <!-- 移动摇杆区域 -->
                         <div style="display:flex;gap:10px;">
                             <button id="btnLeft" class="touch-btn dpad-btn">◀</button>
@@ -1397,7 +1397,10 @@
 
       // 创建子弹
       function createBullet(x, y, dir, skill) {
-        const s = SKILLS[skill]
+        const skillIndex = Math.min(skill, SKILLS.length - 1)
+        const s = SKILLS[skillIndex]
+        if (!s) return
+
         const damageBoost = player.damageBoost > 0 ? 1 + player.damageBoost : 1
 
         bullets.push({
@@ -1406,7 +1409,7 @@
           vx: dir * s.speed,
           vy: 0,
           ...s,
-          damage: s.damage * damageBoost, // 应用伤害加成
+          damage: s.damage * damageBoost,
           life: 100,
           fromPlayer: true,
         })
@@ -1601,22 +1604,25 @@
 
         // 技能攻击
         if (keys['k'] && player.skillCooldown <= 0) {
-          const s = SKILLS[player.currentSkill]
-          const damageBoost =
-            player.damageBoost > 0 ? 1 + player.damageBoost : 1
-          // 发射多发子弹
-          for (let i = -1; i <= 1; i++) {
-            bullets.push({
-              x: player.x + player.w / 2,
-              y: player.y + player.h / 2 - 10,
-              vx: player.facing * s.speed * 0.8,
-              vy: i * 3,
-              ...s,
-              damage: s.damage * damageBoost,
-              life: 80,
-            })
+          const skillIndex = Math.min(player.currentSkill, SKILLS.length - 1)
+          const s = SKILLS[skillIndex]
+          if (s) {
+            const damageBoost =
+              player.damageBoost > 0 ? 1 + player.damageBoost : 1
+            // 发射多发子弹
+            for (let i = -1; i <= 1; i++) {
+              bullets.push({
+                x: player.x + player.w / 2,
+                y: player.y + player.h / 2 - 10,
+                vx: player.facing * s.speed * 0.8,
+                vy: i * 3,
+                ...s,
+                damage: s.damage * damageBoost,
+                life: 80,
+              })
+            }
+            player.skillCooldown = Math.max(30, 60 - player.attackSpeedBoost)
           }
-          player.skillCooldown = Math.max(30, 60 - player.attackSpeedBoost)
         }
 
         // 冷却
