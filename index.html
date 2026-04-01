@@ -1282,7 +1282,6 @@
         const btnCrouch = document.getElementById('btnCrouch')
         const btnAttack = document.getElementById('btnAttack')
         const btnRoll = document.getElementById('btnRoll')
-        const btnSkill = document.getElementById('btnSkill')
         const btnFly = document.getElementById('btnFly')
         const btnDemon = document.getElementById('btnDemon')
 
@@ -1375,21 +1374,6 @@
         btnRoll.addEventListener('touchcancel', (e) => {
           keys['k'] = false
           btnRoll.classList.remove('pressed')
-        })
-
-        btnSkill.addEventListener('touchstart', (e) => {
-          e.preventDefault()
-          keys['l'] = true
-          btnSkill.classList.add('pressed')
-        })
-        btnSkill.addEventListener('touchend', (e) => {
-          e.preventDefault()
-          keys['l'] = false
-          btnSkill.classList.remove('pressed')
-        })
-        btnSkill.addEventListener('touchcancel', (e) => {
-          keys['l'] = false
-          btnSkill.classList.remove('pressed')
         })
 
         // 起飞按钮
@@ -2956,16 +2940,21 @@
       // 更新粒子
       function updateParticles() {
         particles.forEach((p, idx) => {
-          p.x += p.vx
-          p.y += p.vy
+          if (!p) return
+          p.x += p.vx || 0
+          p.y += p.vy || 0
           p.vy += 0.1
           p.life--
-          p.size *= 0.95
+          p.size = Math.max(0.1, (p.size || 1) * 0.95)
 
-          if (p.life <= 0) {
+          if (p.life <= 0 || !isFinite(p.x) || !isFinite(p.y)) {
             particles.splice(idx, 1)
           }
         })
+        // 限制粒子数量
+        if (particles.length > 200) {
+          particles = particles.slice(-200)
+        }
       }
 
       // 更新相机
@@ -4392,6 +4381,7 @@
       // 绘制粒子
       function drawParticles() {
         particles.forEach((p) => {
+          if (!p || !isFinite(p.x) || !isFinite(p.y) || !isFinite(p.size)) return
           const alpha = p.life / 40
           ctx.save()
 
