@@ -264,7 +264,7 @@
         🎮 点击开始游戏
       </div>
       <div style="color: #fff; font-size: 14px; margin-bottom: 8px">
-        J攻击 | K技能 | L翻跟头
+        J攻击 | K技能 | L翻跟头 | F起飞
       </div>
       <div style="color: #888; font-size: 12px; margin-top: 10px">
         手机端使用底部按钮操作
@@ -870,6 +870,101 @@
           gold: 300,
           canShoot: true,
         },
+        // 新增10种敌人
+        幽灵: {
+          hp: 80,
+          speed: 4,
+          damage: 15,
+          color: '#00ced1',
+          size: 55,
+          pattern: 'chase',
+          gold: 40,
+        },
+        僵尸: {
+          hp: 400,
+          speed: 1,
+          damage: 50,
+          color: '#556b2f',
+          size: 100,
+          pattern: 'chase',
+          gold: 200,
+        },
+        骷髅: {
+          hp: 200,
+          speed: 2.8,
+          damage: 25,
+          color: '#f5f5dc',
+          size: 75,
+          pattern: 'patrol',
+          gold: 120,
+        },
+        恶魔: {
+          hp: 300,
+          speed: 3.5,
+          damage: 40,
+          color: '#8b0000',
+          size: 90,
+          pattern: 'shoot',
+          gold: 180,
+          canShoot: true,
+        },
+        巫师: {
+          hp: 150,
+          speed: 2,
+          damage: 55,
+          color: '#9400d3',
+          size: 65,
+          pattern: 'shoot',
+          gold: 250,
+          canShoot: true,
+        },
+        狼人: {
+          hp: 350,
+          speed: 4.5,
+          damage: 30,
+          color: '#4a4a4a',
+          size: 95,
+          pattern: 'chase',
+          gold: 170,
+        },
+        吸血鬼: {
+          hp: 280,
+          speed: 3.2,
+          damage: 35,
+          color: '#800000',
+          size: 80,
+          pattern: 'patrol',
+          gold: 190,
+        },
+        巨魔: {
+          hp: 600,
+          speed: 1.2,
+          damage: 60,
+          color: '#6b8e23',
+          size: 130,
+          pattern: 'chase',
+          gold: 350,
+        },
+        食人魔: {
+          hp: 450,
+          speed: 2.2,
+          damage: 45,
+          color: '#cd853f',
+          size: 110,
+          pattern: 'shoot',
+          gold: 280,
+          canShoot: true,
+        },
+        女巫: {
+          hp: 180,
+          speed: 2.5,
+          damage: 50,
+          color: '#483d8b',
+          size: 70,
+          pattern: 'shoot',
+          gold: 300,
+          canShoot: true,
+        },
       }
 
       // Boss出现规则
@@ -892,18 +987,19 @@
           bgColor: `hsl(${(i * 18) % 360}, 30%, ${25 - Math.min(i, 10)}%)`,
           groundColor: `hsl(${(i * 18 + 60) % 360}, 50%, ${35 - Math.min(i, 15)}%)`,
           enemyCount:
-            Math.min(5 + Math.floor(i * 1.5), 15) *
-            Math.max(difficultyMultiplier, 1),
+            Math.min(5 + Math.floor(i * 1.5), 15) * 10 * Math.max(difficultyMultiplier, 1),
           enemyTypes:
             i < 5
               ? ['嘉姐']
-              : i < 10
-                ? ['嘉姐', '万总']
-                : i < 15
-                  ? ['嘉姐', '万总', '二叔']
-                  : ['嘉姐', '万总', '二叔', '二婶'],
+              : i < 8
+                ? ['嘉姐', '万总', '幽灵']
+                : i < 12
+                  ? ['嘉姐', '万总', '二叔', '幽灵', '骷髅', '狼人']
+                  : i < 16
+                    ? ['嘉姐', '万总', '二叔', '二婶', '幽灵', '僵尸', '骷髅', '恶魔', '巫师']
+                    : ['嘉姐', '万总', '二叔', '二婶', '幽灵', '僵尸', '骷髅', '恶魔', '巫师', '狼人', '吸血鬼', '巨魔', '食人魔', '女巫'],
           spawnRate:
-            Math.max(2000 - i * 80, 600) / Math.max(difficultyMultiplier, 1),
+            Math.max(800 - i * 30, 200) / Math.max(difficultyMultiplier, 1),
           difficultyMultiplier: difficultyMultiplier,
           boss: getBossForLevel(i),
           goalX: 3000 + (i - 1) * 500, // 每关终点更远
@@ -929,22 +1025,28 @@
 
       function generateEnemies(level) {
         const levelEnemies = []
-        const types =
-          level < 5
-            ? ['嘉姐']
-            : level < 10
-              ? ['嘉姐', '万总']
-              : level < 15
-                ? ['嘉姐', '万总', '二叔']
-                : ['嘉姐', '万总', '二叔', '二婶']
-        const count = Math.min(4 + level, 12)
+        const allTypes = [
+          '嘉姐', '万总', '二叔', '二婶',
+          '幽灵', '僵尸', '骷髅', '恶魔', '巫师', '狼人',
+          '吸血鬼', '巨魔', '食人魔', '女巫'
+        ]
+        const types = level < 5
+          ? ['嘉姐']
+          : level < 8
+            ? ['嘉姐', '万总', '幽灵']
+            : level < 12
+              ? ['嘉姐', '万总', '二叔', '幽灵', '骷髅', '狼人']
+              : level < 16
+                ? ['嘉姐', '万总', '二叔', '二婶', '幽灵', '僵尸', '骷髅', '恶魔', '巫师']
+                : allTypes
+        const count = Math.min(4 + level, 12) * 10 // 敌人数量增加10倍
 
         for (let i = 0; i < count; i++) {
           const type = types[Math.floor(Math.random() * types.length)]
           const template = ENEMIES[type]
           levelEnemies.push({
             type,
-            x: W + 200 + i * 150 + Math.random() * 100,
+            x: W + 200 + i * 100 + Math.random() * 50,
             y: H - 60 - template.size,
             ...template,
           })
@@ -988,6 +1090,8 @@
         rollCooldown: 0, // 翻跟头冷却
         rollTimer: 0, // 翻跟头持续时间
         trailParticles: [], // 残影粒子
+        flying: false, // 起飞状态
+        flyHeight: 0, // 飞行高度
       }
 
       // 游戏对象
@@ -1021,6 +1125,8 @@
                 <!-- 手柄左侧 - 移动区域 -->
                 <div style="display:flex;align-items:flex-end;gap:8px;pointer-events:auto;">
                     <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
+                        <!-- 起飞按钮 -->
+                        <button id="btnFly" class="touch-btn fly-btn-sm">✈</button>
                         <!-- 左上按钮 -->
                         <button id="btnRoll" class="touch-btn roll-btn-sm">技</button>
                         <!-- 移动摇杆区域 -->
@@ -1113,6 +1219,15 @@
                     border:2px solid rgba(255,255,255,0.3) !important;
                 }
 
+                /* 起飞按钮 - 彩虹色 */
+                .fly-btn-sm {
+                    width:45px !important;
+                    height:45px !important;
+                    background:linear-gradient(145deg,#ff6b6b,#4ecdc4) !important;
+                    font-size:20px !important;
+                    border:2px solid rgba(255,255,255,0.4) !important;
+                }
+
                 /* 技能按钮 - 紫色小按钮 */
                 .skill-btn-sm {
                     width:45px !important;
@@ -1131,6 +1246,7 @@
         const btnAttack = document.getElementById('btnAttack')
         const btnRoll = document.getElementById('btnRoll')
         const btnSkill = document.getElementById('btnSkill')
+        const btnFly = document.getElementById('btnFly')
 
         // 移动按钮
         btnLeft.addEventListener('touchstart', (e) => {
@@ -1236,6 +1352,22 @@
         btnSkill.addEventListener('touchcancel', (e) => {
           keys['l'] = false
           btnSkill.classList.remove('pressed')
+        })
+
+        // 起飞按钮
+        btnFly.addEventListener('touchstart', (e) => {
+          e.preventDefault()
+          keys['f'] = true
+          btnFly.classList.add('pressed')
+        })
+        btnFly.addEventListener('touchend', (e) => {
+          e.preventDefault()
+          keys['f'] = false
+          btnFly.classList.remove('pressed')
+        })
+        btnFly.addEventListener('touchcancel', (e) => {
+          keys['f'] = false
+          btnFly.classList.remove('pressed')
         })
       }
       createTouchControls()
@@ -1413,6 +1545,65 @@
         }
       }
 
+      // 创建追踪子弹 - 起飞时自动追踪敌人
+      function createTargetedBullet(x, y, target) {
+        const text = getCurrentBulletText()
+        const effectLevel = getTextEffectLevel()
+        const speed = getBulletSpeed() * 1.5 // 追踪弹速度稍快
+
+        // 计算朝向敌人的方向
+        const dx = target.x + target.size / 2 - x
+        const dy = target.y + target.size / 2 - y
+        const dist = Math.hypot(dx, dy)
+        const dirX = dist > 0 ? dx / dist : 1
+        const dirY = dist > 0 ? dy / dist : 0
+
+        bullets.push({
+          x,
+          y,
+          vx: dirX * speed,
+          vy: dirY * speed,
+          text: text,
+          effectLevel: effectLevel,
+          color: getTextColor(effectLevel),
+          damage: getBulletDamage() * 1.2, // 追踪弹伤害稍高
+          size: 20, // 碰撞大小更大
+          life: 150,
+          fromPlayer: true,
+          rotation: 0,
+          targeted: true, // 标记为追踪弹
+        })
+
+        // 发射炫酷追踪粒子特效
+        const particleColor = getTextColor(effectLevel)
+        for (let i = 0; i < 10; i++) {
+          const angle = Math.random() * Math.PI * 2
+          const pSpeed = Math.random() * 10 + 5
+          particles.push({
+            x,
+            y,
+            vx: Math.cos(angle) * pSpeed,
+            vy: Math.sin(angle) * pSpeed,
+            color: particleColor,
+            size: Math.random() * 8 + 4,
+            life: 40 + Math.random() * 20,
+          })
+        }
+
+        // 追踪特效 - 箭头
+        for (let i = 0; i < 3; i++) {
+          particles.push({
+            x: x - dirX * (i + 1) * 15,
+            y: y - dirY * (i + 1) * 15,
+            vx: -dirX * 3,
+            vy: -dirY * 3,
+            color: '#ffffff',
+            size: 6 - i,
+            life: 20,
+          })
+        }
+      }
+
       // 创建敌人子弹
       function createEnemyBullet(enemy) {
         const dir = enemy.facing
@@ -1556,17 +1747,48 @@
           return t.alpha > 0
         })
 
-        // 攻击
+        // 起飞 - 悬空飞行
+        if (keys['f']) {
+          player.flying = true
+          player.flyHeight = 150 // 悬空高度
+          player.vy = 0 // 取消重力
+          player.grounded = false
+        } else {
+          player.flying = false
+          player.flyHeight = 0
+        }
+
+        // 攻击 - 自动追踪敌人
         const speedBoost =
           player.attackSpeedBoost > 0
             ? Math.max(5, 15 - player.attackSpeedBoost)
             : 15
         if (keys['j'] && player.attackCooldown <= 0) {
-          createBullet(
-            player.x + player.w / 2 + player.facing * 30,
-            player.y + player.h / 2 - 10,
-            player.facing,
-          )
+          // 起飞时自动追踪最近的敌人
+          if (player.flying && enemies.length > 0) {
+            let nearestEnemy = null
+            let nearestDist = Infinity
+            enemies.forEach((e) => {
+              const dist = Math.hypot(e.x - player.x, e.y - player.y)
+              if (dist < nearestDist) {
+                nearestDist = dist
+                nearestEnemy = e
+              }
+            })
+            if (nearestEnemy) {
+              createTargetedBullet(
+                player.x + player.w / 2,
+                player.y + player.h / 2 - 10,
+                nearestEnemy,
+              )
+            }
+          } else {
+            createBullet(
+              player.x + player.w / 2 + player.facing * 30,
+              player.y + player.h / 2 - 10,
+              player.facing,
+            )
+          }
           player.attackCooldown = speedBoost
         }
 
@@ -1607,12 +1829,20 @@
         if (player.rollCooldown > 0) player.rollCooldown--
         if (player.invincible > 0) player.invincible--
 
-        // 重力
-        player.vy += GRAVITY
+        // 重力（不适用于飞行状态）
+        if (!player.flying) {
+          player.vy += GRAVITY
+        }
 
         // 移动
         player.x += player.vx
         player.y += player.vy
+
+        // 飞行时保持悬空高度
+        if (player.flying) {
+          player.y = H - 60 - player.h - player.flyHeight
+          player.grounded = false
+        }
 
         // 地面碰撞
         player.grounded = false
