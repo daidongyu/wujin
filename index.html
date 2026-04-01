@@ -1021,7 +1021,7 @@
         const controls = document.createElement('div')
         controls.id = 'touchControls'
         controls.style.cssText =
-          'position:fixed;bottom:80px;left:0;right:0;display:flex;justify-content:space-between;align-items:flex-end;padding:0 15px;pointer-events:none;z-index:100;'
+          'position:fixed;bottom:160px;left:0;right:0;display:flex;justify-content:space-between;align-items:flex-end;padding:0 15px;pointer-events:none;z-index:100;'
         controls.innerHTML = `
                 <!-- 手柄左侧 - 移动区域 -->
                 <div style="display:flex;align-items:flex-end;gap:8px;pointer-events:auto;">
@@ -1397,8 +1397,8 @@
 
       // 创建子弹
       function createBullet(x, y, dir, skill) {
-        const skillIndex = Math.min(skill, SKILLS.length - 1)
-        const s = SKILLS[skillIndex]
+        if (skill == null || skill < 0 || skill >= SKILLS.length) return
+        const s = SKILLS[skill]
         if (!s) return
 
         const damageBoost = player.damageBoost > 0 ? 1 + player.damageBoost : 1
