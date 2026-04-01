@@ -6,7 +6,7 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
     />
-    <title>翠在江湖6.0</title>
+    <title>古风闯关 - 冒险岛</title>
     <style>
       * {
         margin: 0;
@@ -16,6 +16,8 @@
       }
       html,
       body {
+        margin: 0;
+        padding: 0;
         width: 100%;
         height: 100%;
         overflow: hidden;
@@ -23,26 +25,17 @@
         -webkit-touch-callout: none;
         -webkit-user-select: none;
         user-select: none;
-        background: #1a1a2e;
+        background: transparent;
       }
-      body {
-        margin: 0;
-        padding: 0;
-        overflow: hidden;
-        touch-action: none;
-        -webkit-touch-callout: none;
-        -webkit-user-select: none;
-        user-select: none;
-        background: #1a1a2e;
-      }
-      canvas {
-        display: block;
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        image-rendering: pixelated;
+      canvas#game {
+        display: block !important;
+        position: fixed !important;
+        top: 0px !important;
+        left: 0px !important;
+        width: 100% !important;
+        height: 100% !important;
+        z-index: 0 !important;
+        background-color: #87ceeb !important;
       }
       .ui-overlay {
         position: fixed;
@@ -158,10 +151,9 @@
       .skill-bar {
         position: fixed;
         top: 80px;
-        left: 50%;
-        transform: translateX(-50%);
+        right: 10px;
         display: flex;
-        gap: 8px;
+        gap: 6px;
         pointer-events: auto;
         z-index: 50;
       }
@@ -194,21 +186,46 @@
     <canvas id="game"></canvas>
 
     <div class="ui-overlay">
-        <div class="stats">
-            <div style="font-size:18px;font-weight:bold;color:#f1c40f;">👑 翠翠</div>
-            <div>关卡: <span id="level">1</span>/20</div>
-            <div style="color:#e74c3c;">❤️ <span id="hp">100</span></div>
-            <div>💰 <span id="gold">0</span></div>
+      <div class="stats">
+        <div style="font-size: 18px; font-weight: bold; color: #f1c40f">
+          👑 翠翠
         </div>
-        <div class="progress-container">
-            <div style="color:#f1c40f;font-size:11px;text-align:center;margin-bottom:4px;">🏁 <span id="distance">2800</span>m</div>
-            <div style="background:#333;height:8px;border-radius:4px;overflow:hidden;">
-                <div id="progressBar" style="background:linear-gradient(90deg,#27ae60,#2ecc71);height:100%;width:0%;transition:width 0.3s;border-radius:4px;"></div>
-            </div>
+        <div>关卡: <span id="level">1</span>/20</div>
+        <div style="color: #e74c3c">❤️ <span id="hp">100</span></div>
+        <div>💰 <span id="gold">0</span></div>
+      </div>
+      <div class="progress-container">
+        <div
+          style="
+            color: #f1c40f;
+            font-size: 11px;
+            text-align: center;
+            margin-bottom: 4px;
+          "
+        >
+          🏁 <span id="distance">2800</span>m
         </div>
-        <div class="kills-container">
-            ⚔️ 击杀: <span id="kills">0</span>
+        <div
+          style="
+            background: #333;
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+          "
+        >
+          <div
+            id="progressBar"
+            style="
+              background: linear-gradient(90deg, #27ae60, #2ecc71);
+              height: 100%;
+              width: 0%;
+              transition: width 0.3s;
+              border-radius: 4px;
+            "
+          ></div>
         </div>
+      </div>
+      <div class="kills-container">⚔️ 击杀: <span id="kills">0</span></div>
     </div>
 
     <div class="level-title" id="levelTitle"></div>
@@ -217,10 +234,37 @@
     <div class="skill-bar" id="skillBar"></div>
 
     <!-- 开始提示 -->
-    <div id="startHint" style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.8);padding:20px 40px;border-radius:15px;border:3px solid #f1c40f;z-index:200;text-align:center;cursor:pointer;" onclick="this.style.display='none'">
-        <div style="color:#f1c40f;font-size:24px;font-weight:bold;margin-bottom:10px;">🎮 点击开始游戏</div>
-        <div style="color:#fff;font-size:14px;">按 J 攻击 | 按 K 技能 | 按 L 翻跟头</div>
-        <div style="color:#888;font-size:12px;margin-top:10px;">手机端使用底部按钮操作</div>
+    <div
+      id="startHint"
+      style="
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(0, 0, 0, 0.9);
+        padding: 25px 50px;
+        border-radius: 20px;
+        border: 4px solid #f1c40f;
+        z-index: 300;
+        text-align: center;
+      "
+    >
+      <div
+        style="
+          color: #f1c40f;
+          font-size: 28px;
+          font-weight: bold;
+          margin-bottom: 15px;
+        "
+      >
+        🎮 点击开始游戏
+      </div>
+      <div style="color: #fff; font-size: 16px; margin-bottom: 10px">
+        按 J 攻击 | 按 K 技能 | 按 L 翻跟头
+      </div>
+      <div style="color: #888; font-size: 14px; margin-top: 15px">
+        手机端使用底部按钮操作
+      </div>
     </div>
 
     <div class="game-over" id="gameOver">
@@ -558,11 +602,9 @@
       function resize() {
         W = window.innerWidth
         H = window.innerHeight
+        // 设置canvas内部分辨率
         canvas.width = W
         canvas.height = H
-        canvas.style.width = W + 'px'
-        canvas.style.height = H + 'px'
-        ctx.setTransform(1, 0, 0, 1, 0, 0)
       }
       resize()
       window.addEventListener('resize', resize)
@@ -985,7 +1027,7 @@
                 <div style="display:flex;align-items:flex-end;gap:8px;pointer-events:auto;">
                     <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
                         <!-- 左上按钮 -->
-                        <button id="btnRoll" class="touch-btn roll-btn-sm">⚡</button>
+                        <button id="btnRoll" class="touch-btn roll-btn-sm">K</button>
                         <!-- 移动摇杆区域 -->
                         <div style="display:flex;gap:10px;">
                             <button id="btnLeft" class="touch-btn dpad-btn">◀</button>
@@ -994,9 +1036,9 @@
                     </div>
                 </div>
 
-                <!-- 手柄中央 - 特殊技能 -->
+                <!-- 手柄中央 - 翻跟头 -->
                 <div style="display:flex;align-items:flex-end;gap:5px;pointer-events:auto;margin-bottom:50px;">
-                    <button id="btnSkill" class="touch-btn skill-btn-sm">K</button>
+                    <button id="btnSkill" class="touch-btn skill-btn-sm">⚡</button>
                 </div>
 
                 <!-- 手柄右侧 - 动作按钮 -->
@@ -1173,35 +1215,51 @@
 
         btnRoll.addEventListener('touchstart', (e) => {
           e.preventDefault()
-          keys['l'] = true
+          keys['k'] = true
           btnRoll.classList.add('pressed')
         })
         btnRoll.addEventListener('touchend', (e) => {
           e.preventDefault()
-          keys['l'] = false
+          keys['k'] = false
           btnRoll.classList.remove('pressed')
         })
         btnRoll.addEventListener('touchcancel', (e) => {
-          keys['l'] = false
+          keys['k'] = false
           btnRoll.classList.remove('pressed')
         })
 
         btnSkill.addEventListener('touchstart', (e) => {
           e.preventDefault()
-          keys['k'] = true
+          keys['l'] = true
           btnSkill.classList.add('pressed')
         })
         btnSkill.addEventListener('touchend', (e) => {
           e.preventDefault()
-          keys['k'] = false
+          keys['l'] = false
           btnSkill.classList.remove('pressed')
         })
         btnSkill.addEventListener('touchcancel', (e) => {
-          keys['k'] = false
+          keys['l'] = false
           btnSkill.classList.remove('pressed')
         })
       }
       createTouchControls()
+
+      // 开始提示事件
+      const startHint = document.getElementById('startHint')
+      if (startHint) {
+        startHint.addEventListener('click', function () {
+          this.style.opacity = '0'
+          this.style.transition = 'opacity 0.3s'
+          setTimeout(() => (this.style.display = 'none'), 300)
+        })
+        startHint.addEventListener('touchstart', function (e) {
+          e.preventDefault()
+          this.style.opacity = '0'
+          this.style.transition = 'opacity 0.3s'
+          setTimeout(() => (this.style.display = 'none'), 300)
+        })
+      }
 
       // 技能UI
       function createSkillUI() {
@@ -1228,8 +1286,6 @@
         btns.forEach((btn, i) => {
           btn.classList.toggle('active', i === player.currentSkill)
         })
-        document.getElementById('currentSkill').textContent =
-          SKILLS[player.currentSkill].name
       }
       updateSkillUI()
 
@@ -3618,6 +3674,14 @@
 
       // 启动
       initLevel(1)
+      // 确保canvas尺寸正确
+      resize()
+      // 立即绘制第一帧
+      ctx.clearRect(0, 0, W, H)
+      drawBackground()
+      drawGround()
+      drawPlatforms()
+      drawPlayer()
       gameLoop(0)
     </script>
   </body>
